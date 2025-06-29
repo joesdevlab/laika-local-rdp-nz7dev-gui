@@ -1,0 +1,17 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=NZ7DEV Mission Control
+Comment=Professional Development Environment Manager
+GenericName=RDP Fleet Manager
+Icon=preferences-desktop-display
+Exec=/usr/bin/xdg-open http://localhost:5000
+Categories=Development;Network;System;
+Keywords=rdp;remote;desktop;vm;development;hyprland;
+StartupNotify=true
+Terminal=false
+MimeType=x-scheme-handler/http;
+
+# Custom fields
+X-GNOME-SingleWindow=true
+X-Ubuntu-Touch=true 

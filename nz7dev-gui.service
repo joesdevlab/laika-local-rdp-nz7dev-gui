@@ -1,0 +1,40 @@
+[Unit]
+Description=NZ7DEV Mission Control GUI
+Documentation=file:///README.md
+After=network.target graphical-session.target
+Wants=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
+ExecStartPre=/bin/bash -c 'cd /mnt/WD/dev/laika-local-rdp-nz7dev-gui && chmod +x nz7dev'
+ExecStart=/bin/bash -c 'cd /mnt/WD/dev/laika-local-rdp-nz7dev-gui && source venv/bin/activate && exec python3 nz7dev_gui.py'
+Restart=always
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+# Security settings (relaxed for development environment)
+NoNewPrivileges=true
+PrivateTmp=false
+ProtectSystem=false
+ProtectHome=false
+
+# Environment
+Environment=PYTHONPATH=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
+Environment=FLASK_ENV=production
+Environment=DISPLAY=:0
+Environment=HOME=%h
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nz7dev-gui
+
+[Install]
+WantedBy=default.target 

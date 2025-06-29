@@ -1,0 +1,1915 @@
+#!/usr/bin/env bash
+# ═══════════════════════════════════════════════════════════════════════════════════
+# 🚀 NZ7DEV ENTERPRISE MISSION CONTROL CENTER
+# ═══════════════════════════════════════════════════════════════════════════════════
+# Professional Development Environment Automation
+# Built by a 20+ year Linux automation specialist
+# NASA Mission Control themed enterprise-grade automation system
+# Zero-tolerance for hanging processes, maximum reliability
+# ═══════════════════════════════════════════════════════════════════════════════════
+#
+# 🎮 OPTIONAL KEYBOARD SHORTCUTS FOR HYPRLAND
+# ═══════════════════════════════════════════════════════════════════════════════════
+# Add these lines to your ~/.config/hypr/hyprland.conf for quick access:
+#
+# # NZ7DEV Mission Control Shortcuts
+# bind = SUPER, Prior, exec, /path/to/nz7dev morning        # Page Up = Morning Routine
+# bind = SUPER, Next, exec, /path/to/nz7dev down           # Page Down = Shutdown
+# bind = SUPER SHIFT, Prior, exec, /path/to/nz7dev fastup  # Shift+Page Up = LUDICROUS SPEED
+# bind = SUPER SHIFT, Next, exec, /path/to/nz7dev status   # Shift+Page Down = Status
+# bind = SUPER CTRL, Prior, exec, /path/to/nz7dev fleet    # Ctrl+Page Up = Fleet Status
+#
+# Alternative shortcuts:
+# bind = SUPER, F9, exec, /path/to/nz7dev morning          # F9 = Morning Routine  
+# bind = SUPER, F10, exec, /path/to/nz7dev down            # F10 = Shutdown
+# bind = SUPER, F11, exec, /path/to/nz7dev fastup          # F11 = LUDICROUS SPEED
+# bind = SUPER, F12, exec, /path/to/nz7dev status          # F12 = Status
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+set -euo pipefail
+IFS=$'\n\t'
+
+#==============================================================================
+# 🎯 MISSION CONTROL CONFIGURATION
+#==============================================================================
+
+readonly SCRIPT_NAME="nz7dev"
+readonly SCRIPT_VERSION="3.4.0-ENTERPRISE"
+readonly MISSION_CONTROL_ID="HOUSTON-$(date +%Y%m%d-%H%M%S)-$$"
+readonly BUILD_DATE="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+readonly MISSION_COMMANDER="${USER:-unknown}"
+
+# Mission Control File System
+readonly MISSION_BASE_DIR="$HOME/.nz7dev"
+readonly MISSION_CONFIG_DIR="$MISSION_BASE_DIR/config"
+readonly MISSION_LOG_DIR="$MISSION_BASE_DIR/logs"
+readonly MISSION_STATE_DIR="$MISSION_BASE_DIR/state"
+readonly MISSION_CACHE_DIR="$MISSION_BASE_DIR/cache"
+readonly MISSION_SECRETS_DIR="$MISSION_BASE_DIR/secrets"
+
+# Mission Control Runtime
+readonly PID_FILE="$MISSION_STATE_DIR/${SCRIPT_NAME}.pid"
+readonly LOCK_FILE="$MISSION_STATE_DIR/${SCRIPT_NAME}.lock"
+readonly MISSION_LOG="$MISSION_LOG_DIR/mission_control.log"
+readonly TELEMETRY_LOG="$MISSION_LOG_DIR/telemetry.log"
+readonly SECURITY_LOG="$MISSION_LOG_DIR/security.log"
+
+# Mission Timeouts (seconds) - Enterprise grade with aggressive failsafes
+readonly PING_TIMEOUT=3
+readonly RDP_START_TIMEOUT=10
+readonly WINDOW_POSITION_TIMEOUT=5
+readonly AUDIO_RETRY_TIMEOUT=8
+readonly CONFIGURATION_LOAD_TIMEOUT=5
+readonly MISSION_ABORT_TIMEOUT=30
+readonly EMERGENCY_SHUTDOWN_TIMEOUT=15
+
+# Window Positioning Configuration
+readonly WAYBAR_OFFSET_PX=35  # Pixels to move windows down below waybar
+
+# Local System Configuration (local machine only - not for production!)
+readonly LOCAL_SUDO_PASSWORD="lemonlime"
+
+# Mission Control Status Codes
+readonly MISSION_SUCCESS=0
+readonly MISSION_ABORT_USER=1
+readonly MISSION_ABORT_CONFIG=2
+readonly MISSION_ABORT_SECURITY=3
+readonly MISSION_ABORT_SYSTEM=4
+readonly MISSION_ABORT_NETWORK=5
+readonly MISSION_ABORT_CRITICAL=99
+
+#==============================================================================
+# 🎨 NASA MISSION CONTROL VISUAL SYSTEM
+#==============================================================================
+
+# Mission Control Colors - Professional grade with accessibility
+readonly MC_RED='\033[0;31m'        # Critical alerts
+readonly MC_GREEN='\033[0;32m'      # Nominal operations
+readonly MC_YELLOW='\033[1;33m'     # Caution/warnings
+readonly MC_BLUE='\033[0;34m'       # Information
+readonly MC_PURPLE='\033[0;35m'     # Debug/telemetry
+readonly MC_CYAN='\033[0;36m'       # Step/process
+readonly MC_WHITE='\033[1;37m'      # Flight director
+readonly MC_GRAY='\033[0;37m'       # Timestamps
+readonly MC_BOLD='\033[1m'          # Emphasis
+readonly MC_NC='\033[0m'            # Reset
+
+# Mission Control ASCII Art
+readonly MC_BANNER="
+╔═══════════════════════════════════════════════════════════════════════════════════╗
+║  🚀 NASA NZ7DEV ENTERPRISE MISSION CONTROL CENTER 🚀                              ║
+║                                                                                   ║
+║  ███╗   ██╗███████╗███████╗██████╗ ███████╗██╗   ██╗                              ║
+║  ████╗  ██║╚══███╔╝╚════██║██╔══██╗██╔════╝██║   ██║                              ║
+║  ██╔██╗ ██║  ███╔╝     ██╔╝██║  ██║█████╗  ██║   ██║                              ║
+║  ██║╚██╗██║ ███╔╝     ██╔╝ ██║  ██║██╔══╝  ╚██╗ ██╔╝                              ║
+║  ██║ ╚████║███████╗   ██║  ██████╔╝███████╗ ╚████╔╝                               ║
+║  ╚═╝  ╚═══╝╚══════╝   ╚═╝  ╚═════╝ ╚══════╝  ╚═══╝                                ║
+║                                                                                   ║
+║                    Professional Development Environment Manager                   ║
+║                              Version $SCRIPT_VERSION                             ║
+╚═══════════════════════════════════════════════════════════════════════════════════╝
+"
+
+#==============================================================================
+# 🌐 MISSION CONTROL GLOBAL STATE
+#==============================================================================
+
+# Mission Status Tracking
+MISSION_STATUS="PRE_FLIGHT"
+MISSION_START_TIME=""
+MISSION_PHASE=""
+MISSION_SUCCESS_COUNT=0
+MISSION_ERROR_COUNT=0
+MISSION_WARNING_COUNT=0
+LAST_MISSION_ID=""
+
+# Configuration State
+CONFIG_LOADED=false
+CONFIG_VALIDATED=false
+SECRETS_LOADED=false
+
+# System State
+DEPENDENCIES_CHECKED=false
+SECURITY_VALIDATED=false
+SYSTEM_READY=false
+
+#==============================================================================
+# 📡 MISSION CONTROL TELEMETRY & LOGGING SYSTEM
+#==============================================================================
+
+# Mission Control Logging Framework
+mission_log() {
+    local level=$1
+    local station=$2  
+    local color=$3
+    shift 3
+    local message="$*"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S UTC')
+    local correlation_id="${MISSION_CONTROL_ID}"
+    
+    # Console output with color
+    echo -e "${color}[${station}]${MC_NC} ${MC_GRAY}${timestamp}${MC_NC} ${message}" >&2
+    
+    # Structured log output to file
+    if [[ -d "$MISSION_LOG_DIR" ]]; then
+        printf '{"timestamp":"%s","level":"%s","station":"%s","mission_id":"%s","message":"%s"}\n' \
+            "$timestamp" "$level" "$station" "$correlation_id" "$message" >> "$MISSION_LOG"
+    fi
+}
+
+# Mission Control Communication Stations
+flight_director() { mission_log "INFO" "FLIGHT" "$MC_WHITE" "$@"; }
+capcom() { mission_log "INFO" "CAPCOM" "$MC_GREEN" "$@"; }
+houston() { mission_log "INFO" "HOUSTON" "$MC_BLUE" "$@"; }
+telemetry() { mission_log "DEBUG" "TELEM" "$MC_PURPLE" "$@"; }
+ground_control() { mission_log "INFO" "GROUND" "$MC_CYAN" "$@"; }
+mission_warning() { mission_log "WARN" "CAUTION" "$MC_YELLOW" "$@"; ((MISSION_WARNING_COUNT++)); }
+mission_error() { mission_log "ERROR" "ALERT" "$MC_RED" "$@"; ((MISSION_ERROR_COUNT++)); }
+mission_critical() { mission_log "CRITICAL" "ABORT" "$MC_RED" "$@"; ((MISSION_ERROR_COUNT++)); }
+mission_success() { mission_log "INFO" "SUCCESS" "$MC_GREEN" "$@"; ((MISSION_SUCCESS_COUNT++)); }
+
+# Security Logging (separate audit trail)
+security_log() {
+    local event_type=$1
+    local details=$2
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S UTC')
+    
+    if [[ -d "$MISSION_LOG_DIR" ]]; then
+        printf '{"timestamp":"%s","event_type":"%s","user":"%s","mission_id":"%s","details":"%s"}\n' \
+            "$timestamp" "$event_type" "$MISSION_COMMANDER" "$MISSION_CONTROL_ID" "$details" >> "$SECURITY_LOG"
+    fi
+}
+
+#==============================================================================
+# 🔧 MISSION CONTROL UTILITY FUNCTIONS  
+#==============================================================================
+
+# Mission Control Directory Initialization
+init_mission_control() {
+    local dirs=(
+        "$MISSION_BASE_DIR"
+        "$MISSION_CONFIG_DIR" 
+        "$MISSION_LOG_DIR"
+        "$MISSION_STATE_DIR"
+        "$MISSION_CACHE_DIR"
+        "$MISSION_SECRETS_DIR"
+    )
+    
+    for dir in "${dirs[@]}"; do
+        if [[ ! -d "$dir" ]]; then
+            mkdir -p "$dir" || {
+                mission_critical "Failed to create mission directory: $dir"
+                return $MISSION_ABORT_SYSTEM
+            }
+            # Secure permissions
+            chmod 750 "$dir"
+            telemetry "Created mission directory: $dir"
+        fi
+    done
+    
+    # Secure secrets directory
+    chmod 700 "$MISSION_SECRETS_DIR"
+    
+    ground_control "Mission Control directories initialized"
+    return $MISSION_SUCCESS
+}
+
+# Enhanced Process Management
+is_mission_running() {
+    [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
+}
+
+create_mission_lock() {
+    if [[ -f "$LOCK_FILE" ]]; then
+        local lock_pid
+        lock_pid=$(cat "$LOCK_FILE" 2>/dev/null)
+        if [[ -n "$lock_pid" ]] && kill -0 "$lock_pid" 2>/dev/null; then
+            mission_error "🚫 Mission already in progress! (PID: $lock_pid)"
+            return $MISSION_ABORT_USER
+        else
+            mission_warning "🧹 Cleaning up stale mission data..."
+            rm -f "$LOCK_FILE"
+        fi
+    fi
+    
+    echo $$ > "$PID_FILE"
+    echo $$ > "$LOCK_FILE"
+    telemetry "🔒 Mission control acquired"
+    return $MISSION_SUCCESS
+}
+
+# Comprehensive Cleanup System
+mission_cleanup() {
+    local exit_code=$?
+    telemetry "🧹 Mission cleanup initiated"
+    
+    # Stop any background processes
+    local bg_jobs
+    bg_jobs=$(jobs -p)
+    if [[ -n "$bg_jobs" ]]; then
+        telemetry "🔫 Terminating background processes"
+        echo "$bg_jobs" | xargs -r kill 2>/dev/null || true
+        sleep 2
+        echo "$bg_jobs" | xargs -r kill -9 2>/dev/null || true
+    fi
+    
+    # Remove lock files
+    [[ -f "$PID_FILE" ]] && rm -f "$PID_FILE"
+    [[ -f "$LOCK_FILE" ]] && rm -f "$LOCK_FILE"
+    
+    # Final mission report
+    if [[ $exit_code -eq $MISSION_SUCCESS ]]; then
+        mission_success "🎉 Mission accomplished! Welcome home! 🌍"
+    else
+        mission_error "⚠️ Mission ended with issues (code: $exit_code)"
+        houston "🛠️ Check logs for details"
+    fi
+    
+    exit $exit_code
+}
+
+# Signal Handlers
+handle_mission_abort() {
+    mission_warning "🚨 ABORT ABORT ABORT!"
+    MISSION_STATUS="ABORTING"
+    flight_director "💥 Emergency procedures activated!"
+    mission_cleanup
+}
+
+handle_mission_terminate() {
+    mission_warning "🛑 Mission termination requested"
+    MISSION_STATUS="TERMINATING"  
+    flight_director "👋 Graceful shutdown initiated..."
+    mission_cleanup
+}
+
+#==============================================================================
+# 🔒 MISSION CONTROL SECURITY FRAMEWORK
+#==============================================================================
+
+# Input Validation Framework
+validate_input() {
+    local input_type=$1
+    local input_value=$2
+    local validation_rule="${3:-}"
+    
+    security_log "INPUT_VALIDATION" "type:$input_type rule:$validation_rule"
+    
+    case "$input_type" in
+        "ip_address")
+            if [[ ! "$input_value" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+                mission_error "Invalid IP address format: $input_value"
+                return $MISSION_ABORT_SECURITY
+            fi
+            ;;
+        "hostname")
+            if [[ ! "$input_value" =~ ^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$ ]]; then
+                mission_error "Invalid hostname format: $input_value"
+                return $MISSION_ABORT_SECURITY
+            fi
+            ;;
+        "port")
+            if [[ ! "$input_value" =~ ^[0-9]+$ ]] || [[ "$input_value" -lt 1 ]] || [[ "$input_value" -gt 65535 ]]; then
+                mission_error "Invalid port number: $input_value"
+                return $MISSION_ABORT_SECURITY
+            fi
+            ;;
+        "command")
+            # Check for dangerous characters
+            if [[ "$input_value" =~ [\;\&\|\`\$\(\)] ]]; then
+                mission_error "Potentially dangerous command detected"
+                security_log "SECURITY_VIOLATION" "dangerous_command:$input_value"
+                return $MISSION_ABORT_SECURITY
+            fi
+            ;;
+    esac
+    
+    telemetry "Input validation passed: $input_type"
+    return $MISSION_SUCCESS
+}
+
+# System Security Check
+security_pre_flight_check() {
+    ground_control "Initiating security pre-flight check..."
+    
+    # Check if running as root (security violation)
+    if [[ $EUID -eq 0 ]]; then
+        mission_critical "🚨 SECURITY VIOLATION: Running as root is prohibited!"
+        security_log "SECURITY_VIOLATION" "root_execution_attempt"
+        return $MISSION_ABORT_SECURITY
+    fi
+    
+    # Check file permissions
+    if [[ -d "$MISSION_SECRETS_DIR" ]]; then
+        local perms
+        perms=$(stat -c %a "$MISSION_SECRETS_DIR" 2>/dev/null)
+        if [[ "$perms" != "700" ]]; then
+            mission_warning "Fixing secrets directory permissions..."
+            chmod 700 "$MISSION_SECRETS_DIR" || {
+                mission_error "Failed to secure secrets directory"
+                return $MISSION_ABORT_SECURITY
+            }
+        fi
+    fi
+    
+    # Validate PATH security
+    if [[ "$PATH" =~ ^.*:\.:.* ]] || [[ "$PATH" =~ ^\.:.* ]] || [[ "$PATH" =~ .*:\.:$ ]]; then
+        mission_warning "Potentially insecure PATH detected"
+        security_log "SECURITY_WARNING" "insecure_path:$PATH"
+    fi
+    
+    SECURITY_VALIDATED=true
+    mission_success "✅ Security pre-flight check completed"
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# ⚙️ MISSION CONTROL DEPENDENCY FRAMEWORK
+#==============================================================================
+
+# Comprehensive Dependency Checking
+check_mission_dependencies() {
+    ground_control "🔧 Checking system dependencies..."
+    
+    local critical_deps=(
+        "systemctl:systemd:Mission process management"
+        "xfreerdp:freerdp:Remote desktop connections"  
+        "hyprctl:hyprland:Window management system"
+        "pactl:pulseaudio:Audio system control"
+        "notify-send:libnotify:Desktop notifications"
+    )
+    
+    local optional_deps=(
+        "google-chrome:google-chrome:Web dashboard access"
+        "chromium:chromium:Alternative browser"
+        "firefox:firefox:Fallback browser"
+        "usbreset:usbutils:USB device reset capability"
+    )
+    
+    local missing_critical=()
+    local missing_optional=()
+    
+    # Check critical dependencies
+    for dep_spec in "${critical_deps[@]}"; do
+        IFS=':' read -r cmd package description <<< "$dep_spec"
+        if ! command -v "$cmd" &>/dev/null; then
+            missing_critical+=("$package ($description)")
+            mission_error "❌ Missing: $cmd"
+        fi
+    done
+    
+    # Check optional dependencies  
+    for dep_spec in "${optional_deps[@]}"; do
+        IFS=':' read -r cmd package description <<< "$dep_spec"
+        if ! command -v "$cmd" &>/dev/null; then
+            missing_optional+=("$package ($description)")
+        fi
+    done
+    
+    # Report results
+    if [[ ${#missing_critical[@]} -gt 0 ]]; then
+        mission_critical "🚨 MISSION ABORT: Critical dependencies missing!"
+        houston "Install missing dependencies with:"
+        houston "  sudo pacman -S ${missing_critical[*]// */}"
+        return $MISSION_ABORT_SYSTEM
+    fi
+    
+    if [[ ${#missing_optional[@]} -gt 0 ]]; then
+        mission_warning "⚠️ Optional features missing: ${#missing_optional[@]} packages"
+        houston "Install with: sudo pacman -S ${missing_optional[*]// */}"
+    fi
+    
+    DEPENDENCIES_CHECKED=true
+    mission_success "✅ All critical systems ready"
+    
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 📋 MISSION CONTROL CONFIGURATION FRAMEWORK  
+#==============================================================================
+
+# Default Mission Configuration
+create_default_config() {
+    local config_file="$MISSION_CONFIG_DIR/mission.yaml"
+    
+    if [[ -f "$config_file" ]]; then
+        telemetry "Configuration already exists: $config_file"
+        return $MISSION_SUCCESS
+    fi
+    
+    ground_control "Creating default mission configuration..."
+    
+    cat > "$config_file" << 'EOF'
+# NZ7DEV Enterprise Mission Control Configuration
+# NASA-themed development environment automation
+mission_control:
+  callsign: "HOUSTON"
+  commander: "auto"
+  log_level: "INFO"
+  timeout_policy: "AGGRESSIVE"
+  max_retry_attempts: 3
+  
+# Development Fleet Configuration
+development_fleet:
+  vm20:
+    callsign: "ALPHA"
+    ip_address: "192.168.1.20"
+    connection_type: "rdp"
+    credentials: "nz7dev:lemonlime"
+    display_geometry: "957x1042"
+    workspace: 4
+    position: "left" 
+    scratchpad: false
+    auto_connect: true
+    
+  vm21:
+    callsign: "BRAVO"
+    ip_address: "192.168.1.21"
+    connection_type: "rdp"
+    credentials: "nz7dev:lemonlime"
+    display_geometry: "1717x1402"
+    workspace: 2
+    position: "left"
+    scratchpad: true
+    auto_connect: true
+    
+  vm23:
+    callsign: "CHARLIE"
+    ip_address: "192.168.1.23"
+    connection_type: "rdp"
+    credentials: "User:lemonlime"
+    display_geometry: "1915x1042"
+    workspace: 1
+    position: "center"
+    scratchpad: false
+    auto_connect: true
+    
+  vm24:
+    callsign: "DELTA"
+    ip_address: "192.168.1.24"
+    connection_type: "rdp"
+    credentials: "nz7dev:lemonlime"
+    display_geometry: "957x1042"
+    workspace: 4
+    position: "right"
+    scratchpad: false
+    auto_connect: true
+    
+  vm25:
+    callsign: "ECHO"
+    ip_address: "192.168.1.25"
+    connection_type: "rdp"
+    credentials: "User:lemonlime"
+    display_geometry: "1717x1402"
+    workspace: 2
+    position: "right" 
+    scratchpad: true
+    auto_connect: true
+    
+  vm26:
+    callsign: "FOXTROT"
+    ip_address: "192.168.1.26"
+    connection_type: "rdp"
+    credentials: "User:lemonlime"
+    display_geometry: "1915x1042"
+    workspace: 3
+    position: "center"
+    scratchpad: false
+    auto_connect: true
+
+# Audio Mission Systems
+audio_systems:
+  primary_device: "razer_barracuda_x"
+  usb_id: "1532:0552"
+  default_volume: 80
+  reset_on_startup: true
+  fallback_enabled: true
+  
+# Dashboard Mission Control
+dashboard_integration:
+  grafana:
+    url: "http://192.168.1.10:9080/"
+    auto_open: true
+    workspace: 1
+    
+  prometheus:
+    url: "http://192.168.1.10:9090/graph"
+    auto_open: true
+    workspace: 1
+    
+  browser_preference:
+    - "google-chrome"
+    - "chromium" 
+    - "firefox"
+
+# Mission Timeouts (seconds)
+timeouts:
+  ping_timeout: 3
+  connection_timeout: 10
+  window_positioning: 20
+  audio_setup: 8
+  mission_abort: 30
+  
+# Security Configuration
+security:
+  validate_inputs: true
+  audit_logging: true
+  require_encryption: false
+  max_failed_attempts: 3
+EOF
+
+    mission_success "✅ Default configuration created: $config_file"
+    return $MISSION_SUCCESS
+}
+
+# YAML Configuration Parser (Pure Bash)
+parse_yaml_config() {
+    local config_file="$1"
+    local prefix="${2:-CONFIG}"
+    
+    if [[ ! -f "$config_file" ]]; then
+        mission_error "Configuration file not found: $config_file"
+        return $MISSION_ABORT_CONFIG
+    fi
+    
+    ground_control "📋 Loading mission configuration..."
+    
+    # Simple YAML parser for our specific format
+    while IFS= read -r line; do
+        # Skip comments and empty lines
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+        
+        # Handle key-value pairs
+        if [[ "$line" =~ ^[[:space:]]*([^:]+):[[:space:]]*(.*)$ ]]; then
+            local key="${BASH_REMATCH[1]// /}"
+            local value="${BASH_REMATCH[2]}"
+            
+            # Remove quotes from value
+            value="${value//\"/}"
+            value="${value//\'/}"
+            
+            # Create environment variable
+            declare -g "${prefix}_${key^^}"="$value"
+        fi
+    done < "$config_file"
+    
+    CONFIG_LOADED=true
+    mission_success "✅ Configuration loaded successfully"
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 🔊 MISSION CONTROL AUDIO SYSTEMS
+#==============================================================================
+
+# Network connectivity test with timeout (completely isolated)
+test_target_connectivity() {
+    local ip=$1
+    local timeout=${2:-$PING_TIMEOUT}
+    
+    # Use a completely isolated subshell to prevent any interference
+    (
+        set +e  # Disable exit on error for this subshell
+        timeout "$timeout" ping -c 1 -W 1 "$ip" >/dev/null 2>&1
+        exit $?
+    )
+    return $?
+}
+
+# Razer Audio Device Reset System
+reset_razer_audio_device() {
+    capcom "🔊 Initiating Razer Barracuda X audio device reset sequence..."
+    
+    local razer_usb_id="${CONFIG_USB_ID:-1532:0552}"
+    
+    # Locate USB device
+    local device_info
+    device_info=$(lsusb | grep "$razer_usb_id" | head -n1) || {
+        mission_warning "Razer Barracuda X not detected in USB devices"
+        return $MISSION_ABORT_SYSTEM
+    }
+    
+    telemetry "Audio device located: $device_info"
+    
+    # USB device reset procedure
+    if command -v usbreset &>/dev/null; then
+        telemetry "Executing USB reset via usbreset utility..."
+        echo "$LOCAL_SUDO_PASSWORD" | sudo -S usbreset "$razer_usb_id" &>/dev/null || {
+            mission_warning "USB reset command failed, attempting alternative method"
+        }
+    fi
+    
+    # Device stabilization wait
+    ground_control "Waiting for audio device stabilization..."
+    sleep 3
+    
+    # Audio device verification
+    local retry_count=0
+    local max_retries=3
+    
+    while [[ $retry_count -lt $max_retries ]]; do
+        if pactl list short sinks | grep -qi razer; then
+            mission_success "✅ Razer audio device operational"
+            return $MISSION_SUCCESS
+        fi
+        ((retry_count++))
+        telemetry "Audio device verification attempt $retry_count/$max_retries"
+        sleep 2
+    done
+    
+    mission_warning "Audio device reset completed but verification failed"
+    return $MISSION_SUCCESS
+}
+
+# Audio Mission Systems Setup
+setup_audio_systems() {
+    capcom "🔊 Initiating audio mission systems setup..."
+    
+    local default_volume="${CONFIG_DEFAULT_VOLUME:-80}"
+    
+    # Device reset if configured
+    if [[ "${CONFIG_RESET_ON_STARTUP:-true}" == "true" ]]; then
+        reset_razer_audio_device || {
+            if [[ "${CONFIG_FALLBACK_ENABLED:-true}" == "true" ]]; then
+                mission_warning "Continuing with system default audio..."
+            else
+                return $MISSION_ABORT_SYSTEM
+            fi
+        }
+    fi
+    
+    # Configure audio sink
+    local audio_sink
+    audio_sink=$(pactl list short sinks | grep -i razer | awk '{print $2}' | head -n1)
+    
+    if [[ -n "$audio_sink" ]]; then
+        pactl set-default-sink "$audio_sink" || mission_warning "Failed to set default audio sink"
+        pactl set-sink-volume "$audio_sink" "${default_volume}%" || mission_warning "Failed to set audio volume"
+        mission_success "✅ Audio configured: $audio_sink at ${default_volume}%"
+    else
+        mission_warning "Razer audio sink not available, using system default"
+    fi
+    
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 🚀 CONNECTION MANAGEMENT SYSTEM
+#==============================================================================
+
+# RDP Connection Establishment
+establish_rdp_connection() {
+    local target_name=$1
+    local target_ip=$2
+    local credentials=$3
+    local geometry=$4
+    local callsign=$5
+    
+    capcom "🚀 Establishing RDP connection to $callsign ($target_ip)..."
+    
+    # Input validation
+    validate_input "ip_address" "$target_ip" || return $?
+    
+    # Connectivity pre-check
+    if ! test_target_connectivity "$target_ip"; then
+        mission_warning "⚠️ $callsign ($target_ip) is unreachable - skipping"
+        return $MISSION_ABORT_NETWORK
+    fi
+    
+    # Parse credentials
+    IFS=':' read -r username password <<< "$credentials"
+    
+    # Build RDP command array
+    local rdp_command=(
+        /usr/bin/xfreerdp
+        "/u:$username"
+        "/p:$password"
+        "/v:$target_ip"
+        "/sec:nla"
+        "/size:$geometry"
+        "/gfx:AVC444"
+        "/auto-reconnect"
+        "+fonts"
+        "+clipboard"
+        "+heartbeat"
+        "/cert:ignore"
+        "/log-level:WARN"
+        "/network:auto"
+    )
+    
+    # Launch with systemd for enterprise process management
+    local service_unit="nz7dev-${target_name}.service"
+    local connection_log="$MISSION_LOG_DIR/${target_name}_connection.log"
+    
+    systemd-run --user \
+        --unit="$service_unit" \
+        --collect \
+        --property="Restart=always" \
+        --property="RestartSec=5" \
+        --property="StartLimitBurst=3" \
+        --property="StartLimitIntervalSec=300" \
+        "${rdp_command[@]}" &>>"$connection_log" &
+    
+    local launch_pid=$!
+    telemetry "RDP service launched: $service_unit (PID: $launch_pid)"
+    
+    # Record connection state for window positioning
+    echo "$target_name:$target_ip:$callsign" >> "$MISSION_STATE_DIR/active_connections"
+    
+    mission_success "✅ RDP connection established to $callsign"
+    return $MISSION_SUCCESS
+}
+
+# Launch All Development Fleet Connections
+launch_development_fleet() {
+    capcom "🚀 Initiating development fleet launch sequence..."
+    
+    # Clear previous connection state
+    > "$MISSION_STATE_DIR/active_connections"
+    
+    # Fleet configuration
+    local fleet_targets=(
+        "vm20:192.168.1.20:nz7dev:lemonlime:957x1042:ALPHA"
+        "vm21:192.168.1.21:nz7dev:lemonlime:1717x1402:BRAVO"
+        "vm23:192.168.1.23:User:lemonlime:1915x1042:CHARLIE"
+        "vm24:192.168.1.24:nz7dev:lemonlime:957x1042:DELTA"
+        "vm25:192.168.1.25:User:lemonlime:1717x1402:ECHO"
+        "vm26:192.168.1.26:User:lemonlime:1915x1042:FOXTROT"
+    )
+    
+    local success_count=0
+    local total_targets=${#fleet_targets[@]}
+    
+    for target_spec in "${fleet_targets[@]}"; do
+        IFS=':' read -r name ip username password geometry callsign <<< "$target_spec"
+        local credentials="$username:$password"
+        
+        if establish_rdp_connection "$name" "$ip" "$credentials" "$geometry" "$callsign"; then
+            ((success_count++))
+        fi
+        
+        # Prevent system overload
+        sleep 1
+    done
+    
+    # Mission summary
+    local success_rate=$((success_count * 100 / total_targets))
+    houston "🚀 Fleet launch summary: $success_count/$total_targets targets deployed ($success_rate%)"
+    
+    if [[ $success_count -eq 0 ]]; then
+        mission_critical "🚨 MISSION ABORT: No fleet connections established!"
+        return $MISSION_ABORT_NETWORK
+    fi
+    
+    mission_success "✅ Development fleet deployment successful"
+    return $MISSION_SUCCESS
+}
+
+# Emergency Connection Abort
+abort_all_connections() {
+    capcom "🚨 Initiating emergency connection abort sequence..."
+    
+    # Stop systemd services
+    local active_services
+    active_services=$(systemctl --user list-units --no-legend 'nz7dev-*.service' 2>/dev/null | awk '{print $1}')
+    
+    if [[ -n "$active_services" ]]; then
+        telemetry "Terminating systemd services: $active_services"
+        echo "$active_services" | xargs -r systemctl --user stop
+        sleep 2
+    fi
+    
+    # Force terminate remaining RDP processes
+    if pgrep -f "xfreerdp.*192\.168\.1\." &>/dev/null; then
+        telemetry "Force terminating remaining RDP processes..."
+        pkill -f "xfreerdp.*192\.168\.1\." || true
+        sleep 2
+        pkill -9 -f "xfreerdp.*192\.168\.1\." || true
+    fi
+    
+    # Clean up connection state
+    [[ -f "$MISSION_STATE_DIR/active_connections" ]] && rm -f "$MISSION_STATE_DIR/active_connections"
+    
+    mission_success "✅ All connections safely aborted"
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 🪟 WINDOW POSITIONING SYSTEM (NASA STYLE)
+#==============================================================================
+
+# Ultra-Fast Window Positioning (LUDICROUS SPEED MODE)
+position_mission_windows_fast() {
+    # Temporarily disable strict error handling for this function
+    local old_set_state=$-
+    set +e
+    
+    capcom "🏎️ INITIATING LUDICROUS SPEED WINDOW POSITIONING!"
+    flight_director "⚡ REDUCED SAFETY! MAXIMUM VELOCITY! ⚡"
+    
+    # Window spawn countdown with visual feedback
+    echo -e "${MC_RED}[LUDICROUS]${MC_NC} 🏎️💨 Waiting for windows to spawn..."
+    local countdown=10
+    while [[ $countdown -gt 0 ]]; do
+        if [[ $countdown -le 3 ]]; then
+            echo -ne "\r${MC_RED}[LUDICROUS]${MC_NC} T-${countdown}s until WARP SPEED... 🏎️💨"
+            # Desktop notification for final countdown
+            if command -v notify-send &>/dev/null; then
+                notify-send "🏎️ WARP SPEED!" "T-${countdown}s until LUDICROUS positioning!" -i preferences-desktop-display -t 1000
+            fi
+        elif [[ $countdown -le 5 ]]; then
+            echo -ne "\r${MC_YELLOW}[LUDICROUS]${MC_NC} T-${countdown}s until WARP SPEED... 🏎️💨"
+        else
+            echo -ne "\r${MC_CYAN}[LUDICROUS]${MC_NC} T-${countdown}s until WARP SPEED... 🏎️💨"
+        fi
+        sleep 1
+        ((countdown--))
+    done
+    echo -e "\r${MC_RED}[LUDICROUS]${MC_NC} 🏎️💨 ENGAGING WARP SPEED! 🏎️💨        "
+    
+    # Desktop notification for WARP SPEED engagement
+    if command -v notify-send &>/dev/null; then
+        notify-send "⚡ WARP SPEED ENGAGED!" "LUDICROUS positioning in progress!" -i preferences-desktop-display -t 2000
+    fi
+    
+    # Check for active connections
+    if [[ ! -f "$MISSION_STATE_DIR/active_connections" ]]; then
+        mission_warning "No active connections found for window positioning"
+        # Restore original set state before returning
+        [[ "$old_set_state" =~ e ]] && set -e
+        return $MISSION_SUCCESS
+    fi
+    
+    # Window positioning configuration (same order)
+    local positioning_targets=(
+        "vm20:192.168.1.20:ALPHA:4:left:false"
+        "vm24:192.168.1.24:DELTA:4:right:false"
+        "vm21:192.168.1.21:BRAVO:2:left:true"
+        "vm25:192.168.1.25:ECHO:2:right:true"
+        "vm23:192.168.1.23:CHARLIE:1:center:false"
+        "vm26:192.168.1.26:FOXTROT:3:center:false"
+    )
+    
+    local positioned_count=0
+    
+    for target_spec in "${positioning_targets[@]}"; do
+        IFS=':' read -r name ip callsign workspace position scratchpad <<< "$target_spec"
+        
+        local window_title="FreeRDP: $ip"
+        
+        # Quick window existence check
+        if ! hyprctl clients 2>/dev/null | grep -q "title: $window_title" 2>/dev/null; then
+            echo -e "${MC_YELLOW}⚠️ $callsign ($ip) - Window not found (skipping)${MC_NC}"
+            continue
+        fi
+        
+        # Focus window quickly
+        if ! hyprctl dispatch focuswindow "title:$window_title" 2>/dev/null; then
+            echo -e "${MC_YELLOW}⚠️ $callsign ($ip) - Failed to focus window${MC_NC}"
+            continue
+        fi
+        
+        # Fast positioning with minimal delay
+        local positioning_success=true
+        
+        if [[ "$scratchpad" == "true" ]]; then
+            if hyprctl dispatch movetoworkspace special 2>/dev/null; then
+                sleep 0.2  # Tiny delay for workspace change
+                case "$position" in
+                    center) 
+                        hyprctl dispatch centerwindow 2>/dev/null || true
+                        hyprctl dispatch fullscreen 1 2>/dev/null || true
+                        ;;
+                    left) 
+                        hyprctl dispatch movewindow l 2>/dev/null || true
+                        sleep 0.1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX 2>/dev/null || true
+                        ;;
+                    right) 
+                        hyprctl dispatch movewindow r 2>/dev/null || true
+                        sleep 0.1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX 2>/dev/null || true
+                        ;;
+                esac
+                echo -e "${MC_PURPLE}⚡ $callsign ($ip) → Scratchpad ($position) - FAST!${MC_NC}"
+            else
+                echo -e "${MC_YELLOW}⚠️ $callsign ($ip) - Failed to move to scratchpad${MC_NC}"
+                positioning_success=false
+            fi
+        else
+            if hyprctl dispatch movetoworkspace "$workspace" 2>/dev/null; then
+                sleep 0.2  # Tiny delay for workspace change
+                case "$position" in
+                    center) 
+                        hyprctl dispatch centerwindow 2>/dev/null || true
+                        hyprctl dispatch fullscreen 1 2>/dev/null || true
+                        ;;
+                    left) 
+                        hyprctl dispatch movewindow l 2>/dev/null || true
+                        sleep 0.1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX 2>/dev/null || true
+                        ;;
+                    right) 
+                        hyprctl dispatch movewindow r 2>/dev/null || true
+                        sleep 0.1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX 2>/dev/null || true
+                        ;;
+                esac
+                echo -e "${MC_PURPLE}⚡ $callsign ($ip) → Workspace $workspace ($position) - FAST!${MC_NC}"
+            else
+                echo -e "${MC_YELLOW}⚠️ $callsign ($ip) - Failed to move to workspace $workspace${MC_NC}"
+                positioning_success=false
+            fi
+        fi
+        
+        # Count successful positioning
+        if [[ "$positioning_success" == "true" ]]; then
+            ((positioned_count++)) || true
+        fi
+        
+        # Micro-delay for hyprland to process - still MUCH faster than normal!
+        sleep 0.5
+    done
+    
+    # Return to Mission Control workspace
+    hyprctl dispatch workspace 2 2>/dev/null || true
+    
+    # Restore original set state
+    if [[ $old_set_state =~ e ]]; then
+        set -e
+    fi
+    
+    mission_success "🏎️ LUDICROUS SPEED positioning complete: $positioned_count/6 windows positioned!"
+    capcom "💨 That was fast AND stable! Best of both worlds! ⚡"
+    
+    return $MISSION_SUCCESS
+}
+
+# Mission Control Window Positioning
+position_mission_windows() {
+    capcom "🪟 Initiating window positioning mission sequence..."
+    
+    # Window stabilization countdown
+    ground_control "T-minus ${WINDOW_POSITION_TIMEOUT} seconds to window positioning..."
+    local countdown=$WINDOW_POSITION_TIMEOUT
+    
+    while [[ $countdown -gt 0 ]]; do
+        if [[ $countdown -le 10 ]]; then
+            echo -ne "\r${MC_WHITE}[COUNTDOWN]${MC_NC} T-${countdown}s... "
+        else
+            echo -ne "\r${MC_CYAN}[COUNTDOWN]${MC_NC} T-${countdown}s... "
+        fi
+        sleep 1
+        ((countdown--))
+    done
+    echo -e "\r${MC_GREEN}[COUNTDOWN]${MC_NC} T-0! Window positioning GO! 🚀"
+    
+    # Check for active connections
+    if [[ ! -f "$MISSION_STATE_DIR/active_connections" ]]; then
+        mission_warning "No active connections found for window positioning"
+        return $MISSION_SUCCESS
+    fi
+    
+    # Window positioning configuration
+    local positioning_targets=(
+        "vm20:192.168.1.20:ALPHA:4:left:false"
+        "vm24:192.168.1.24:DELTA:4:right:false"
+        "vm21:192.168.1.21:BRAVO:2:left:true"
+        "vm25:192.168.1.25:ECHO:2:right:true"
+        "vm23:192.168.1.23:CHARLIE:1:center:false"
+        "vm26:192.168.1.26:FOXTROT:3:center:false"
+    )
+    
+    local positioned_count=0
+    
+    for target_spec in "${positioning_targets[@]}"; do
+        IFS=':' read -r name ip callsign workspace position scratchpad <<< "$target_spec"
+        
+        local window_title="FreeRDP: $ip"
+        
+        # Window existence verification
+        if ! hyprctl clients | grep -q "title: $window_title"; then
+            mission_warning "❌ $callsign ($ip) - Window not found"
+            continue
+        fi
+        
+        # Window focus acquisition
+        if ! hyprctl dispatch focuswindow "title:$window_title" &>/dev/null; then
+            echo -e "${MC_YELLOW}⚠️ $callsign ($ip) - Failed to focus window${MC_NC}"
+            continue
+        fi
+        
+        sleep 1
+        
+        # Scratchpad vs workspace positioning
+        if [[ "$scratchpad" == "true" ]]; then
+            hyprctl dispatch movetoworkspace special &>/dev/null && {
+                sleep 1
+                # Apply positioning within scratchpad
+                case "$position" in
+                    center)
+                        hyprctl dispatch centerwindow &>/dev/null || true
+                        hyprctl dispatch fullscreen 1 &>/dev/null || true
+                        ;;
+                    left)
+                        hyprctl dispatch movewindow l &>/dev/null || true
+                        # Move window down below waybar
+                        sleep 1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX &>/dev/null || true
+                        ;;
+                    right)
+                        hyprctl dispatch movewindow r &>/dev/null || true
+                        # Move window down below waybar
+                        sleep 1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX &>/dev/null || true
+                        ;;
+                esac
+                capcom "🗂️ $callsign ($ip) → Scratchpad ($position)"
+                ((positioned_count++))
+            } || mission_warning "❌ $callsign ($ip) - Scratchpad move failed"
+        else
+            hyprctl dispatch movetoworkspace "$workspace" &>/dev/null && {
+                sleep 1
+                # Fine positioning within workspace
+                case "$position" in
+                    center)
+                        hyprctl dispatch centerwindow &>/dev/null || true
+                        hyprctl dispatch fullscreen 1 &>/dev/null || true
+                        ;;
+                    left)
+                        hyprctl dispatch movewindow l &>/dev/null || true
+                        # Move window down below waybar
+                        sleep 1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX &>/dev/null || true
+                        ;;
+                    right)
+                        hyprctl dispatch movewindow r &>/dev/null || true
+                        # Move window down below waybar
+                        sleep 1
+                        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX &>/dev/null || true
+                        ;;
+                esac
+                capcom "🪟 $callsign ($ip) → Workspace $workspace ($position)"
+                ((positioned_count++))
+            } || mission_warning "❌ $callsign ($ip) - Workspace $workspace move failed"
+        fi
+        
+        sleep 1
+    done
+    
+    # Return to Mission Control workspace
+    hyprctl dispatch workspace 2 &>/dev/null || true
+    
+    mission_success "🎯 Window positioning complete: $positioned_count/6 windows positioned"
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 📈 DASHBOARD OPERATIONS
+#==============================================================================
+
+# Mission Dashboard Launch
+launch_mission_dashboards() {
+    capcom "📈 Initiating mission dashboard launch sequence..."
+    
+    local browser_preferences=("google-chrome" "chromium" "firefox")
+    local selected_browser=""
+    
+    # Browser selection logic
+    for browser in "${browser_preferences[@]}"; do
+        if command -v "$browser" &>/dev/null; then
+            selected_browser="$browser"
+            break
+        fi
+    done
+    
+    if [[ -z "$selected_browser" ]]; then
+        mission_warning "No suitable browser found for dashboard operations"
+        return $MISSION_ABORT_SYSTEM
+    fi
+    
+    telemetry "Selected browser: $selected_browser"
+    
+    # Dashboard URLs
+    local grafana_url="${CONFIG_URL:-http://192.168.1.10:9080/}"
+    local prometheus_url="http://192.168.1.10:9090/graph"
+    
+    # Launch dashboards
+    "$selected_browser" --new-window "$grafana_url" "$prometheus_url" &>/dev/null &
+    local browser_pid=$!
+    
+    telemetry "Dashboard browser launched (PID: $browser_pid)"
+    mission_success "✅ Mission dashboards operational in $selected_browser"
+    
+    # Give Chrome time to fully start and load all tabs
+    sleep 5
+    
+    # Check if Chrome process is still running
+    if kill -0 "$browser_pid" 2>/dev/null; then
+        telemetry "Chrome process verified running (PID: $browser_pid)"
+        
+        # Focus Chrome window and move to workspace 2 immediately
+        hyprctl dispatch focuswindow "class:Google-chrome" &>/dev/null
+        sleep 0.5
+        
+        # Move Chrome to workspace 2 before any positioning
+        hyprctl dispatch movetoworkspace 2 &>/dev/null || true
+        sleep 0.5
+        
+        # Ensure we're on workspace 2 and Chrome is focused
+        hyprctl dispatch workspace 2 &>/dev/null || true
+        sleep 0.5
+        hyprctl dispatch focuswindow "class:Google-chrome" &>/dev/null
+        sleep 0.5
+        
+        # Position Chrome: left side, full height (already on workspace 2)
+        hyprctl dispatch movewindow l &>/dev/null || true
+        
+        
+        # Move down below waybar
+        hyprctl dispatch moveactive 0 $WAYBAR_OFFSET_PX &>/dev/null || true
+    else
+        mission_warning "Chrome process exited unexpectedly (PID: $browser_pid)"
+    fi
+    
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 🚀 RDP FLEET STATUS DISPLAY
+#==============================================================================
+
+# Beautiful RDP Fleet Status Display
+display_rdp_fleet_status() {
+    capcom "🚀 Generating RDP fleet status overview..."
+    
+    echo
+    echo "╔═══════════════════════════════════════════════════════════════════════════════════╗"
+    echo "║  🚀 NASA NZ7DEV RDP FLEET STATUS OVERVIEW 🚀                                      ║"
+    echo "╚═══════════════════════════════════════════════════════════════════════════════════╝"
+    echo
+    
+    # Fleet configuration with all details
+    local fleet_targets=(
+        "vm20:192.168.1.20:ALPHA:4:left:false:nz7dev:lemonlime:957x1042"
+        "vm21:192.168.1.21:BRAVO:2:left:true:nz7dev:lemonlime:1717x1402"
+        "vm23:192.168.1.23:CHARLIE:1:center:false:User:lemonlime:1915x1042"
+        "vm24:192.168.1.24:DELTA:4:right:false:nz7dev:lemonlime:957x1042"
+        "vm25:192.168.1.25:ECHO:2:right:true:User:lemonlime:1717x1402"
+        "vm26:192.168.1.26:FOXTROT:3:center:false:User:lemonlime:1915x1042"
+    )
+    
+    local online_count=0
+    local connected_count=0
+    local total_count=${#fleet_targets[@]}
+    
+    for target_spec in "${fleet_targets[@]}"; do
+        IFS=':' read -r name ip callsign workspace position scratchpad username password geometry <<< "$target_spec"
+        
+        # Test connectivity (handle failures gracefully)
+        local connectivity_status="🔴 OFFLINE"
+        local connectivity_color="$MC_RED"
+        if test_target_connectivity "$ip" 2 2>/dev/null; then
+            connectivity_status="🟢 ONLINE"
+            connectivity_color="$MC_GREEN"
+            ((online_count++)) || true
+        fi
+        
+        # Check RDP service status (handle failures gracefully)
+        local service_name="nz7dev-${name}.service"
+        local rdp_status="❌ DISCONNECTED"
+        local rdp_color="$MC_RED"
+        if systemctl --user is-active "$service_name" >/dev/null 2>&1; then
+            rdp_status="✅ CONNECTED"
+            rdp_color="$MC_GREEN"
+            ((connected_count++)) || true
+        fi
+        
+        # Check window status (handle failures gracefully)
+        local window_title="FreeRDP: $ip"
+        local window_status="🪟 NO WINDOW"
+        local window_color="$MC_YELLOW"
+        if command -v hyprctl >/dev/null 2>&1 && hyprctl clients 2>/dev/null | grep -q "title: $window_title"; then
+            window_status="🪟 WINDOW ACTIVE"
+            window_color="$MC_GREEN"
+        fi
+        
+        # Workspace/Scratchpad info
+        local workspace_info
+        if [[ "$scratchpad" == "true" ]]; then
+            workspace_info="🗂️ Scratchpad"
+        else
+            workspace_info="🪟 Workspace $workspace ($position)"
+        fi
+        
+        # Display VM card
+        echo "┌─────────────────────────────────────────────────────────────────────────────────┐"
+        echo -e "│ ${MC_BOLD}🚀 $callsign ($name)${MC_NC}                                                      │"
+        echo "├─────────────────────────────────────────────────────────────────────────────────┤"
+        echo -e "│ 🌐 IP Address:     ${MC_CYAN}$ip${MC_NC}                                               │"
+        echo -e "│ 📶 Network:       ${connectivity_color}$connectivity_status${MC_NC}                                            │"
+        echo -e "│ 🔗 RDP Service:    ${rdp_color}$rdp_status${MC_NC}                                          │"
+        echo -e "│ ${window_color}$window_status${MC_NC}                                                  │"
+        echo -e "│ 📐 Display:        ${MC_PURPLE}$geometry${MC_NC}                                            │"
+        echo -e "│ 🎯 Deployment:     ${MC_BLUE}$workspace_info${MC_NC}                                       │"
+        echo -e "│ 👤 User:           ${MC_GRAY}$username${MC_NC}                                                 │"
+        echo "└─────────────────────────────────────────────────────────────────────────────────┘"
+        echo
+    done
+    
+    # Fleet summary
+    echo "╔═══════════════════════════════════════════════════════════════════════════════════╗"
+    echo "║  📊 FLEET SUMMARY                                                                  ║"
+    echo "╚═══════════════════════════════════════════════════════════════════════════════════╝"
+    echo
+    
+    local network_percentage=$((online_count * 100 / total_count))
+    local rdp_percentage=$((connected_count * 100 / total_count))
+    
+    echo -e "🌐 ${MC_BOLD}Network Status:${MC_NC}     $online_count/$total_count targets online (${network_percentage}%)"
+    echo -e "🔗 ${MC_BOLD}RDP Connections:${MC_NC}    $connected_count/$total_count services active (${rdp_percentage}%)"
+    echo -e "🚀 ${MC_BOLD}Fleet Status:${MC_NC}       "
+    
+    if [[ $network_percentage -ge 80 && $rdp_percentage -ge 80 ]]; then
+        echo -e "   ${MC_GREEN}🎯 MISSION READY - All systems nominal!${MC_NC}"
+    elif [[ $network_percentage -ge 50 ]]; then
+        echo -e "   ${MC_YELLOW}⚠️ PARTIAL DEPLOYMENT - Some systems offline${MC_NC}"
+    else
+        echo -e "   ${MC_RED}🚨 MISSION CRITICAL - Multiple system failures${MC_NC}"
+    fi
+    
+    echo
+    echo -e "${MC_GRAY}Last updated: $(date '+%Y-%m-%d %H:%M:%S UTC')${MC_NC}"
+    echo
+    
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 📊 MISSION STATUS MONITORING
+#==============================================================================
+
+# Comprehensive Mission Status Report
+display_mission_status() {
+    capcom "📊 Generating comprehensive mission status report..."
+    
+    echo
+    echo "╔═══════════════════════════════════════════════════════════════════════════════════╗"
+    echo "║  🚀 NASA NZ7DEV MISSION STATUS REPORT 🚀                                          ║"
+    echo "╚═══════════════════════════════════════════════════════════════════════════════════╝"
+    echo
+    
+    # System Information
+    houston "=== MISSION CONTROL SYSTEMS ==="
+    houston "Mission ID: $MISSION_CONTROL_ID"
+    houston "Mission Commander: $MISSION_COMMANDER"
+    houston "System Status: ${MISSION_STATUS:-UNKNOWN}"
+    if [[ -n "$MISSION_START_TIME" ]]; then
+        local elapsed=$(($(date +%s) - MISSION_START_TIME))
+        houston "Mission Elapsed Time: ${elapsed}s"
+    fi
+    houston "Success Count: $MISSION_SUCCESS_COUNT"
+    houston "Warning Count: $MISSION_WARNING_COUNT"
+    houston "Error Count: $MISSION_ERROR_COUNT"
+    echo
+    
+    # RDP Connection Status
+    houston "=== DEVELOPMENT FLEET STATUS ==="
+    local active_services
+    active_services=$(systemctl --user list-units --no-legend 'nz7dev-*.service' 2>/dev/null | wc -l)
+    
+    if [[ $active_services -gt 0 ]]; then
+        systemctl --user --no-pager list-units 'nz7dev-*.service' 2>/dev/null || mission_warning "Failed to list services"
+    else
+        mission_warning "No active fleet connections detected"
+    fi
+    echo
+    
+    # Network Connectivity Status
+    houston "=== TARGET CONNECTIVITY STATUS ==="
+    local fleet_ips=("192.168.1.20" "192.168.1.21" "192.168.1.23" "192.168.1.24" "192.168.1.25" "192.168.1.26")
+    local fleet_callsigns=("ALPHA" "BRAVO" "CHARLIE" "DELTA" "ECHO" "FOXTROT")
+    local online_count=0
+    
+    for i in "${!fleet_ips[@]}"; do
+        local ip="${fleet_ips[$i]}"
+        local callsign="${fleet_callsigns[$i]}"
+        
+        if test_target_connectivity "$ip" 1; then
+            echo -e "  ${MC_GREEN}●${MC_NC} $callsign ($ip) - ONLINE"
+            ((online_count++))
+        else
+            echo -e "  ${MC_RED}●${MC_NC} $callsign ($ip) - OFFLINE"
+        fi
+    done
+    echo
+    
+    # Summary Statistics
+    local total_targets=${#fleet_ips[@]}
+    local connectivity_rate=$((online_count * 100 / total_targets))
+    houston "=== MISSION SUMMARY ==="
+    houston "Fleet Connectivity: $online_count/$total_targets targets online ($connectivity_rate%)"
+    houston "Active RDP Sessions: $active_services"
+    
+    # Process Status
+    if is_mission_running; then
+        houston "Mission Control Status: OPERATIONAL (PID: $(cat "$PID_FILE" 2>/dev/null || echo "UNKNOWN"))"
+    else
+        houston "Mission Control Status: STANDBY"
+    fi
+    
+    echo
+    echo "╚═══════════════════════════════════════════════════════════════════════════════════╝"
+    
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 🚀 MAIN MISSION WORKFLOWS
+#==============================================================================
+
+# Complete Morning Routine Mission
+execute_morning_routine() {
+    MISSION_START_TIME=$(date +%s)
+    MISSION_STATUS="MORNING_ROUTINE"
+    
+    flight_director "🌅 Good morning, Commander! Let's get to work!"
+    
+    # Phase 1: Audio Systems
+    capcom "🔊 Phase 1: Wake up the speakers..."
+    # Desktop notification for Phase 1
+    if command -v notify-send &>/dev/null; then
+        notify-send "🚀 NZ7DEV Phase 1" "Initializing audio systems..." -i audio-volume-high -t 3000
+    fi
+    setup_audio_systems || mission_warning "Audio had some hiccups"
+    # Phase 1 completion notification
+    if command -v notify-send &>/dev/null; then
+        notify-send "✅ Audio Ready!" "Razer Barracuda X configured and operational" -i audio-volume-high -t 3000
+    fi
+    
+    # Phase 2: Fleet Launch
+    capcom "🚀 Phase 2: Firing up the dev fleet..."
+    # Desktop notification for Phase 2
+    if command -v notify-send &>/dev/null; then
+        notify-send "🚀 NZ7DEV Phase 2" "Launching development fleet (6 VMs)..." -i network-workgroup -t 3000
+    fi
+    launch_development_fleet || {
+        mission_critical "Fleet launch failed - mission abort!"
+        return $MISSION_ABORT_NETWORK
+    }
+    # Phase 2 completion notification
+    if command -v notify-send &>/dev/null; then
+        notify-send "✅ Fleet Deployed!" "ALPHA, BRAVO, CHARLIE, DELTA, ECHO, FOXTROT operational" -i network-workgroup -t 4000
+    fi
+    
+    # Phase 3: Window Positioning
+    capcom "🪟 Phase 3: Preparing workspace organization..."
+    flight_director "🏎️ Auto-positioning windows at LUDICROUS SPEED..."
+    # Desktop notification for Phase 3
+    if command -v notify-send &>/dev/null; then
+        notify-send "🏎️ NZ7DEV Phase 3" "LUDICROUS SPEED window positioning initiated!" -i preferences-desktop-display -t 3000
+    fi
+    
+    # Phase 4: LUDICROUS SPEED Window Positioning
+    position_mission_windows_fast
+    # Phase 4 completion notification
+    if command -v notify-send &>/dev/null; then
+        notify-send "⚡ Windows Positioned!" "LUDICROUS SPEED positioning complete!" -i preferences-desktop-display -t 3000
+    fi
+    
+    # Critical delay: Let VM positioning completely settle before Chrome launch
+    telemetry "Waiting for VM positioning to stabilize..."
+    sleep 3
+    
+    # Phase 5: Essential Web Applications
+    capcom "🌐 Phase 5: Opening essential web applications..."
+    flight_director "🔗 Loading Discord, Neural Beats, and ChatGPT..."
+    
+    # Desktop notification for Phase 5
+    if command -v notify-send &>/dev/null; then
+        notify-send "🚀 NZ7DEV Phase 5" "Loading Discord, Neural Beats & ChatGPT..." -i web-browser -t 3000
+    fi
+    
+    # Chrome profile and URLs configuration
+    local chrome_profile="Profile 1"  # zedvex@gmail.com profile
+    local essential_urls=(
+        "https://discord.com/channels/@me/911475776174559232"
+        "https://chatgpt.com/"
+        "https://neuralbeats.app/"
+    )
+    
+    # Launch Chrome with essential URLs
+    if command -v google-chrome-stable &>/dev/null; then
+        # Launch Chrome with just Discord first (most likely to stay open)
+        google-chrome-stable \
+            --profile-directory="$chrome_profile" \
+            --user-data-dir="$HOME/.config/google-chrome" \
+            --no-default-browser-check \
+            --no-first-run \
+            --disable-default-apps \
+            "${essential_urls[0]}" > /tmp/chrome-output.log 2>&1 &
+        local chrome_pid=$!
+        # Disown Chrome so it doesn't get killed by script cleanup
+        disown
+        telemetry "Chrome launched with Discord and disowned (PID: $chrome_pid)"
+        
+        # Give Chrome time to fully start and load Discord
+        sleep 6
+        
+        # Check if Chrome process is still running
+        if kill -0 "$chrome_pid" 2>/dev/null; then
+            telemetry "Chrome process verified running (PID: $chrome_pid)"
+            
+            # EXPLICIT workspace management - force ourselves to workspace 2 first
+            capcom "🎯 Focusing Chrome on workspace 2..."
+            hyprctl dispatch workspace 2 &>/dev/null || true
+            sleep 1
+            
+            # Focus Chrome window (should now be on workspace 2)
+            hyprctl dispatch focuswindow "class:Google-chrome" &>/dev/null
+            sleep 0.5
+            
+            # Open Neural Beats in new tab (no positioning - let Hyprland auto-tile)
+            google-chrome-stable --profile-directory="$chrome_profile" --new-tab "${essential_urls[2]}" &>/dev/null &
+            disown
+            sleep 2
+            
+            # Open ChatGPT in new tab
+            google-chrome-stable --profile-directory="$chrome_profile" --new-tab "${essential_urls[1]}" &>/dev/null &
+            disown
+            sleep 2
+            
+        else
+            mission_warning "Chrome process exited unexpectedly (PID: $chrome_pid)"
+            # Show Chrome output for debugging
+            if [[ -f "/tmp/chrome-output.log" ]]; then
+                telemetry "Chrome output: $(tail -3 /tmp/chrome-output.log)"
+            fi
+            return $MISSION_ABORT_SYSTEM
+        fi
+        
+        mission_success "✅ Discord, Neural Beats & ChatGPT loaded in tabs on workspace 2"
+        
+        # Desktop notification for Phase 5 success
+        if command -v notify-send &>/dev/null; then
+            notify-send "✅ Chrome Ready!" "Discord, Neural Beats & ChatGPT loaded successfully" -i web-browser -t 4000
+        fi
+    else
+        mission_warning "Google Chrome not found - skipping web app launch"
+    fi
+    
+    # Phase 6: Second Chrome Browser for ClickUp (laikadynamics@gmail.com)
+    capcom "📋 Phase 6: Opening ClickUp workspace management..."
+    flight_director "🚀 Loading second Chrome instance for project management..."
+    
+    if command -v google-chrome-stable &>/dev/null; then
+        # Second Chrome profile and ClickUp URL
+        local clickup_profile="Profile 2"  # laikadynamics@gmail.com profile (confirmed)
+        local clickup_url="https://app.clickup.com/90161007752/home"
+        
+        # Desktop notification for Phase 6
+        if command -v notify-send &>/dev/null; then
+            notify-send "🚀 NZ7DEV Phase 6" "Opening ClickUp workspace management..." -i computer -t 3000
+        fi
+        
+        # Launch second Chrome instance with ClickUp
+        google-chrome-stable \
+            --profile-directory="$clickup_profile" \
+            --user-data-dir="$HOME/.config/google-chrome" \
+            --no-default-browser-check \
+            --no-first-run \
+            --disable-default-apps \
+            --new-window \
+            "$clickup_url" > /tmp/chrome-clickup-output.log 2>&1 &
+        local clickup_chrome_pid=$!
+        # Disown ClickUp Chrome so it doesn't get killed by script cleanup
+        disown
+        telemetry "ClickUp Chrome launched with laikadynamics profile and disowned (PID: $clickup_chrome_pid)"
+        
+        # Give ClickUp Chrome time to fully start and load
+        sleep 6
+        
+        # Check if ClickUp Chrome process is still running
+        if kill -0 "$clickup_chrome_pid" 2>/dev/null; then
+            telemetry "ClickUp Chrome process verified running (PID: $clickup_chrome_pid)"
+            
+            # Focus ClickUp Chrome on workspace 2
+            capcom "🎯 Focusing ClickUp Chrome on workspace 2..."
+            
+            # Ensure we're on workspace 2
+            hyprctl dispatch workspace 2 &>/dev/null || true
+            sleep 0.5
+            
+            # Focus the ClickUp Chrome window (should be newest Chrome window)
+            hyprctl dispatch focuswindow "title:.*ClickUp.*" &>/dev/null || {
+                # Fallback: focus any Chrome window and hope it's the right one
+                hyprctl dispatch focuswindow "class:Google-chrome" &>/dev/null
+            }
+            sleep 0.5
+            
+            mission_success "✅ ClickUp opened in second Chrome on workspace 2"
+            
+            # Desktop notification for ClickUp success
+            if command -v notify-send &>/dev/null; then
+                notify-send "✅ ClickUp Ready!" "laikadynamics@gmail.com profile loaded successfully" -i computer -t 4000
+            fi
+        else
+            mission_warning "ClickUp Chrome process exited unexpectedly (PID: $clickup_chrome_pid)"
+            # Show ClickUp Chrome output for debugging
+            if [[ -f "/tmp/chrome-clickup-output.log" ]]; then
+                telemetry "ClickUp Chrome output: $(tail -3 /tmp/chrome-clickup-output.log)"
+            fi
+        fi
+    else
+        mission_warning "Google Chrome not found - skipping ClickUp launch"
+    fi
+    
+    # Mission Complete Notification
+    if command -v notify-send &>/dev/null; then
+        notify-send "🚀 NZ7DEV Ready!" "Your dev environment is ready to rock! 🎸" -i computer -t 5000
+    fi
+    
+    mission_success "🎉 Morning routine complete! Discord, Neural Beats, ChatGPT & ClickUp ready! 💻🏎️📋"
+    capcom "Your complete development environment is ready, Commander! Both Chrome browsers opened on workspace 2! WARP SPEED ENGAGED! 🚀💨"
+    
+    # Enhanced final mission success notification
+    if command -v notify-send &>/dev/null; then
+        notify-send "🎉 MISSION ACCOMPLISHED!" "All systems operational! Welcome to your development environment, Commander! 🚀" -i computer -t 8000 --urgency=normal
+    fi
+    
+    MISSION_STATUS="OPERATIONAL"
+    return $MISSION_SUCCESS
+}
+
+# Ultra-Fast Launch Sequence (LUDICROUS SPEED)
+execute_fastup_sequence() {
+    MISSION_START_TIME=$(date +%s)
+    MISSION_STATUS="FASTUP_LUDICROUS_SPEED"
+    
+    flight_director "🏎️ INITIATING LUDICROUS SPEED LAUNCH SEQUENCE!"
+    capcom "⚡ WARNING: SAFETY SYSTEMS DISABLED! MAXIMUM VELOCITY MODE! ⚡"
+    
+    # Phase 1: Fleet Launch (normal speed for safety)
+    capcom "🚀 Phase 1: Fleet launch (normal speed for stability)..."
+    launch_development_fleet || return $?
+    
+    # Phase 2: INSTANT Window Positioning
+    capcom "🏎️ Phase 2: LUDICROUS SPEED WINDOW POSITIONING!"
+    flight_director "💨 ENGAGING WARP SPEED! NO DELAYS! NO MERCY! 💨"
+    
+    # Call the ultra-fast positioning function
+    position_mission_windows_fast
+
+    mission_success "🏎️💨 FASTUP sequence completed at LUDICROUS SPEED!"
+    capcom "🤞 Fingers crossed nothing exploded! Welcome to the danger zone! 🔥"
+    
+    MISSION_STATUS="OPERATIONAL_LUDICROUS"
+    return $MISSION_SUCCESS
+}
+
+# Quick Launch Sequence
+execute_launch_sequence() {
+    MISSION_START_TIME=$(date +%s)
+    MISSION_STATUS="LAUNCH_SEQUENCE"
+    
+    flight_director "🚀 Initiating quick launch sequence..."
+    
+    # Phase 1: Fleet Launch
+    capcom "🚀 Phase 1: Firing up the dev fleet..."
+    launch_development_fleet || return $?
+    
+    # Phase 2: Window Positioning Countdown
+    capcom "🪟 Phase 2: Preparing workspace organization..."
+    flight_director "🎯 Auto-positioning windows in 5 seconds..."
+    
+    # 5-second countdown
+    local countdown=5
+    while [[ $countdown -gt 0 ]]; do
+        if [[ $countdown -le 3 ]]; then
+            echo -ne "\r${MC_RED}[COUNTDOWN]${MC_NC} Window positioning in ${countdown}s... "
+        elif [[ $countdown -le 5 ]]; then
+            echo -ne "\r${MC_YELLOW}[COUNTDOWN]${MC_NC} Window positioning in ${countdown}s... "
+        else
+            echo -ne "\r${MC_CYAN}[COUNTDOWN]${MC_NC} Window positioning in ${countdown}s... "
+        fi
+        sleep 1
+        ((countdown--))
+    done
+    echo -e "\r${MC_GREEN}[COUNTDOWN]${MC_NC} Starting window positioning now! 🚀"
+    
+    # Phase 3: Window Positioning
+    position_mission_windows
+
+    mission_success "🚀 Launch sequence completed!"
+    MISSION_STATUS="OPERATIONAL"
+    return $MISSION_SUCCESS
+}
+
+#==============================================================================
+# 🚀 MISSION CONTROL MAIN ENTRY POINT
+#==============================================================================
+
+# Lightweight Mission Control Initialization (for quick commands)
+init_mission_control_lite() {
+    # Initialize directories silently
+    init_mission_control &>/dev/null || return $?
+    
+    # Quick security check
+    if [[ $EUID -eq 0 ]]; then
+        mission_critical "🚨 SECURITY VIOLATION: Running as root is prohibited!"
+        return $MISSION_ABORT_SECURITY
+    fi
+    
+    # Load configuration quietly
+    create_default_config &>/dev/null || return $?
+    parse_yaml_config "$MISSION_CONFIG_DIR/mission.yaml" &>/dev/null || return $?
+    
+    return $MISSION_SUCCESS
+}
+
+# Mission Control Initialization
+init_mission_control_systems() {
+    MISSION_STATUS="INITIALIZING"
+    
+    # Display mission banner
+    echo -e "$MC_BANNER"
+    echo
+    flight_director "Mission Control initialization sequence initiated"
+    flight_director "Mission ID: $MISSION_CONTROL_ID"
+    flight_director "Mission Commander: $MISSION_COMMANDER"
+    flight_director "Build Date: $BUILD_DATE"
+    echo
+    
+    # Initialize directories
+    init_mission_control || return $?
+    
+    # Security checks
+    security_pre_flight_check || return $?
+    
+    # Dependency verification
+    check_mission_dependencies || return $?
+    
+    # Configuration setup
+    create_default_config || return $?
+    parse_yaml_config "$MISSION_CONFIG_DIR/mission.yaml" || return $?
+    
+    # Process management
+    create_mission_lock || return $?
+    
+    SYSTEM_READY=true
+    mission_success "🎯 Mission Control systems ready for operations"
+    
+    return $MISSION_SUCCESS
+}
+
+# Mission Control Command Interface
+show_mission_help() {
+    cat << EOF
+
+$MC_BANNER
+
+🚀 MISSION CONTROL COMMAND CENTER 🚀
+
+USAGE:
+    $SCRIPT_NAME <mission_command> [options]
+
+MISSION COMMANDS:
+    morning         Complete morning startup sequence (recommended)
+    up              Start development environment connections
+    fastup          🏎️ LUDICROUS SPEED fleet + instant windows (may break!)
+    down            Emergency shutdown of all operations
+    status          Display comprehensive system status
+    audio           Configure and test audio systems
+    windows         Position and organize workspace windows
+    dashboards      Open monitoring and control dashboards
+    check           Run comprehensive system diagnostics
+    cleanup         Clean up Chrome testing processes and files
+    config          Display current mission configuration
+    logs            Display recent mission telemetry
+    fleet           Display beautiful VM fleet status overview
+
+MISSION EXAMPLES:
+    $SCRIPT_NAME morning        # Full automated startup
+    $SCRIPT_NAME up             # Quick development setup
+    $SCRIPT_NAME fastup         # 🏎️ MAXIMUM SPEED (risky!)
+    $SCRIPT_NAME status         # Check all systems
+    $SCRIPT_NAME down           # Emergency shutdown
+    $SCRIPT_NAME fleet          # View VM fleet status
+
+MISSION CONTROL:
+    Configuration: $MISSION_CONFIG_DIR/mission.yaml
+    Mission Logs:  $MISSION_LOG_DIR/
+    State Data:    $MISSION_STATE_DIR/
+    
+🎮 KEYBOARD SHORTCUTS:
+    See the top of this script for optional Hyprland keyboard shortcuts
+    SUPER+PageUp = morning, SUPER+PageDown = down, etc.
+    
+🚀 All systems nominal. Ready for mission operations, Commander! 🚀
+
+EOF
+}
+
+# Main Mission Control Function
+main() {
+    # Parse mission command first
+    local mission_command="${1:-help}"
+    
+    # Quick commands that don't need full initialization or process management
+    case "$mission_command" in
+        "fleet"|"fleet-status"|"config"|"logs"|"help"|"--help"|"-h"|"")
+            if ! init_mission_control_lite; then
+                mission_critical "Mission Control initialization failed!"
+                exit $MISSION_ABORT_SYSTEM
+            fi
+            ;;
+        *)
+            # Set up signal handlers for operational commands
+            trap handle_mission_abort INT
+            trap handle_mission_terminate TERM
+            trap mission_cleanup EXIT
+            
+            # Full initialization for operational commands
+            if ! init_mission_control_systems; then
+                mission_critical "Mission Control initialization failed!"
+                exit $MISSION_ABORT_SYSTEM
+            fi
+            ;;
+    esac
+    
+    case "$mission_command" in
+        "morning"|"morning-routine")
+            flight_director "🌅 Initiating morning routine mission sequence..."
+            execute_morning_routine
+            ;;
+        "up"|"launch"|"launch-sequence")
+            flight_director "🚀 Initiating launch sequence..."
+            execute_launch_sequence
+            ;;
+        "fastup"|"fast"|"ludicrous"|"fast-up")
+            flight_director "🏎️ Initiating LUDICROUS SPEED sequence..."
+            execute_fastup_sequence
+            ;;
+        "down"|"abort"|"abort-mission"|"stop")
+            flight_director "🚨 Initiating mission abort sequence..."
+            abort_all_connections
+            ;;
+        "status"|"mission-status")
+            flight_director "📊 Displaying mission status..."
+            display_mission_status
+            ;;
+        "audio"|"audio-systems")
+            flight_director "🔊 Initiating audio systems check..."
+            setup_audio_systems
+            ;;
+        "windows"|"window-control")
+            flight_director "🪟 Initiating window control sequence..."
+            position_mission_windows
+            ;;
+        "dashboards"|"dashboard-ops")
+            flight_director "📈 Opening mission dashboards..."
+            launch_mission_dashboards
+            ;;
+        "check"|"system-check")
+            flight_director "🔧 Conducting comprehensive system check..."
+            check_mission_dependencies
+            security_pre_flight_check
+            mission_success "System check completed - all systems nominal"
+            ;;
+        "cleanup"|"chrome-cleanup"|"clean")
+            flight_director "🧹 Initiating Chrome testing cleanup..."
+            cleanup_chrome_testing
+            ;;
+        "config"|"show-config")
+            flight_director "📋 Displaying mission configuration..."
+            if [[ -f "$MISSION_CONFIG_DIR/mission.yaml" ]]; then
+                cat "$MISSION_CONFIG_DIR/mission.yaml"
+            else
+                mission_error "Mission configuration not found"
+            fi
+            ;;
+        "logs"|"mission-logs")
+            flight_director "📡 Displaying mission telemetry..."
+            if [[ -f "$MISSION_LOG" ]]; then
+                tail -n 50 "$MISSION_LOG" | jq -r '.timestamp + " [" + .level + "] " + .station + ": " + .message' 2>/dev/null || tail -n 50 "$MISSION_LOG"
+            else
+                mission_warning "No mission logs found"
+            fi
+            ;;
+        "fleet"|"fleet-status")
+            flight_director "🚀 Displaying RDP fleet status overview..."
+            display_rdp_fleet_status
+            ;;
+        "help"|"--help"|"-h"|"")
+            show_mission_help
+            ;;
+        *)
+            mission_error "Unknown mission command: $mission_command"
+            houston "Use '$SCRIPT_NAME help' for available commands"
+            exit $MISSION_ABORT_USER
+            ;;
+    esac
+    
+    return $MISSION_SUCCESS
+}
+
+# 🚀 MISSION LAUNCH SEQUENCE
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
+
+# Chrome Testing Cleanup (moved here for proper scope)
+cleanup_chrome_testing() {
+    capcom "🧹 Initiating Chrome testing cleanup sequence..."
+    
+    # Count existing Chrome processes
+    local chrome_count
+    chrome_count=$(pgrep -c chrome 2>/dev/null || echo "0")
+    
+    if [[ $chrome_count -eq 0 ]]; then
+        mission_success "✅ No Chrome processes found - system is clean!"
+        return $MISSION_SUCCESS
+    fi
+    
+    mission_warning "Found $chrome_count Chrome processes running"
+    
+    # Show Chrome processes for confirmation
+    ground_control "Chrome processes:"
+    ps aux | grep chrome | grep -v grep | head -5
+    
+    # Ask for confirmation (auto-confirm in non-interactive mode)
+    if [[ -t 0 ]]; then
+        echo -n "Kill all Chrome processes? [y/N]: "
+        read -r response
+        if [[ ! "$response" =~ ^[Yy] ]]; then
+            mission_warning "Chrome cleanup cancelled by user"
+            return $MISSION_SUCCESS
+        fi
+    fi
+    
+    # Kill Chrome processes
+    telemetry "Terminating Chrome processes..."
+    if pkill chrome; then
+        sleep 2
+        local remaining
+        remaining=$(pgrep -c chrome 2>/dev/null || echo "0")
+        if [[ $remaining -gt 0 ]]; then
+            mission_warning "Force killing $remaining stubborn Chrome processes..."
+            pkill -9 chrome
+        fi
+        mission_success "✅ Chrome cleanup complete!"
+    else
+        mission_warning "No Chrome processes were running"
+    fi
+    
+    # Clean up temp files
+    telemetry "Cleaning up Chrome temp files..."
+    rm -f /tmp/chrome-*.log 2>/dev/null || true
+    rm -rf /tmp/nz7dev-chrome-* 2>/dev/null || true
+    
+    mission_success "🎉 Chrome testing cleanup complete!"
+    return $MISSION_SUCCESS
+}

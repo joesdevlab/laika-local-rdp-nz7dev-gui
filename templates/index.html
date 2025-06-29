@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 NZ7DEV Mission Control Center</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Monaco', 'Consolas', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #0f3460 0%, #16537e 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .header .subtitle {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00a8ff, #0078d4);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00d084, #16a085);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-ludicrous {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-content {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .vm-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vm-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff, #0078d4);
+        }
+
+        .vm-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 212, 255, 0.6);
+        }
+
+        .vm-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .vm-callsign {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .vm-name {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        .status-online { background: #00d084; }
+        .status-offline { background: #e74c3c; }
+        .status-connected { background: #00a8ff; }
+        .status-disconnected { background: #6c757d; }
+
+        @keyframes pulse-dot {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .vm-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .vm-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .config-panel {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            backdrop-filter: blur(10px);
+        }
+
+        .workspace-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr auto;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            height: 200px;
+        }
+
+        .workspace {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .workspace:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .workspace-label {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            color: #00d4ff;
+        }
+
+        .workspace-vms {
+            font-size: 0.7rem;
+            color: #9ca3af;
+        }
+
+        .scratchpad {
+            grid-column: 1 / -1;
+            background: rgba(255, 193, 7, 0.1);
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .scratchpad .workspace-label {
+            color: #ffc107;
+        }
+
+        .config-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .config-section h3 {
+            color: #00d4ff;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .config-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .input-group input,
+        .input-group select {
+            padding: 0.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e6ed;
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #6c757d;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #00d084;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .log-panel {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .log-timestamp {
+            color: #9ca3af;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #00d4ff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .status-online-text { color: #00d084; }
+        .status-offline-text { color: #e74c3c; }
+        .status-connected-text { color: #00a8ff; }
+        .status-disconnected-text { color: #6c757d; }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #00d084; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #00a8ff; }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(15, 52, 96, 0.3), rgba(22, 83, 126, 0.3));
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #e0e6ed;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .config-group label {
+            font-weight: 600;
+            color: #e0e6ed;
+            font-size: 0.9rem;
+        }
+        
+        .config-group input,
+        .config-group select {
+            padding: 0.75rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e6ed;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .config-group input:focus,
+        .config-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+        
+        .config-group small {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            background: linear-gradient(90deg, rgba(15, 52, 96, 0.1), rgba(22, 83, 126, 0.1));
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>
+            <i class="fas fa-rocket"></i>
+            NZ7DEV MISSION CONTROL CENTER
+        </h1>
+        <div class="subtitle">
+            Professional Development Environment Manager - Real-time Fleet Operations
+        </div>
+    </header>
+
+    <div class="control-panel">
+        <button class="btn btn-success" onclick="executeCommand('morning')">
+            <i class="fas fa-sun"></i> Morning Routine
+        </button>
+        <button class="btn btn-primary" onclick="executeCommand('up')">
+            <i class="fas fa-rocket"></i> Launch Fleet
+        </button>
+        <button class="btn btn-ludicrous" onclick="executeCommand('fastup')">
+            <i class="fas fa-bolt"></i> LUDICROUS SPEED
+        </button>
+        <button class="btn btn-warning" onclick="positionWindows()">
+            <i class="fas fa-window-restore"></i> Position Windows
+        </button>
+        <button class="btn btn-danger" onclick="executeCommand('down')">
+            <i class="fas fa-power-off"></i> Emergency Stop
+        </button>
+    </div>
+
+    <div class="main-content">
+        <div class="fleet-section">
+            <div class="fleet-grid" id="fleetGrid">
+                <!-- VM cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="control-section">
+            <div class="config-panel">
+                <div class="config-section">
+                    <h3><i class="fas fa-desktop"></i> Workspace Layout</h3>
+                    <div class="workspace-layout">
+                        <div class="workspace" data-workspace="1">
+                            <div class="workspace-label">Workspace 1</div>
+                            <div class="workspace-vms" id="ws1-vms"></div>
+                        </div>
+                        <div class="workspace" data-workspace="2">
+                            <div class="workspace-label">Workspace 2</div>
+                            <div class="workspace-vms" id="ws2-vms"></div>
+                        </div>
+                        <div class="workspace" data-workspace="3">
+                            <div class="workspace-label">Workspace 3</div>
+                            <div class="workspace-vms" id="ws3-vms"></div>
+                        </div>
+                        <div class="workspace" data-workspace="4">
+                            <div class="workspace-label">Workspace 4</div>
+                            <div class="workspace-vms" id="ws4-vms"></div>
+                        </div>
+                        <div class="workspace scratchpad">
+                            <div class="workspace-label">Scratchpad</div>
+                            <div class="workspace-vms" id="scratchpad-vms"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3><i class="fas fa-cog"></i> Quick Controls</h3>
+                    <div class="config-controls">
+                        <button class="btn btn-sm btn-primary" onclick="refreshStatus()">
+                            <i class="fas fa-sync"></i> Refresh Status
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="saveConfig()">
+                            <i class="fas fa-save"></i> Save Configuration
+                        </button>
+                    </div>
+                </div>
+
+                <div class="log-panel" id="logPanel">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[SYSTEM]</span> Mission Control GUI initialized
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Modal -->
+    <div id="configModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Configure <span id="configVmName"></span></h2>
+                <button class="modal-close" onclick="closeConfigModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="config-grid">
+                    <div class="config-group">
+                        <label>Display Geometry</label>
+                        <input type="text" id="configGeometry" placeholder="1920x1080">
+                        <small>Format: WIDTHxHEIGHT</small>
+                    </div>
+                    
+                    <div class="config-group">
+                        <label>Workspace</label>
+                        <select id="configWorkspace">
+                            <option value="1">Workspace 1</option>
+                            <option value="2">Workspace 2</option>
+                            <option value="3">Workspace 3</option>
+                            <option value="4">Workspace 4</option>
+                        </select>
+                    </div>
+                    
+                    <div class="config-group">
+                        <label>Position</label>
+                        <select id="configPosition">
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                    
+                    <div class="config-group">
+                        <label>Scratchpad Mode</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="configScratchpad">
+                            <span class="slider"></span>
+                        </label>
+                        <small>Use scratchpad instead of workspace</small>
+                    </div>
+                    
+                    <div class="config-group">
+                        <label>Auto Connect</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="configEnabled">
+                            <span class="slider"></span>
+                        </label>
+                        <small>Start with morning routine</small>
+                    </div>
+                    
+                    <div class="config-group">
+                        <label>IP Address</label>
+                        <input type="text" id="configIp" placeholder="192.168.1.20">
+                        <small>VM network address</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveVmConfig()">
+                    <i class="fas fa-save"></i> Save Configuration
+                </button>
+                <button class="btn btn-secondary" onclick="closeConfigModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connection
+        const socket = io();
+        let fleetStatus = {};
+        let currentConfigVm = null;
+
+        // Socket event handlers
+        socket.on('connect', function() {
+            addLog('WebSocket connected to Mission Control');
+            refreshStatus();
+        });
+
+        socket.on('disconnect', function() {
+            addLog('WebSocket disconnected from Mission Control', 'error');
+        });
+
+        socket.on('status_update', function(data) {
+            fleetStatus = data;
+            updateFleetDisplay();
+            updateWorkspaceDisplay();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshStatus();
+            setInterval(refreshStatus, 30000); // Refresh every 30 seconds
+        });
+
+        function refreshStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    fleetStatus = data;
+                    updateFleetDisplay();
+                    updateWorkspaceDisplay();
+                })
+                .catch(error => {
+                    addLog('Error fetching status: ' + error.message, 'error');
+                });
+        }
+
+        function updateFleetDisplay() {
+            const grid = document.getElementById('fleetGrid');
+            grid.innerHTML = '';
+
+            Object.values(fleetStatus).forEach(vm => {
+                const card = createVMCard(vm);
+                grid.appendChild(card);
+            });
+        }
+
+        function createVMCard(vm) {
+            const card = document.createElement('div');
+            card.className = 'vm-card';
+            card.innerHTML = `
+                <div class="vm-header">
+                    <div>
+                        <div class="vm-callsign">${vm.callsign}</div>
+                        <div class="vm-name">${vm.name} (${vm.ip})</div>
+                    </div>
+                    <div class="status-indicators">
+                        <div class="status-dot ${vm.online ? 'status-online' : 'status-offline'}" 
+                             title="Network: ${vm.online ? 'Online' : 'Offline'}"></div>
+                        <div class="status-dot ${vm.rdp_connected ? 'status-connected' : 'status-disconnected'}" 
+                             title="RDP: ${vm.rdp_connected ? 'Connected' : 'Disconnected'}"></div>
+                    </div>
+                </div>
+                
+                <div class="vm-details">
+                    <div class="status-text ${vm.online ? 'status-online-text' : 'status-offline-text'}">
+                        <i class="fas fa-${vm.online ? 'check-circle' : 'times-circle'}"></i>
+                        Network: ${vm.online ? 'Online' : 'Offline'}
+                    </div>
+                    <div class="status-text ${vm.rdp_connected ? 'status-connected-text' : 'status-disconnected-text'}">
+                        <i class="fas fa-${vm.rdp_connected ? 'link' : 'unlink'}"></i>
+                        RDP: ${vm.rdp_connected ? 'Connected' : 'Disconnected'}
+                    </div>
+                    <div>
+                        <i class="fas fa-expand-arrows-alt"></i>
+                        Size: ${vm.geometry}
+                    </div>
+                    <div>
+                        <i class="fas fa-${vm.scratchpad ? 'layer-group' : 'desktop'}"></i>
+                        ${vm.scratchpad ? 'Scratchpad' : 'Workspace ' + vm.workspace}
+                    </div>
+                    <div>
+                        <i class="fas fa-arrows-alt"></i>
+                        Position: ${vm.position}
+                    </div>
+                    <div>
+                        <i class="fas fa-window-restore"></i>
+                        Window: ${vm.window_active ? 'Active' : 'Inactive'}
+                    </div>
+                </div>
+
+                <div class="vm-controls">
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${vm.enabled ? 'checked' : ''} 
+                               onchange="toggleVM('${vm.name}', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                    <button class="btn btn-sm btn-primary" onclick="startVM('${vm.name}')"
+                            ${!vm.enabled || vm.rdp_connected ? 'disabled' : ''}>
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="stopVM('${vm.name}')"
+                            ${!vm.rdp_connected ? 'disabled' : ''}>
+                        <i class="fas fa-stop"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="openConfigModal('${vm.name}')">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function updateWorkspaceDisplay() {
+            // Clear workspace displays
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`ws${i}-vms`).textContent = '';
+            }
+            document.getElementById('scratchpad-vms').textContent = '';
+
+            // Group VMs by workspace
+            const workspaces = { 1: [], 2: [], 3: [], 4: [], scratchpad: [] };
+            
+            Object.values(fleetStatus).forEach(vm => {
+                if (vm.scratchpad) {
+                    workspaces.scratchpad.push(vm.callsign);
+                } else {
+                    workspaces[vm.workspace].push(vm.callsign);
+                }
+            });
+
+            // Update displays
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`ws${i}-vms`).textContent = workspaces[i].join(', ');
+            }
+            document.getElementById('scratchpad-vms').textContent = workspaces.scratchpad.join(', ');
+        }
+
+        // Configuration Modal Functions
+        function openConfigModal(vmName) {
+            currentConfigVm = vmName;
+            const vm = fleetStatus[vmName];
+            
+            if (!vm) return;
+            
+            // Populate form with current values
+            document.getElementById('configVmName').textContent = vm.callsign;
+            document.getElementById('configGeometry').value = vm.geometry;
+            document.getElementById('configWorkspace').value = vm.workspace;
+            document.getElementById('configPosition').value = vm.position;
+            document.getElementById('configScratchpad').checked = vm.scratchpad;
+            document.getElementById('configEnabled').checked = vm.enabled;
+            document.getElementById('configIp').value = vm.ip;
+            
+            // Show modal
+            document.getElementById('configModal').style.display = 'block';
+            
+            // Focus first input
+            setTimeout(() => {
+                document.getElementById('configGeometry').focus();
+            }, 100);
+        }
+        
+        function closeConfigModal() {
+            document.getElementById('configModal').style.display = 'none';
+            currentConfigVm = null;
+        }
+        
+        function saveVmConfig() {
+            if (!currentConfigVm) return;
+            
+            const updates = {
+                geometry: document.getElementById('configGeometry').value,
+                workspace: parseInt(document.getElementById('configWorkspace').value),
+                position: document.getElementById('configPosition').value,
+                scratchpad: document.getElementById('configScratchpad').checked,
+                enabled: document.getElementById('configEnabled').checked,
+                ip: document.getElementById('configIp').value
+            };
+            
+            // Validate geometry format
+            if (!/^\d+x\d+$/.test(updates.geometry)) {
+                showNotification('Invalid geometry format. Use WIDTHxHEIGHT (e.g., 1920x1080)', 'error');
+                return;
+            }
+            
+            // Validate IP address
+            if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(updates.ip)) {
+                showNotification('Invalid IP address format', 'error');
+                return;
+            }
+            
+            // Update configuration
+            updateVMConfig(currentConfigVm, updates);
+            
+            closeConfigModal();
+            showNotification(`Configuration updated for ${currentConfigVm}`, 'success');
+        }
+
+        function toggleVM(vmName, enabled) {
+            updateVMConfig(vmName, { enabled: enabled });
+        }
+
+        function startVM(vmName) {
+            showLoading(`Starting ${vmName}...`);
+            fetch(`/api/vm/${vmName}/start`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(`${vmName} connection started`, 'success');
+                        addLog(`Started RDP connection to ${vmName}`);
+                    } else {
+                        showNotification(`Failed to start ${vmName}: ${data.error}`, 'error');
+                        addLog(`Error starting ${vmName}: ${data.error}`, 'error');
+                    }
+                    refreshStatus();
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                    addLog(`Error starting ${vmName}: ${error.message}`, 'error');
+                });
+        }
+
+        function stopVM(vmName) {
+            showLoading(`Stopping ${vmName}...`);
+            fetch(`/api/vm/${vmName}/stop`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(`${vmName} connection stopped`, 'success');
+                        addLog(`Stopped RDP connection to ${vmName}`);
+                    } else {
+                        showNotification(`Failed to stop ${vmName}: ${data.error}`, 'error');
+                        addLog(`Error stopping ${vmName}: ${data.error}`, 'error');
+                    }
+                    refreshStatus();
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                    addLog(`Error stopping ${vmName}: ${error.message}`, 'error');
+                });
+        }
+
+        function executeCommand(command) {
+            showLoading(`Executing ${command}...`);
+            let endpoint = '';
+            
+            switch(command) {
+                case 'morning': endpoint = '/api/fleet/morning'; break;
+                case 'up': endpoint = '/api/fleet/start'; break;
+                case 'fastup': endpoint = '/api/fleet/fastup'; break;
+                case 'down': endpoint = '/api/fleet/stop'; break;
+            }
+            
+            fetch(endpoint, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(`${command} executed successfully`, 'success');
+                        addLog(`Executed: ${command}`);
+                    } else {
+                        showNotification(`Failed to execute ${command}: ${data.error}`, 'error');
+                        addLog(`Error executing ${command}: ${data.error}`, 'error');
+                    }
+                    setTimeout(refreshStatus, 2000); // Refresh after 2 seconds
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                    addLog(`Error executing ${command}: ${error.message}`, 'error');
+                });
+        }
+
+        function positionWindows() {
+            showLoading('Positioning windows...');
+            fetch('/api/windows/position', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Windows positioned successfully', 'success');
+                        addLog('Positioned all windows');
+                    } else {
+                        showNotification(`Failed to position windows: ${data.error}`, 'error');
+                        addLog(`Error positioning windows: ${data.error}`, 'error');
+                    }
+                    refreshStatus();
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                    addLog(`Error positioning windows: ${error.message}`, 'error');
+                });
+        }
+
+        function updateVMConfig(vmName, updates) {
+            fetch(`/api/vm/${vmName}/config`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        addLog(`Updated ${vmName} configuration`);
+                        refreshStatus();
+                    } else {
+                        showNotification(`Failed to update ${vmName}: ${data.error}`, 'error');
+                        addLog(`Error updating ${vmName}: ${data.error}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                    addLog(`Error updating ${vmName}: ${error.message}`, 'error');
+                });
+        }
+
+        function saveConfig() {
+            fetch('/api/config', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Configuration saved', 'success');
+                        addLog('Configuration saved to YAML file');
+                    } else {
+                        showNotification('Failed to save configuration', 'error');
+                        addLog('Error saving configuration', 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                    addLog(`Error saving configuration: ${error.message}`, 'error');
+                });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function showLoading(message) {
+            // Could add a loading overlay here
+            addLog(message);
+        }
+
+        function addLog(message, type = 'info') {
+            const logPanel = document.getElementById('logPanel');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span> ${message}
+            `;
+            
+            logPanel.appendChild(entry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (logPanel.children.length > 50) {
+                logPanel.removeChild(logPanel.firstChild);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('configModal');
+            if (event.target === modal) {
+                closeConfigModal();
+            }
+        });
+        
+        // Close modal with escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeConfigModal();
+            }
+        });
+    </script>
+</body>
+</html> 
