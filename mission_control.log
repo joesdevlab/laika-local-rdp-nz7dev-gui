@@ -22,3 +22,179 @@
 2025-07-01 13:11:47,750 - __main__ - INFO - Mission Control monitoring started
 2025-07-01 13:11:47,750 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
 2025-07-01 13:11:47,750 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:11:59,752 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:11:59,753 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:11:59,753 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:12:11,818 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:12:11,819 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:12:11,819 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:12:23,723 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:12:23,724 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:12:23,724 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:12:35,728 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:12:35,729 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:12:35,729 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:12:47,736 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:12:47,736 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:12:47,736 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:12:59,711 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:12:59,712 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:12:59,712 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:13:11,507 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:13:11,508 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:13:11,508 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:13:23,487 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:13:23,488 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:13:23,488 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:13:35,515 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:13:35,516 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:13:35,516 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:13:47,542 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:13:47,543 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:13:47,543 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:13:59,559 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:13:59,560 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:13:59,560 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:14:11,513 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:14:11,514 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:14:11,514 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:14:23,522 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:14:23,522 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:14:23,523 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:14:35,522 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:14:35,523 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:14:35,523 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:14:47,565 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:14:47,566 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:14:47,566 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:14:59,501 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:14:59,502 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:14:59,502 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:15:11,466 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:15:11,467 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:15:11,467 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:15:23,511 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:15:23,512 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:15:23,513 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:15:35,470 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:15:35,470 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:15:35,470 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:15:47,500 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:15:47,501 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:15:47,501 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:15:59,483 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:15:59,484 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:15:59,484 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:16:11,493 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:16:11,493 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:16:11,493 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:16:23,528 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:16:23,528 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:16:23,529 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:16:35,458 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:16:35,459 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:16:35,459 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:16:47,212 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:16:47,213 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:16:47,213 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:16:58,992 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:16:58,993 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:16:58,993 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:17:11,016 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:17:11,016 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:17:11,017 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:17:23,007 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:17:23,007 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:17:23,007 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:17:34,984 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:17:34,985 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:17:34,985 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:17:46,959 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:17:46,960 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:17:46,960 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:17:58,748 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:17:58,749 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:17:58,749 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:18:10,744 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:18:10,745 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:18:10,745 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:18:22,755 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:18:22,756 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:18:22,756 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:18:34,746 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:18:34,747 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:18:34,748 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:18:40,506 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:18:40,507 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:18:40,508 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:18:52,496 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:18:52,496 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:18:52,497 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:19:04,490 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:19:04,490 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:19:04,491 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:19:16,536 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:19:16,537 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:19:16,539 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:19:28,509 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:19:28,510 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:19:28,511 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:19:59,807 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:19:59,808 - __main__ - INFO - Starting in production service mode
+2025-07-01 13:19:59,809 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:20:11,780 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:20:11,781 - __main__ - INFO - Starting in production service mode
+2025-07-01 13:20:11,782 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:20:23,752 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:20:23,752 - __main__ - INFO - Starting in production service mode
+2025-07-01 13:20:23,757 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 13:20:23,757 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 13:20:30,083 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:20:30,084 - __main__ - INFO - Starting in production service mode
+2025-07-01 13:20:30,116 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 13:20:30,116 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 13:20:40,364 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:20:40] "GET / HTTP/1.1" 200 -
+2025-07-01 13:21:52,737 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:21:52] "GET / HTTP/1.1" 200 -
+2025-07-01 13:21:52,879 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:21:52] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:21:53,970 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:21:53] "GET / HTTP/1.1" 200 -
+2025-07-01 13:21:54,041 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:21:54] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:25:20,386 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:25:20,387 - __main__ - INFO - Starting in production service mode
+2025-07-01 13:25:20,391 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 13:25:20,391 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 13:25:27,697 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:25:27] "GET / HTTP/1.1" 200 -
+2025-07-01 13:25:27,864 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:25:27] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:32:38,854 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:32:38] "GET / HTTP/1.1" 200 -
+2025-07-01 13:32:38,982 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:32:38] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:33:41,106 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:33:41] "GET / HTTP/1.1" 200 -
+2025-07-01 13:33:41,407 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:33:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:38:02,635 - __main__ - INFO - Background monitoring thread started
+2025-07-01 13:38:02,635 - __main__ - INFO - Mission Control monitoring started - real-time fleet status tracking active
+2025-07-01 13:38:02,636 - __main__ - INFO - Starting in production service mode
+2025-07-01 13:38:02,676 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 13:38:02,676 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 13:38:09,827 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:38:09] "GET / HTTP/1.1" 200 -
+2025-07-01 13:38:09,874 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:38:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:39:35,651 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:39:35] "GET / HTTP/1.1" 200 -
+2025-07-01 13:39:35,774 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:39:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:43:45,340 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:43:45] "GET / HTTP/1.1" 200 -
+2025-07-01 13:43:45,598 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:43:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-01 13:45:42,034 - __main__ - INFO - Spawning RDP connection to 192.168.1.24 (1920x1080, workspace 1)
+2025-07-01 13:45:42,038 - __main__ - INFO - RDP process started for 192.168.1.24 (PID: 949949)
+2025-07-01 13:45:42,038 - __main__ - INFO - RDP connection rdp_192.168.1.24_1751334342 registered and tracking started
+2025-07-01 13:45:42,039 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:45:42] "POST /api/rdp/spawn HTTP/1.1" 200 -
+2025-07-01 13:45:45,044 - __main__ - INFO - Window positioned successfully for 192.168.1.24
+2025-07-01 13:45:48,776 - __main__ - INFO - Cleaning up dead connection: rdp_192.168.1.24_1751334342
+2025-07-01 13:45:48,776 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 13:45:48] "GET /api/rdp/connections HTTP/1.1" 200 -

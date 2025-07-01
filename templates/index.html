@@ -3,303 +3,711 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NZ7DEV Mission Control - Optimized Edition</title>
+    <title>NZ7DEV Mission Control - Professional Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js" integrity="sha512-luMnTJZ7oEchNDZkhPk7BYJEuP5IO/jQYYHB0aXqBAXZmnPHI77Jug8C+yjTa4kGMO/14ue3rWYq8v5sCz/Y5jg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Optimized CSS with CSS Variables and Modern Design */
+        /* Professional Dark Mode Toolkit CSS */
         :root {
-            --primary-color: #00ff88;
-            --primary-dark: #00cc6a;
-            --secondary-color: #ff6b35;
-            --background-dark: #0a0a0a;
-            --background-medium: #1a1a1a;
-            --background-light: #2a2a2a;
+            /* Professional Dark Palette */
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #1a1a1d;
+            --bg-card: #1e1e21;
+            --bg-card-hover: #242428;
+            
+            /* Accent Colors */
+            --accent-primary: #00d4ff;
+            --accent-secondary: #0099cc;
+            --accent-success: #00ff88;
+            --accent-warning: #ffb800;
+            --accent-danger: #ff4757;
+            --accent-info: #3742fa;
+            
+            /* Text Colors */
             --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-            --text-muted: #888888;
-            --border-color: #333333;
-            --success-color: #4caf50;
-            --warning-color: #ff9800;
-            --error-color: #f44336;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            --border-radius: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --text-secondary: #b8bcc5;
+            --text-muted: #6c7085;
+            --text-accent: var(--accent-primary);
+            
+            /* Border & Shadow */
+            --border-primary: #2a2a2e;
+            --border-secondary: #3a3a3e;
+            --border-accent: var(--accent-primary);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-accent: 0 0 20px rgba(0, 212, 255, 0.2);
+            
+            /* Sizing */
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Transitions */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-medium) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 184, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            background: var(--background-light);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            background: rgba(30, 30, 33, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-primary);
+            padding: var(--spacing-lg) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
         }
 
-        .header h1 {
-            color: var(--primary-color);
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .header-title h1 {
             font-size: 2.5rem;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 255, 136, 0.3);
-            margin-bottom: 10px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-success);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
 
         .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-left: 10px;
+            background: var(--accent-success);
             animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--accent-success);
         }
-
-        .status-indicator.online { background: var(--success-color); }
-        .status-indicator.offline { background: var(--error-color); }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
         }
 
-        .grid {
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
         }
 
-        .panel {
-            background: var(--background-light);
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
             border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
         }
 
-        .panel:hover {
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+        }
+
+        .dashboard-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-secondary);
+            background: var(--bg-card-hover);
         }
 
-        .panel h2 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.3rem;
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
         }
 
-        .quick-spawn {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
-            color: white;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .input-row {
+        .card-title {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-primary);
+        }
+
+        /* Quick Actions Panel */
+        .quick-actions {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+            border: 1px solid var(--accent-primary);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .action-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto;
+            gap: var(--spacing-md);
             align-items: end;
         }
 
-        input, select {
-            background: var(--background-medium);
-            border: 2px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: var(--transition);
-            flex: 1;
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
         }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
-        }
-
-        .btn {
-            background: var(--primary-color);
-            color: var(--background-dark);
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
+        .input-label {
+            font-size: 0.875rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 14px;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+        .input-field, .select-field {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
         }
 
-        .btn:active { transform: translateY(0); }
+        .input-field:focus, .select-field:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+            background: var(--bg-tertiary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left var(--transition-normal);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+        }
 
         .btn-secondary {
-            background: var(--secondary-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
         }
 
         .btn-danger {
-            background: var(--error-color);
+            background: linear-gradient(135deg, var(--accent-danger), #ff3742);
             color: white;
         }
 
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
+        .btn-sm {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 0.875rem;
         }
 
-        .preset-buttons {
+        /* Preset Buttons Grid */
+        .preset-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
         }
 
-        .vm-card {
-            background: var(--background-medium);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-bottom: 10px;
-            transition: var(--transition);
-        }
-
-        .vm-card:hover {
-            border-color: var(--primary-color);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        .vm-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .vm-callsign {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .vm-status {
-            display: flex;
-            gap: 10px;
-            font-size: 0.9rem;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
+        .preset-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-md);
+            color: var(--text-primary);
             font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
         }
 
-        .status-badge.online { background: rgba(76, 175, 80, 0.2); color: var(--success-color); }
-        .status-badge.offline { background: rgba(244, 67, 54, 0.2); color: var(--error-color); }
-        .status-badge.connected { background: rgba(0, 255, 136, 0.2); color: var(--primary-color); }
+        .preset-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-primary);
+            transform: translateY(-1px);
+        }
 
-        .connection-item {
-            background: var(--background-medium);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 12px;
-            margin-bottom: 8px;
+        /* Fleet Status */
+        .fleet-grid {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        .fleet-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-md);
+            transition: all var(--transition-fast);
+        }
+
+        .fleet-item:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-secondary);
+        }
+
+        .fleet-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: var(--spacing-sm);
         }
 
-        .connection-info {
-            flex: 1;
+        .fleet-callsign {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-primary);
         }
 
-        .connection-meta {
-            font-size: 0.9rem;
+        .fleet-status {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .status-chip {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-chip.online {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        .status-chip.offline {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .status-chip.connected {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+        }
+
+        .fleet-details {
+            font-size: 0.875rem;
             color: var(--text-muted);
         }
 
+        /* Connections Panel */
+        .connection-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .connection-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-fast);
+        }
+
+        .connection-item:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-secondary);
+        }
+
+        .connection-info h4 {
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .connection-meta {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* System Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-primary);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Fleet Controls */
+        .fleet-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        /* Live Log Panel */
+        .log-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            height: 300px;
+            overflow-y: auto;
+            padding: var(--spacing-sm);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .log-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .log-container::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb {
+            background: var(--border-secondary);
+            border-radius: 3px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            margin-bottom: 2px;
+            border-radius: 4px;
+            transition: background-color var(--transition-fast);
+            word-wrap: break-word;
+        }
+
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .log-timestamp {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            min-width: 60px;
+            flex-shrink: 0;
+        }
+
+        .log-level {
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-align: center;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .log-level.INFO {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+        }
+
+        .log-level.SUCCESS {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        .log-level.WARNING {
+            background: rgba(255, 184, 0, 0.2);
+            color: var(--accent-warning);
+            border: 1px solid var(--accent-warning);
+        }
+
+        .log-level.ERROR {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .log-level.DEBUG {
+            background: rgba(116, 112, 133, 0.2);
+            color: var(--text-muted);
+            border: 1px solid var(--text-muted);
+        }
+
+        .log-message {
+            color: var(--text-primary);
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .log-item.log-info {
+            border-left: 2px solid var(--accent-primary);
+        }
+
+        .log-item.log-success {
+            border-left: 2px solid var(--accent-success);
+        }
+
+        .log-item.log-warning {
+            border-left: 2px solid var(--accent-warning);
+        }
+
+        .log-item.log-error {
+            border-left: 2px solid var(--accent-danger);
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .log-item.log-debug {
+            border-left: 2px solid var(--text-muted);
+            opacity: 0.7;
+        }
+
+        /* Loading States */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--border-primary);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
+        /* Notifications */
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
+            max-width: 400px;
+            padding: var(--spacing-lg);
             border-radius: var(--border-radius);
             color: white;
             font-weight: 600;
             z-index: 1000;
-            transform: translateX(400px);
-            transition: var(--transition);
-            box-shadow: var(--shadow);
+            transform: translateX(450px);
+            transition: transform var(--transition-normal);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
         }
 
-        .notification.show { transform: translateX(0); }
-        .notification.success { background: var(--success-color); }
-        .notification.error { background: var(--error-color); }
-        .notification.warning { background: var(--warning-color); }
+        .notification.show {
+            transform: translateX(0);
+        }
 
-        .fleet-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
+        .notification.success {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.9), rgba(0, 200, 100, 0.9));
+            border: 1px solid var(--accent-success);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.9), rgba(255, 55, 71, 0.9));
+            border: 1px solid var(--accent-danger);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, rgba(255, 184, 0, 0.9), rgba(255, 160, 0, 0.9));
+            border: 1px solid var(--accent-warning);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .action-form {
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: auto auto auto;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 768px) {
-            .grid { grid-template-columns: 1fr; }
-            .input-row { flex-direction: column; }
-            .preset-buttons { grid-template-columns: 1fr; }
-            .fleet-controls { flex-direction: column; }
+            .container {
+                padding: var(--spacing-md);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-form {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+            .header-content {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                text-align: center;
+            }
+            .header-title h1 {
+                font-size: 2rem;
+            }
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .fleet-controls {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* Accessibility improvements */
+        /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -307,169 +715,338 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* Focus states for accessibility */
+        .btn:focus-visible,
+        .input-field:focus-visible,
+        .select-field:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🚀 NZ7DEV Mission Control <span class="status-indicator online" id="connectionStatus"></span></h1>
-            <p>High-Performance RDP Fleet Management - Optimized Edition</p>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1><i class="fas fa-rocket"></i> NZ7DEV Mission Control</h1>
+                <div class="status-badge">
+                    <div class="status-indicator" id="connectionStatus"></div>
+                    <span>OPERATIONAL</span>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="text-muted">Professional Edition • Optimized Performance</span>
+            </div>
         </div>
+    </header>
 
-        <div class="grid">
-            <!-- Quick RDP Spawner -->
-            <div class="panel quick-spawn">
-                <h2>⚡ Quick RDP Spawner</h2>
-                <div class="input-group">
-                    <label for="rdpIp">Target IP Address</label>
-                    <div class="input-row">
-                        <input type="text" id="rdpIp" placeholder="192.168.1.24" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-                        <select id="rdpGeometry">
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Quick Actions Panel -->
+            <div class="dashboard-card quick-actions">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bolt card-icon"></i>
+                        <span>Quick RDP Deployment</span>
+                    </div>
+                </div>
+                
+                <div class="action-form">
+                    <div class="input-group">
+                        <label class="input-label">Target IP Address</label>
+                        <input type="text" id="rdpIp" class="input-field" placeholder="192.168.1.24" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Username</label>
+                        <input type="text" id="rdpUsername" class="input-field" placeholder="User" value="User">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Password</label>
+                        <input type="password" id="rdpPassword" class="input-field" placeholder="password" value="lemonlime">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Resolution</label>
+                        <select id="rdpGeometry" class="select-field">
                             <option value="1920x1080">1920×1080</option>
                             <option value="1680x1050">1680×1050</option>
                             <option value="1440x900">1440×900</option>
                             <option value="1280x720">1280×720</option>
                             <option value="1024x768">1024×768</option>
                         </select>
-                        <select id="rdpWorkspace">
-                            <option value="1">WS 1</option>
-                            <option value="2">WS 2</option>
-                            <option value="3">WS 3</option>
-                            <option value="4">WS 4</option>
-                            <option value="5">WS 5</option>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Workspace</label>
+                        <select id="rdpWorkspace" class="select-field">
+                            <option value="1">Workspace 1</option>
+                            <option value="2">Workspace 2</option>
+                            <option value="3">Workspace 3</option>
+                            <option value="4">Workspace 4</option>
+                            <option value="5">Workspace 5</option>
                         </select>
-                        <button class="btn" onclick="spawnRDP()">SPAWN</button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Action</label>
+                        <button class="btn btn-primary" onclick="spawnRDP()">
+                            <i class="fas fa-rocket"></i>
+                            Deploy
+                        </button>
                     </div>
                 </div>
-                
-                <div class="preset-buttons">
-                    <button class="btn btn-secondary btn-small" onclick="setPreset('192.168.1.20', 'ALPHA')">ALPHA</button>
-                    <button class="btn btn-secondary btn-small" onclick="setPreset('192.168.1.21', 'BRAVO')">BRAVO</button>
-                    <button class="btn btn-secondary btn-small" onclick="setPreset('192.168.1.23', 'CHARLIE')">CHARLIE</button>
-                    <button class="btn btn-secondary btn-small" onclick="setPreset('192.168.1.24', 'DELTA')">DELTA</button>
-                    <button class="btn btn-secondary btn-small" onclick="setPreset('192.168.1.25', 'ECHO')">ECHO</button>
-                    <button class="btn btn-secondary btn-small" onclick="setPreset('192.168.1.26', 'FOXTROT')">FOXTROT</button>
-                </div>
-            </div>
 
-            <!-- Active Connections -->
-            <div class="panel">
-                <h2>🔗 Active Connections</h2>
-                <div id="activeConnections">
-                    <p>No active connections</p>
+                <div class="preset-grid">
+                    <button class="preset-btn" onclick="setPreset('192.168.1.20', 'nz7dev', 'lemonlime', 'ALPHA')">
+                        <i class="fas fa-server"></i> ALPHA
+                    </button>
+                    <button class="preset-btn" onclick="setPreset('192.168.1.21', 'nz7dev', 'lemonlime', 'BRAVO')">
+                        <i class="fas fa-server"></i> BRAVO
+                    </button>
+                    <button class="preset-btn" onclick="setPreset('192.168.1.23', 'User', 'lemonlime', 'CHARLIE')">
+                        <i class="fas fa-server"></i> CHARLIE
+                    </button>
+                    <button class="preset-btn" onclick="setPreset('192.168.1.24', 'nz7dev', 'lemonlime', 'DELTA')">
+                        <i class="fas fa-server"></i> DELTA
+                    </button>
+                    <button class="preset-btn" onclick="setPreset('192.168.1.25', 'User', 'lemonlime', 'ECHO')">
+                        <i class="fas fa-server"></i> ECHO
+                    </button>
+                    <button class="preset-btn" onclick="setPreset('192.168.1.26', 'User', 'lemonlime', 'FOXTROT')">
+                        <i class="fas fa-server"></i> FOXTROT
+                    </button>
                 </div>
             </div>
 
             <!-- Fleet Status -->
-            <div class="panel">
-                <h2>🛡️ Fleet Status</h2>
-                <div id="fleetStatus">
-                    <div class="loading"></div> Loading fleet status...
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-network-wired card-icon"></i>
+                        <span>Fleet Status</span>
+                    </div>
                 </div>
+                
+                <div class="fleet-grid" id="fleetStatus">
+                    <div class="loading"></div>
+                </div>
+
                 <div class="fleet-controls">
-                    <button class="btn btn-small" onclick="executeFleetCommand('up')">Start Fleet</button>
-                    <button class="btn btn-small btn-secondary" onclick="executeFleetCommand('morning')">Morning Routine</button>
-                    <button class="btn btn-small btn-secondary" onclick="executeFleetCommand('fastup')">LUDICROUS SPEED</button>
-                    <button class="btn btn-small btn-danger" onclick="executeFleetCommand('down')">Stop Fleet</button>
+                    <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('up')">
+                        <i class="fas fa-play"></i> Start Fleet
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('morning')">
+                        <i class="fas fa-sun"></i> Morning Routine
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('fastup')">
+                        <i class="fas fa-fighter-jet"></i> Ludicrous Speed
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="executeFleetCommand('down')">
+                        <i class="fas fa-stop"></i> Emergency Stop
+                    </button>
                 </div>
             </div>
 
-            <!-- System Info -->
-            <div class="panel">
-                <h2>📊 System Info</h2>
-                <div id="systemInfo">
-                    <p><strong>Connections:</strong> <span id="connectionCount">0</span></p>
-                    <p><strong>Online VMs:</strong> <span id="onlineCount">0</span></p>
-                    <p><strong>Last Update:</strong> <span id="lastUpdate">Never</span></p>
-                    <p><strong>Performance:</strong> <span class="status-badge online">Optimized</span></p>
+            <!-- Active Connections -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-link card-icon"></i>
+                        <span>Active Connections</span>
+                    </div>
+                </div>
+                
+                <div class="connection-list" id="activeConnections">
+                    <div class="text-muted">No active connections</div>
+                </div>
+            </div>
+
+            <!-- System Metrics -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line card-icon"></i>
+                        <span>System Metrics</span>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" id="connectionCount">0</div>
+                        <div class="metric-label">Active Connections</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="onlineCount">0</div>
+                        <div class="metric-label">Online VMs</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="uptimeDisplay">--:--</div>
+                        <div class="metric-label">Uptime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">
+                            <i class="fas fa-check-circle" style="color: var(--accent-success);"></i>
+                        </div>
+                        <div class="metric-label">System Status</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--border-radius-sm); border: 1px solid var(--border-primary);">
+                    <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: var(--spacing-sm);">Last Update: <span id="lastUpdate">Never</span></div>
+                    <div style="font-size: 0.875rem; color: var(--accent-success);">
+                        <i class="fas fa-bolt"></i> Performance Optimized • Real-time Monitoring Active
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Log Panel -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-terminal card-icon"></i>
+                        <span>Live System Logs</span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="clearLogs()" title="Clear Logs">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="log-container" id="logContainer">
+                    <div class="log-item log-info">
+                        <span class="log-timestamp">--:--:--</span>
+                        <span class="log-level">INFO</span>
+                        <span class="log-message">System initializing...</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Optimized JavaScript with modern features
-        class MissionControlApp {
+        // Enhanced Professional JavaScript Application
+        class MissionControlPro {
             constructor() {
                 this.socket = io();
+                this.startTime = Date.now();
                 this.setupEventListeners();
                 this.setupKeyboardShortcuts();
                 this.requestInitialData();
+                this.startUptimeCounter();
             }
 
             setupEventListeners() {
                 this.socket.on('connect', () => {
                     this.updateConnectionStatus(true);
-                    this.showNotification('Connected to Mission Control', 'success');
+                    this.showNotification('Mission Control Online', 'success');
+                    this.addLog('Mission Control connected successfully', 'SUCCESS');
                 });
 
                 this.socket.on('disconnect', () => {
                     this.updateConnectionStatus(false);
-                    this.showNotification('Disconnected from Mission Control', 'warning');
+                    this.showNotification('Connection Lost - Attempting Reconnect', 'warning');
+                    this.addLog('Connection lost - attempting reconnect', 'WARNING');
                 });
 
                 this.socket.on('status_update', (data) => {
                     this.updateFleetStatus(data);
                 });
 
-                // Auto-refresh connections every 5 seconds
-                setInterval(() => this.updateActiveConnections(), 5000);
+                this.socket.on('log_message', (data) => {
+                    this.addLog(data.message, data.level, data.timestamp);
+                });
+
+                // Auto-refresh connections every 3 seconds for real-time feel
+                setInterval(() => this.updateActiveConnections(), 3000);
             }
 
             setupKeyboardShortcuts() {
                 document.addEventListener('keydown', (e) => {
+                    // Ctrl+Enter to deploy
                     if (e.ctrlKey && e.key === 'Enter') {
                         e.preventDefault();
                         spawnRDP();
                     }
+                    
+                    // Alt+1-6 for quick presets
                     if (e.altKey && e.key >= '1' && e.key <= '6') {
                         e.preventDefault();
                         const presets = [
-                            ['192.168.1.20', 'ALPHA'],
-                            ['192.168.1.21', 'BRAVO'], 
-                            ['192.168.1.23', 'CHARLIE'],
-                            ['192.168.1.24', 'DELTA'],
-                            ['192.168.1.25', 'ECHO'],
-                            ['192.168.1.26', 'FOXTROT']
+                            ['192.168.1.20', 'nz7dev', 'lemonlime', 'ALPHA'],
+                            ['192.168.1.21', 'nz7dev', 'lemonlime', 'BRAVO'], 
+                            ['192.168.1.23', 'User', 'lemonlime', 'CHARLIE'],
+                            ['192.168.1.24', 'nz7dev', 'lemonlime', 'DELTA'],
+                            ['192.168.1.25', 'User', 'lemonlime', 'ECHO'],
+                            ['192.168.1.26', 'User', 'lemonlime', 'FOXTROT']
                         ];
                         const index = parseInt(e.key) - 1;
                         if (presets[index]) {
-                            setPreset(presets[index][0], presets[index][1]);
+                            setPreset(presets[index][0], presets[index][1], presets[index][2], presets[index][3]);
                         }
                     }
+
+                    // F5 to refresh status
+                    if (e.key === 'F5') {
+                        e.preventDefault();
+                        this.socket.emit('request_status');
+                        this.showNotification('Status Refreshed', 'success');
+                    }
                 });
+            }
+
+            startUptimeCounter() {
+                setInterval(() => {
+                    const uptime = Date.now() - this.startTime;
+                    const hours = Math.floor(uptime / (1000 * 60 * 60));
+                    const minutes = Math.floor((uptime % (1000 * 60 * 60)) / (1000 * 60));
+                    document.getElementById('uptimeDisplay').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                }, 1000);
             }
 
             requestInitialData() {
                 this.socket.emit('request_status');
                 this.updateActiveConnections();
+                this.addLog('System initialized - requesting initial fleet status', 'INFO');
             }
 
             updateConnectionStatus(connected) {
                 const indicator = document.getElementById('connectionStatus');
-                indicator.className = `status-indicator ${connected ? 'online' : 'offline'}`;
+                if (connected) {
+                    indicator.style.background = 'var(--accent-success)';
+                    indicator.style.boxShadow = '0 0 10px var(--accent-success)';
+                } else {
+                    indicator.style.background = 'var(--accent-danger)';
+                    indicator.style.boxShadow = '0 0 10px var(--accent-danger)';
+                }
             }
 
             updateFleetStatus(data) {
                 const container = document.getElementById('fleetStatus');
                 let onlineCount = 0;
+                let connectedCount = 0;
                 
                 const html = Object.values(data).map(vm => {
                     if (vm.online) onlineCount++;
+                    if (vm.window_active) connectedCount++;
                     
                     return `
-                        <div class="vm-card">
-                            <div class="vm-header">
-                                <span class="vm-callsign">${vm.callsign} (${vm.name})</span>
-                                <div class="vm-status">
-                                    <span class="status-badge ${vm.online ? 'online' : 'offline'}">
-                                        ${vm.online ? 'Online' : 'Offline'}
+                        <div class="fleet-item">
+                            <div class="fleet-header">
+                                <div class="fleet-callsign">${vm.callsign}</div>
+                                <div class="fleet-status">
+                                    <span class="status-chip ${vm.online ? 'online' : 'offline'}">
+                                        ${vm.online ? 'ONLINE' : 'OFFLINE'}
                                     </span>
-                                    ${vm.window_active ? '<span class="status-badge connected">Connected</span>' : ''}
+                                    ${vm.window_active ? '<span class="status-chip connected">CONNECTED</span>' : ''}
                                 </div>
                             </div>
-                            <div class="connection-meta">
-                                ${vm.ip} • ${vm.geometry} • WS${vm.workspace} • ${vm.position}
+                            <div class="fleet-details">
+                                ${vm.ip} • ${vm.geometry} • WS${vm.workspace} • ${vm.position.toUpperCase()}
                             </div>
                         </div>
                     `;
@@ -478,6 +1055,26 @@
                 container.innerHTML = html;
                 document.getElementById('onlineCount').textContent = onlineCount;
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                
+                // Log significant fleet status changes
+                if (this.lastOnlineCount !== undefined && this.lastOnlineCount !== onlineCount) {
+                    if (onlineCount > this.lastOnlineCount) {
+                        this.addLog(`Fleet status: ${onlineCount} VMs online (+${onlineCount - this.lastOnlineCount})`, 'SUCCESS');
+                    } else {
+                        this.addLog(`Fleet status: ${onlineCount} VMs online (-${this.lastOnlineCount - onlineCount})`, 'WARNING');
+                    }
+                }
+                
+                if (this.lastConnectedCount !== undefined && this.lastConnectedCount !== connectedCount) {
+                    if (connectedCount > this.lastConnectedCount) {
+                        this.addLog(`RDP connections: ${connectedCount} active (+${connectedCount - this.lastConnectedCount})`, 'INFO');
+                    } else if (connectedCount < this.lastConnectedCount) {
+                        this.addLog(`RDP connections: ${connectedCount} active (-${this.lastConnectedCount - connectedCount})`, 'INFO');
+                    }
+                }
+                
+                this.lastOnlineCount = onlineCount;
+                this.lastConnectedCount = connectedCount;
             }
 
             async updateActiveConnections() {
@@ -489,18 +1086,18 @@
                     const count = Object.keys(connections).length;
                     
                     if (count === 0) {
-                        container.innerHTML = '<p>No active connections</p>';
+                        container.innerHTML = '<div class="text-muted">No active connections</div>';
                     } else {
                         const html = Object.entries(connections).map(([id, conn]) => `
                             <div class="connection-item">
                                 <div class="connection-info">
-                                    <strong>${conn.ip}</strong> (${conn.username})
+                                    <h4>${conn.ip}</h4>
                                     <div class="connection-meta">
-                                        ${conn.geometry} • WS${conn.workspace} • ${conn.duration}
+                                        ${conn.username} • ${conn.geometry} • WS${conn.workspace} • ${conn.duration}
                                     </div>
                                 </div>
-                                <button class="btn btn-danger btn-small" onclick="killConnection('${id}')">
-                                    Kill
+                                <button class="btn btn-danger btn-sm" onclick="killConnection('${id}')">
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         `).join('');
@@ -516,17 +1113,24 @@
             showNotification(message, type = 'success') {
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
-                notification.textContent = message;
+                
+                const icon = type === 'success' ? 'check-circle' : 
+                           type === 'error' ? 'exclamation-circle' : 
+                           type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+                
+                notification.innerHTML = `
+                    <i class="fas fa-${icon}" style="margin-right: 8px;"></i>
+                    ${message}
+                `;
+                
                 document.body.appendChild(notification);
                 
-                // Trigger animation
                 setTimeout(() => notification.classList.add('show'), 100);
                 
-                // Remove after 3 seconds
                 setTimeout(() => {
                     notification.classList.remove('show');
                     setTimeout(() => document.body.removeChild(notification), 300);
-                }, 3000);
+                }, 4000);
             }
 
             async makeRequest(url, options = {}) {
@@ -549,29 +1153,80 @@
                     throw error;
                 }
             }
+
+            addLog(message, level = 'INFO', timestamp = null) {
+                const container = document.getElementById('logContainer');
+                const logItem = document.createElement('div');
+                const time = timestamp ? new Date(timestamp) : new Date();
+                const timeStr = time.toLocaleTimeString();
+                
+                logItem.className = `log-item log-${level.toLowerCase()}`;
+                logItem.innerHTML = `
+                    <span class="log-timestamp">${timeStr}</span>
+                    <span class="log-level ${level.toUpperCase()}">${level.toUpperCase()}</span>
+                    <span class="log-message">${message}</span>
+                `;
+                
+                container.appendChild(logItem);
+                
+                // Auto-scroll to bottom
+                container.scrollTop = container.scrollHeight;
+                
+                // Keep only last 100 log entries for performance
+                const logItems = container.children;
+                if (logItems.length > 100) {
+                    container.removeChild(logItems[0]);
+                }
+            }
+
+            clearLogs() {
+                const container = document.getElementById('logContainer');
+                container.innerHTML = '';
+                this.addLog('Logs cleared by user', 'INFO');
+            }
         }
 
         // Global functions for UI interactions
         async function spawnRDP() {
             const ip = document.getElementById('rdpIp').value.trim();
+            const username = document.getElementById('rdpUsername').value.trim();
+            const password = document.getElementById('rdpPassword').value.trim();
             const geometry = document.getElementById('rdpGeometry').value;
             const workspace = parseInt(document.getElementById('rdpWorkspace').value);
 
             if (!ip) {
-                app.showNotification('Please enter an IP address', 'warning');
+                app.showNotification('Please enter target IP address', 'warning');
+                app.addLog('RDP deployment failed: No IP address provided', 'WARNING');
                 return;
             }
 
             if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
-                app.showNotification('Please enter a valid IP address', 'error');
+                app.showNotification('Invalid IP address format', 'error');
+                app.addLog(`RDP deployment failed: Invalid IP format (${ip})`, 'ERROR');
+                return;
+            }
+
+            if (!username) {
+                app.showNotification('Please enter username', 'warning');
+                app.addLog('RDP deployment failed: No username provided', 'WARNING');
+                return;
+            }
+
+            if (!password) {
+                app.showNotification('Please enter password', 'warning');
+                app.addLog('RDP deployment failed: No password provided', 'WARNING');
                 return;
             }
 
             try {
+                app.addLog(`Deploying RDP connection to ${ip} (${username}, ${geometry}, WS${workspace})`, 'INFO');
+                
                 const result = await app.makeRequest('/api/rdp/spawn', {
                     method: 'POST',
                     body: JSON.stringify({
                         ip,
+                        username,
+                        password,
                         geometry,
                         workspace,
                         position: 'center',
@@ -580,58 +1235,83 @@
                 });
 
                 if (result.success) {
-                    app.showNotification(`RDP connection to ${ip} started!`, 'success');
+                    app.showNotification(`RDP deployed to ${ip} successfully`, 'success');
+                    app.addLog(`RDP connection to ${ip} deployed successfully (ID: ${result.connection_id})`, 'SUCCESS');
                     app.updateActiveConnections();
                 } else {
-                    app.showNotification(`Failed to spawn RDP: ${result.error}`, 'error');
+                    app.showNotification(`Deployment failed: ${result.error}`, 'error');
+                    app.addLog(`RDP deployment to ${ip} failed: ${result.error}`, 'ERROR');
                 }
             } catch (error) {
-                console.error('Spawn RDP error:', error);
+                console.error('RDP deployment error:', error);
+                app.addLog(`RDP deployment to ${ip} failed: ${error.message}`, 'ERROR');
             }
         }
 
-        function setPreset(ip, name) {
+        function setPreset(ip, username, password, name) {
             document.getElementById('rdpIp').value = ip;
-            app.showNotification(`Preset ${name} selected (${ip})`, 'success');
+            document.getElementById('rdpUsername').value = username;
+            document.getElementById('rdpPassword').value = password;
+            app.showNotification(`${name} target selected (${ip})`, 'success');
+            app.addLog(`Fleet preset selected: ${name} (${ip})`, 'INFO');
         }
 
         async function killConnection(connectionId) {
             try {
+                app.addLog(`Terminating connection: ${connectionId}`, 'INFO');
+                
                 const result = await app.makeRequest(`/api/rdp/connection/${connectionId}/kill`, {
                     method: 'POST'
                 });
 
                 if (result.success) {
-                    app.showNotification('Connection terminated', 'success');
+                    app.showNotification('Connection terminated successfully', 'success');
+                    app.addLog(`Connection ${connectionId} terminated successfully`, 'SUCCESS');
                     app.updateActiveConnections();
                 } else {
-                    app.showNotification(`Failed to kill connection: ${result.error}`, 'error');
+                    app.showNotification(`Termination failed: ${result.error}`, 'error');
+                    app.addLog(`Failed to terminate connection ${connectionId}: ${result.error}`, 'ERROR');
                 }
             } catch (error) {
-                console.error('Kill connection error:', error);
+                console.error('Connection termination error:', error);
+                app.addLog(`Connection termination failed: ${error.message}`, 'ERROR');
             }
         }
 
         async function executeFleetCommand(command) {
             try {
+                app.showNotification(`Executing fleet command: ${command.toUpperCase()}`, 'success');
+                app.addLog(`Executing fleet command: ${command}`, 'INFO');
+                
                 const result = await app.makeRequest(`/api/fleet/${command}`, {
                     method: 'POST'
                 });
 
                 if (result.success) {
                     app.showNotification(`Fleet command '${command}' executed successfully`, 'success');
+                    app.addLog(`Fleet command '${command}' completed successfully`, 'SUCCESS');
+                    if (result.output) {
+                        app.addLog(`Command output: ${result.output.trim()}`, 'DEBUG');
+                    }
                 } else {
                     app.showNotification(`Fleet command failed: ${result.error}`, 'error');
+                    app.addLog(`Fleet command '${command}' failed: ${result.error}`, 'ERROR');
                 }
             } catch (error) {
                 console.error('Fleet command error:', error);
+                app.addLog(`Fleet command '${command}' failed: ${error.message}`, 'ERROR');
             }
         }
 
-        // Initialize app when DOM is ready
+        function clearLogs() {
+            app.clearLogs();
+        }
+
+        // Initialize Professional Application
         let app;
         document.addEventListener('DOMContentLoaded', () => {
-            app = new MissionControlApp();
+            app = new MissionControlPro();
+            console.log('🚀 NZ7DEV Mission Control Professional Edition Initialized');
         });
     </script>
 </body>
