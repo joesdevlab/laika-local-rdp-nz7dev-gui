@@ -25,9 +25,12 @@
             
             /* Accent Colors */
             --accent-primary: #00d4ff;
+            --accent-primary-rgb: 0, 212, 255;
             --accent-secondary: #0099cc;
             --accent-success: #00ff88;
+            --accent-success-rgb: 0, 255, 136;
             --accent-warning: #ffb800;
+            --accent-warning-rgb: 255, 184, 0;
             --accent-danger: #ff4757;
             --accent-info: #3742fa;
             
@@ -49,6 +52,7 @@
             /* Sizing */
             --border-radius: 12px;
             --border-radius-sm: 8px;
+            --border-radius-md: 10px;
             --spacing-xs: 4px;
             --spacing-sm: 8px;
             --spacing-md: 16px;
@@ -59,6 +63,7 @@
             --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { 
@@ -165,10 +170,113 @@
         /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto auto;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: var(--spacing-lg);
             margin-bottom: var(--spacing-xl);
+        }
+
+        /* Hero Panel Styling */
+        .hero-panel {
+            grid-column: 1 / -1; /* Full width */
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border: 2px solid var(--accent-primary);
+            box-shadow: 0 8px 32px rgba(var(--accent-primary-rgb), 0.15);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .hero-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success), var(--accent-warning), var(--accent-primary));
+            background-size: 200% 100%;
+            animation: heroGradient 3s ease-in-out infinite;
+        }
+
+        @keyframes heroGradient {
+            0%, 100% { background-position: 200% 0; }
+            50% { background-position: 0% 0; }
+        }
+
+        .hero-panel .card-header {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            border-bottom: 3px solid var(--accent-primary);
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .hero-panel .card-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .hero-panel .card-title .card-icon {
+            width: 36px;
+            height: 36px;
+            color: var(--accent-primary);
+            text-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.5);
+        }
+
+        .hero-badge {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: auto;
+            box-shadow: 0 4px 12px rgba(var(--accent-primary-rgb), 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        /* Secondary Panel Styling */
+        .secondary-panel {
+            grid-column: 1 / -1; /* Full width */
+            border-left: 4px solid var(--accent-secondary);
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .secondary-panel .card-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent-secondary);
+        }
+
+        .secondary-panel .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .secondary-panel .card-title .card-icon {
+            color: var(--accent-secondary);
+        }
+
+        /* Specific layout for different sections */
+        .quick-actions {
+            grid-column: 1 / -1; /* Full width for quick actions */
+        }
+
+        .workspace-manager {
+            grid-column: 1 / -1; /* Full width for workspace manager */
+            margin-top: var(--spacing-xl);
+        }
+
+        /* Two-column layout for status panels */
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: var(--spacing-lg);
+            grid-column: 1 / -1;
         }
 
         .dashboard-card {
@@ -730,6 +838,823 @@
             outline: 2px solid var(--accent-primary);
             outline-offset: 2px;
         }
+
+        /* Custom Resolution Section */
+        #customResolutionGroup {
+            transition: all var(--transition-normal);
+            transform-origin: top;
+        }
+
+        #customResolutionGroup.show {
+            animation: slideDown var(--transition-normal) ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 200px;
+            }
+        }
+
+        .custom-resolution-inputs {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .custom-resolution-inputs input[type="number"] {
+            flex: 1;
+            text-align: center;
+        }
+
+        .custom-resolution-separator {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 1.2rem;
+            min-width: 20px;
+            justify-content: center;
+        }
+
+        .custom-resolution-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .custom-resolution-hint i {
+            color: var(--accent-primary);
+        }
+
+        /* Workspace Manager Specific Improvements */
+        .workspace-manager .card-header {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            border-bottom: 2px solid var(--accent-primary);
+            margin-bottom: 0;
+        }
+
+        .workspace-manager .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .workspace-manager .card-title .card-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--accent-primary);
+        }
+
+        /* Fleet and Connection Grid Improvements */
+        .fleet-grid, .connection-list, .metrics-grid {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            min-height: auto;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .metric-item:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-primary);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Log Panel Improvements */
+        .log-panel {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-md);
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        /* Fleet Controls Improvements */
+        .fleet-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: 'Loading...';
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Responsive Grid Adjustments */
+        @media (max-width: 1400px) {
+            .dashboard-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-form {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .action-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .fleet-controls {
+                justify-content: center;
+            }
+            
+            .workspace-manager .card-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* ==================================================
+           VISUAL WORKSPACE MANAGER STYLES
+           ================================================== */
+
+        .workspace-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .workspace-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-lg);
+        }
+
+        .workspace-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            padding: 0 var(--spacing-sm);
+            border-bottom: 2px solid var(--border-primary);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .scratchpad-controls {
+            margin-left: auto;
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .workspaces-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--spacing-lg);
+            padding: var(--spacing-md);
+        }
+
+        .scratchpad-container {
+            display: flex;
+            justify-content: center;
+            padding: var(--spacing-md);
+        }
+
+        .workspace-item {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            transition: all 0.3s var(--transition-smooth);
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .workspace-item:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(var(--accent-primary-rgb), 0.15);
+        }
+
+        .workspace-item.scratchpad-item {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-color: var(--accent-secondary);
+            max-width: 280px;
+            min-height: 200px;
+        }
+
+        .workspace-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .workspace-id {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+        }
+
+        .workspace-status {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-indicator.active {
+            background: var(--accent-success);
+            box-shadow: 0 0 8px rgba(var(--accent-success-rgb), 0.6);
+        }
+
+        .status-indicator.inactive {
+            background: var(--text-muted);
+        }
+
+        .status-indicator.visible {
+            background: var(--accent-warning);
+            box-shadow: 0 0 8px rgba(var(--accent-warning-rgb), 0.6);
+        }
+
+        .status-indicator.hidden {
+            background: var(--text-muted);
+        }
+
+        .workspace-content {
+            flex: 1;
+            padding: var(--spacing-sm);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vm-slots {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            min-height: 80px;
+        }
+
+        .scratchpad-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-xs);
+            min-height: 120px;
+        }
+
+        .vm-slot {
+            padding: var(--spacing-sm);
+            border: 1px dashed var(--border-secondary);
+            border-radius: var(--border-radius-sm);
+            transition: all 0.3s var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .vm-slot.empty:hover,
+        .vm-slot.drag-over {
+            border-color: var(--accent-primary);
+            background: rgba(var(--accent-primary-rgb), 0.05);
+        }
+
+        .vm-slot.occupied {
+            border-style: solid;
+            border-color: var(--accent-success);
+            background: rgba(var(--accent-success-rgb), 0.05);
+        }
+
+        .slot-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .slot-placeholder i {
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+
+        .vm-info {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            text-align: center;
+        }
+
+        .vm-ip {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .vm-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .vm-actions {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-xs);
+        }
+
+        .workspace-info {
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-primary);
+            text-align: center;
+        }
+
+        .resolution-info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Available VMs Panel */
+        .available-vms-panel {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-md);
+            margin-top: var(--spacing-lg);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-lg);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .panel-header h4 {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .vm-filters {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .filter-btn {
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .vms-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .draggable-vm {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-md);
+            cursor: grab;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            user-select: none;
+        }
+
+        .draggable-vm:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .draggable-vm:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .draggable-vm.online {
+            border-left: 3px solid var(--accent-success);
+        }
+
+        .draggable-vm.offline {
+            border-left: 3px solid var(--text-muted);
+        }
+
+        .vm-icon {
+            font-size: 1.2rem;
+            color: var(--accent-primary);
+        }
+
+        .vm-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .vm-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+
+        .vm-status {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .vm-status.online {
+            color: var(--accent-success);
+        }
+
+        .vm-status.offline {
+            color: var(--text-muted);
+        }
+
+        /* Size Preset Panel */
+        .size-preset-panel {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-md);
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .preset-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+            user-select: none;
+        }
+
+        .preset-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .preset-item.selected {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 16px rgba(var(--accent-primary-rgb), 0.3);
+        }
+
+        .preset-icon {
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+        }
+
+        .preset-item.selected .preset-icon {
+            color: var(--bg-primary);
+        }
+
+        .preset-item span {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preset-item.selected span {
+            color: var(--bg-primary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-lg);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-primary);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .close {
+            color: var(--text-muted);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .close:hover {
+            color: var(--accent-danger);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: var(--spacing-lg);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            padding: var(--spacing-lg);
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-primary);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+
+        .settings-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-section h4 {
+            margin: 0 0 var(--spacing-md) 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-secondary);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-sm);
+        }
+
+        .config-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: var(--spacing-xs);
+        }
+
+        /* Tiny button styles */
+        .btn-tiny {
+            padding: 2px 4px;
+            font-size: 0.7rem;
+            border: 1px solid var(--border-secondary);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+        }
+
+        .btn-tiny:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-tiny.danger:hover {
+            background: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+
+        /* Drag and drop visual feedback */
+        .vm-slot.drag-over {
+            border-color: var(--accent-primary);
+            background: rgba(var(--accent-primary-rgb), 0.1);
+            transform: scale(1.02);
+        }
+
+        .draggable-vm.dragging {
+            opacity: 0.7;
+            transform: rotate(5deg) scale(0.95);
+        }
+
+        /* Responsive Design for Workspace Manager */
+        @media (max-width: 1200px) {
+            .workspaces-container {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: var(--spacing-md);
+            }
+            
+            .vms-container {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .workspaces-container {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: var(--spacing-sm);
+                padding: var(--spacing-sm);
+            }
+            
+            .vms-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+            
+            .workspace-item {
+                min-height: 150px;
+            }
+            
+            .scratchpad-item {
+                max-width: none;
+                min-height: 150px;
+            }
+            
+            .vm-filters {
+                flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+                padding: var(--spacing-xs) var(--spacing-sm);
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -753,8 +1678,266 @@
     <div class="container">
         <!-- Dashboard Grid -->
         <div class="dashboard-grid">
-            <!-- Quick Actions Panel -->
-            <div class="dashboard-card quick-actions">
+            <!-- Visual Workspace Manager - MAIN HERO PANEL -->
+            <div class="dashboard-card workspace-manager hero-panel">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-th-large card-icon"></i>
+                        <span>Visual Workspace Manager</span>
+                        <span class="hero-badge">PRIMARY CONTROL</span>
+                    </div>
+                    <div class="workspace-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="refreshWorkspaceState()" title="Refresh workspace state">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="openWorkspaceSettings()" title="Workspace Settings">
+                            <i class="fas fa-cogs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Workspace Grid -->
+                <div class="workspace-grid">
+                    <!-- Regular Workspaces -->
+                    <div class="workspace-section">
+                        <div class="section-title">
+                            <i class="fas fa-desktop"></i>
+                            <span>Workspaces</span>
+                        </div>
+                        <div class="workspaces-container">
+                            <div class="workspace-item" data-workspace="1" data-type="workspace">
+                                <div class="workspace-header">
+                                    <span class="workspace-id">1</span>
+                                    <div class="workspace-status">
+                                        <span class="status-indicator inactive"></span>
+                                    </div>
+                                </div>
+                                <div class="workspace-content">
+                                    <div class="vm-slots">
+                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
+                                            <div class="slot-placeholder">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Drop VM here</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-info">
+                                    <span class="resolution-info">1920×1080</span>
+                                </div>
+                            </div>
+
+                            <div class="workspace-item" data-workspace="2" data-type="workspace">
+                                <div class="workspace-header">
+                                    <span class="workspace-id">2</span>
+                                    <div class="workspace-status">
+                                        <span class="status-indicator active"></span>
+                                    </div>
+                                </div>
+                                <div class="workspace-content">
+                                    <div class="vm-slots">
+                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
+                                            <div class="slot-placeholder">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Drop VM here</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-info">
+                                    <span class="resolution-info">1920×1080</span>
+                                </div>
+                            </div>
+            
+                            <div class="workspace-item" data-workspace="3" data-type="workspace">
+                                <div class="workspace-header">
+                                    <span class="workspace-id">3</span>
+                                    <div class="workspace-status">
+                                        <span class="status-indicator inactive"></span>
+                                    </div>
+                                </div>
+                                <div class="workspace-content">
+                                    <div class="vm-slots">
+                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
+                                            <div class="slot-placeholder">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Drop VM here</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-info">
+                                    <span class="resolution-info">1920×1080</span>
+                                </div>
+                            </div>
+                    
+                            <div class="workspace-item" data-workspace="4" data-type="workspace">
+                                <div class="workspace-header">
+                                    <span class="workspace-id">4</span>
+                                    <div class="workspace-status">
+                                        <span class="status-indicator inactive"></span>
+                                    </div>
+                                </div>
+                                <div class="workspace-content">
+                                    <div class="vm-slots">
+                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
+                                            <div class="slot-placeholder">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Drop VM here</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-info">
+                                    <span class="resolution-info">1920×1080</span>
+                                </div>
+                            </div>
+                    
+                            <div class="workspace-item" data-workspace="5" data-type="workspace">
+                                <div class="workspace-header">
+                                    <span class="workspace-id">5</span>
+                                    <div class="workspace-status">
+                                        <span class="status-indicator inactive"></span>
+                                    </div>
+                                </div>
+                                <div class="workspace-content">
+                                    <div class="vm-slots">
+                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
+                                            <div class="slot-placeholder">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Drop VM here</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-info">
+                                    <span class="resolution-info">1920×1080</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scratchpad -->
+                    <div class="workspace-section">
+                        <div class="section-title">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Scratchpad</span>
+                            <div class="scratchpad-controls">
+                                <button class="btn btn-tiny" onclick="toggleScratchpad()" title="Toggle Scratchpad Visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="scratchpad-container">
+                            <div class="workspace-item scratchpad-item" data-workspace="special" data-type="scratchpad">
+                                <div class="workspace-header">
+                                    <span class="workspace-id">
+                                        <i class="fas fa-layer-group"></i>
+                                    </span>
+                                    <div class="workspace-status">
+                                        <span class="status-indicator scratchpad-status hidden"></span>
+                                    </div>
+                                </div>
+                                <div class="workspace-content">
+                                    <div class="vm-slots scratchpad-slots">
+                                        <div class="vm-slot empty scratchpad-slot" ondrop="dropVM(event)" ondragover="allowDrop(event)">
+                                            <div class="slot-placeholder">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Drop VM here</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="workspace-info">
+                                    <span class="resolution-info">Floating</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
+                <!-- Available VMs Panel -->
+                <div class="available-vms-panel">
+                    <div class="panel-header">
+                        <h4>
+                            <i class="fas fa-server"></i>
+                            Available VMs
+                        </h4>
+                        <div class="vm-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="online">Online</button>
+                            <button class="filter-btn" data-filter="offline">Offline</button>
+                            <button class="filter-btn" data-filter="connected">Connected</button>
+                        </div>
+                    </div>
+                    <div class="vms-container" id="availableVMs">
+                        <!-- VMs will be populated dynamically -->
+                    </div>
+                </div>
+                    
+                <!-- Size Preset Panel -->
+                <div class="size-preset-panel">
+                    <div class="panel-header">
+                        <h4>
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            Size Presets
+                        </h4>
+                    </div>
+                    <div class="preset-grid">
+                        <div class="preset-item" data-preset="full">
+                            <div class="preset-icon">
+                                <i class="fas fa-square"></i>
+                            </div>
+                            <span>Full</span>
+                        </div>
+                        <div class="preset-item" data-preset="half-left">
+                            <div class="preset-icon">
+                                <i class="fas fa-columns"></i>
+                            </div>
+                            <span>Half Left</span>
+                        </div>
+                        <div class="preset-item" data-preset="half-right">
+                            <div class="preset-icon">
+                                <i class="fas fa-columns"></i>
+                            </div>
+                            <span>Half Right</span>
+                        </div>
+                        <div class="preset-item" data-preset="half-top">
+                            <div class="preset-icon">
+                                <i class="fas fa-window-maximize"></i>
+                            </div>
+                            <span>Half Top</span>
+                        </div>
+                        <div class="preset-item" data-preset="half-bottom">
+                            <div class="preset-icon">
+                                <i class="fas fa-window-minimize"></i>
+                            </div>
+                            <span>Half Bottom</span>
+                        </div>
+                        <div class="preset-item" data-preset="quarter">
+                            <div class="preset-icon">
+                                <i class="fas fa-th"></i>
+                            </div>
+                            <span>Quarter</span>
+                        </div>
+                        <div class="preset-item" data-preset="third">
+                            <div class="preset-icon">
+                                <i class="fas fa-bars"></i>
+                            </div>
+                            <span>Third</span>
+                        </div>
+                        <div class="preset-item" data-preset="two-thirds">
+                            <div class="preset-icon">
+                                <i class="fas fa-align-left"></i>
+                            </div>
+                            <span>Two Thirds</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Panel - SECONDARY PANEL -->
+            <div class="dashboard-card quick-actions secondary-panel">
                 <div class="card-header">
                     <div class="card-title">
                         <i class="fas fa-bolt card-icon"></i>
@@ -780,13 +1963,27 @@
                     
                     <div class="input-group">
                         <label class="input-label">Resolution</label>
-                        <select id="rdpGeometry" class="select-field">
+                        <select id="rdpGeometry" class="select-field" onchange="toggleCustomResolution()">
                             <option value="1920x1080">1920×1080</option>
                             <option value="1680x1050">1680×1050</option>
                             <option value="1440x900">1440×900</option>
                             <option value="1280x720">1280×720</option>
                             <option value="1024x768">1024×768</option>
+                            <option value="custom">🎯 Custom Resolution</option>
                         </select>
+                    </div>
+                    
+                    <!-- Custom Resolution Inputs (Hidden by default) -->
+                    <div id="customResolutionGroup" class="input-group" style="display: none;">
+                        <label class="input-label">Custom Resolution</label>
+                        <div class="custom-resolution-inputs">
+                            <input type="number" id="customWidth" class="input-field" placeholder="Width" min="640" max="3840" value="1920">
+                            <span class="custom-resolution-separator">×</span>
+                            <input type="number" id="customHeight" class="input-field" placeholder="Height" min="480" max="2160" value="1080">
+                        </div>
+                        <div class="custom-resolution-hint">
+                            <i class="fas fa-info-circle"></i> Enter width and height in pixels (640×480 to 3840×2160)
+                        </div>
                     </div>
                     
                     <div class="input-group">
@@ -831,109 +2028,176 @@
                 </div>
             </div>
 
-            <!-- Fleet Status -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-network-wired card-icon"></i>
-                        <span>Fleet Status</span>
-                    </div>
-                </div>
-                
-                <div class="fleet-grid" id="fleetStatus">
-                    <div class="loading"></div>
-                </div>
-
-                <div class="fleet-controls">
-                    <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('up')">
-                        <i class="fas fa-play"></i> Start Fleet
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('morning')">
-                        <i class="fas fa-sun"></i> Morning Routine
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('fastup')">
-                        <i class="fas fa-fighter-jet"></i> Ludicrous Speed
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="executeFleetCommand('scratchpad')" title="Launch all RDP sessions in 3x2 grid on scratchpad workspace 2">
-                        <i class="fas fa-th-large"></i> Scratchpad Launch
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="executeFleetCommand('down')">
-                        <i class="fas fa-stop"></i> Emergency Stop
-                    </button>
-                </div>
-            </div>
-
-            <!-- Active Connections -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-link card-icon"></i>
-                        <span>Active Connections</span>
-                    </div>
-                </div>
-                
-                <div class="connection-list" id="activeConnections">
-                    <div class="text-muted">No active connections</div>
-                </div>
-            </div>
-
-            <!-- System Metrics -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-chart-line card-icon"></i>
-                        <span>System Metrics</span>
-                    </div>
-                </div>
-                
-                <div class="metrics-grid">
-                    <div class="metric-item">
-                        <div class="metric-value" id="connectionCount">0</div>
-                        <div class="metric-label">Active Connections</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value" id="onlineCount">0</div>
-                        <div class="metric-label">Online VMs</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value" id="uptimeDisplay">--:--</div>
-                        <div class="metric-label">Uptime</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value">
-                            <i class="fas fa-check-circle" style="color: var(--accent-success);"></i>
+            <!-- Status Panels Row -->
+            <div class="dashboard-row">
+                <!-- Fleet Status -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-network-wired card-icon"></i>
+                            <span>Fleet Status</span>
                         </div>
-                        <div class="metric-label">System Status</div>
+                    </div>
+                    
+                    <div class="fleet-grid" id="fleetStatus">
+                        <div class="loading"></div>
+                    </div>
+
+                    <div class="fleet-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('up')">
+                            <i class="fas fa-play"></i> Start Fleet
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('morning')">
+                            <i class="fas fa-sun"></i> Morning Routine
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('fastup')">
+                            <i class="fas fa-fighter-jet"></i> Ludicrous Speed
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="executeFleetCommand('scratchpad')" title="Launch all RDP sessions in 3x2 grid on scratchpad workspace 2">
+                            <i class="fas fa-th-large"></i> Scratchpad Launch
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="executeFleetCommand('down')">
+                            <i class="fas fa-stop"></i> Emergency Stop
+                        </button>
                     </div>
                 </div>
 
-                <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--border-radius-sm); border: 1px solid var(--border-primary);">
-                    <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: var(--spacing-sm);">Last Update: <span id="lastUpdate">Never</span></div>
-                    <div style="font-size: 0.875rem; color: var(--accent-success);">
-                        <i class="fas fa-bolt"></i> Performance Optimized • Real-time Monitoring Active
+                <!-- Active Connections -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-link card-icon"></i>
+                            <span>Active Connections</span>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-list" id="activeConnections">
+                        <div class="text-muted">No active connections</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Live Log Panel -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-terminal card-icon"></i>
-                        <span>Live System Logs</span>
+            <!-- Bottom Status Row -->
+            <div class="dashboard-row">
+                <!-- System Metrics -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-chart-line card-icon"></i>
+                            <span>System Metrics</span>
+                        </div>
                     </div>
-                    <button class="btn btn-secondary btn-sm" onclick="clearLogs()" title="Clear Logs">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="connectionCount">0</div>
+                            <div class="metric-label">Active Connections</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="onlineCount">0</div>
+                            <div class="metric-label">Online VMs</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="uptimeDisplay">--:--</div>
+                            <div class="metric-label">Uptime</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <i class="fas fa-check-circle" style="color: var(--accent-success);"></i>
+                            </div>
+                            <div class="metric-label">System Status</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--border-radius-sm); border: 1px solid var(--border-primary);">
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: var(--spacing-sm);">Last Update: <span id="lastUpdate">Never</span></div>
+                        <div style="font-size: 0.875rem; color: var(--accent-success);">
+                            <i class="fas fa-bolt"></i> Performance Optimized • Real-time Monitoring Active
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Log Panel -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-terminal card-icon"></i>
+                            <span>Live System Logs</span>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="clearLogs()" title="Clear Logs">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="log-panel" id="logPanel">
+                        <div class="text-muted">System ready - logs will appear here</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workspace Settings Modal -->
+    <div id="workspaceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-cogs"></i>
+                    Workspace Settings
+                </h3>
+                <span class="close" onclick="closeWorkspaceModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Quick Actions</h4>
+                    <div class="quick-actions-grid">
+                        <button class="btn btn-primary" onclick="assignAllVMsToWorkspaces()">
+                            <i class="fas fa-magic"></i>
+                            Auto-Assign All VMs
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearAllWorkspaces()">
+                            <i class="fas fa-eraser"></i>
+                            Clear All Workspaces
+                        </button>
+                        <button class="btn btn-info" onclick="saveWorkspaceLayout()">
+                            <i class="fas fa-save"></i>
+                            Save Layout
+                        </button>
+                        <button class="btn btn-warning" onclick="loadWorkspaceLayout()">
+                            <i class="fas fa-upload"></i>
+                            Load Layout
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="log-container" id="logContainer">
-                    <div class="log-item log-info">
-                        <span class="log-timestamp">--:--:--</span>
-                        <span class="log-level">INFO</span>
-                        <span class="log-message">System initializing...</span>
+                <div class="settings-section">
+                    <h4>Workspace Configuration</h4>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label>Default Size Preset</label>
+                            <select id="defaultSizePreset" class="select-field">
+                                <option value="full">Full</option>
+                                <option value="half-left">Half Left</option>
+                                <option value="half-right">Half Right</option>
+                                <option value="quarter">Quarter</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Auto-refresh Interval (seconds)</label>
+                            <input type="number" id="refreshInterval" class="input-field" value="5" min="1" max="60">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="enableAutoPosition" checked>
+                                Auto-position new RDP connections
+                            </label>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeWorkspaceModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveWorkspaceSettings()">Save Settings</button>
             </div>
         </div>
     </div>
@@ -1072,7 +2336,8 @@
                     { value: '1680x1050', text: '1680×1050 (16:10)' },
                     { value: '1440x900', text: '1440×900 (16:10)' },
                     { value: '1280x720', text: '1280×720 (HD)' },
-                    { value: '1024x768', text: '1024×768 (4:3)' }
+                    { value: '1024x768', text: '1024×768 (4:3)' },
+                    { value: 'custom', text: '🎯 Custom Resolution' }
                 ];
                 
                 manualOptions.forEach(opt => {
@@ -1232,7 +2497,7 @@
             }
 
             addLog(message, level = 'INFO', timestamp = null) {
-                const container = document.getElementById('logContainer');
+                const container = document.getElementById('logPanel');
                 const logItem = document.createElement('div');
                 const time = timestamp ? new Date(timestamp) : new Date();
                 const timeStr = time.toLocaleTimeString();
@@ -1257,19 +2522,59 @@
             }
 
             clearLogs() {
-                const container = document.getElementById('logContainer');
+                const container = document.getElementById('logPanel');
                 container.innerHTML = '';
                 this.addLog('Logs cleared by user', 'INFO');
             }
         }
 
         // Global functions for UI interactions
+        function toggleCustomResolution() {
+            const geometrySelect = document.getElementById('rdpGeometry');
+            const customGroup = document.getElementById('customResolutionGroup');
+            
+            if (geometrySelect.value === 'custom') {
+                customGroup.style.display = 'block';
+                customGroup.classList.add('show');
+                // Focus on width input for quick entry
+                setTimeout(() => document.getElementById('customWidth').focus(), 150);
+                app.addLog('Custom resolution mode enabled', 'INFO');
+            } else {
+                customGroup.classList.remove('show');
+                setTimeout(() => {
+                    customGroup.style.display = 'none';
+                }, 300); // Match animation duration
+                app.addLog('Standard resolution selected', 'INFO');
+            }
+        }
+
         async function spawnRDP() {
             const ip = document.getElementById('rdpIp').value.trim();
             const username = document.getElementById('rdpUsername').value.trim();
             const password = document.getElementById('rdpPassword').value.trim();
-            const geometry = document.getElementById('rdpGeometry').value;
+            let geometry = document.getElementById('rdpGeometry').value;
             const workspace = parseInt(document.getElementById('rdpWorkspace').value);
+
+            // Handle custom resolution
+            if (geometry === 'custom') {
+                const customWidth = parseInt(document.getElementById('customWidth').value);
+                const customHeight = parseInt(document.getElementById('customHeight').value);
+                
+                if (!customWidth || !customHeight || customWidth < 640 || customHeight < 480) {
+                    app.showNotification('Invalid custom resolution. Please enter valid width×height (min 640×480)', 'error');
+                    app.addLog('RDP deployment failed: Invalid custom resolution specified', 'ERROR');
+                    return;
+                }
+                
+                if (customWidth > 3840 || customHeight > 2160) {
+                    app.showNotification('Custom resolution too large. Maximum supported: 3840×2160', 'warning');
+                    app.addLog('RDP deployment failed: Custom resolution exceeds maximum supported size', 'WARNING');
+                    return;
+                }
+                
+                geometry = `${customWidth}x${customHeight}`;
+                app.addLog(`Using custom resolution: ${geometry}`, 'INFO');
+            }
 
             if (!ip) {
                 app.showNotification('Please enter target IP address', 'warning');
@@ -1301,6 +2606,8 @@
                 if (geometry.startsWith('auto-ws')) {
                     const autoWs = geometry.replace('auto-ws', '');
                     geometryDisplay = `Auto-Detect WS${autoWs}`;
+                } else if (document.getElementById('rdpGeometry').value === 'custom') {
+                    geometryDisplay = `Custom ${geometry}`;
                 }
                 
                 app.addLog(`Deploying RDP connection to ${ip} (${username}, ${geometryDisplay}, WS${workspace})`, 'INFO');
@@ -1391,6 +2698,461 @@
             app.clearLogs();
         }
 
+        // Workspace Manager Functions
+        let currentSizePreset = 'full';
+        let workspaceState = {};
+
+        async function refreshWorkspaceState() {
+            try {
+                app.addLog('Refreshing workspace state...', 'INFO');
+                const result = await app.makeRequest('/api/workspaces/state');
+                
+                if (result.success) {
+                    workspaceState = result.workspaces;
+                    updateWorkspaceVisual();
+                    updateAvailableVMs();
+                    app.addLog('Workspace state refreshed successfully', 'SUCCESS');
+                } else {
+                    app.addLog(`Failed to refresh workspace state: ${result.error}`, 'ERROR');
+                }
+            } catch (error) {
+                console.error('Error refreshing workspace state:', error);
+                app.addLog(`Error refreshing workspace state: ${error.message}`, 'ERROR');
+            }
+        }
+
+        function updateWorkspaceVisual() {
+            // Update workspace indicators and VM assignments
+            for (let wsId = 1; wsId <= 5; wsId++) {
+                const workspaceItem = document.querySelector(`[data-workspace="${wsId}"]`);
+                const workspace = workspaceState.workspaces && workspaceState.workspaces[wsId];
+                
+                if (workspaceItem && workspace) {
+                    // Update status indicator
+                    const statusIndicator = workspaceItem.querySelector('.status-indicator');
+                    statusIndicator.className = `status-indicator ${workspace.active ? 'active' : 'inactive'}`;
+                    
+                    // Update resolution info
+                    const resolutionInfo = workspaceItem.querySelector('.resolution-info');
+                    if (workspace.resolution) {
+                        resolutionInfo.textContent = `${workspace.resolution[0]}×${workspace.resolution[1]}`;
+                    }
+                    
+                    // Update VM slots
+                    const vmSlots = workspaceItem.querySelector('.vm-slots');
+                    vmSlots.innerHTML = '';
+                    
+                    if (workspace.windows && workspace.windows.length > 0) {
+                        workspace.windows.forEach(window => {
+                            if (window.vm_info) {
+                                const vmSlot = createVMSlot(window.vm_info);
+                                vmSlots.appendChild(vmSlot);
+                            }
+                        });
+                    } else {
+                        const emptySlot = createEmptySlot();
+                        vmSlots.appendChild(emptySlot);
+                    }
+                }
+            }
+            
+            // Update scratchpad
+            const scratchpadItem = document.querySelector('[data-workspace="special"]');
+            if (scratchpadItem && workspaceState.scratchpad) {
+                const statusIndicator = scratchpadItem.querySelector('.scratchpad-status');
+                statusIndicator.className = `status-indicator scratchpad-status ${workspaceState.scratchpad.visible ? 'visible' : 'hidden'}`;
+                
+                const vmSlots = scratchpadItem.querySelector('.scratchpad-slots');
+                vmSlots.innerHTML = '';
+                
+                if (workspaceState.scratchpad.windows && workspaceState.scratchpad.windows.length > 0) {
+                    workspaceState.scratchpad.windows.forEach(window => {
+                        if (window.vm_info) {
+                            const vmSlot = createVMSlot(window.vm_info);
+                            vmSlots.appendChild(vmSlot);
+                        }
+                    });
+                } else {
+                    const emptySlot = createEmptySlot('scratchpad-slot');
+                    vmSlots.appendChild(emptySlot);
+                }
+            }
+        }
+
+        function createVMSlot(vmInfo) {
+            const slot = document.createElement('div');
+            slot.className = 'vm-slot occupied';
+            slot.innerHTML = `
+                <div class="vm-info">
+                    <div class="vm-ip">${vmInfo.ip}</div>
+                    <div class="vm-size">${vmInfo.size.width}×${vmInfo.size.height}</div>
+                    <div class="vm-actions">
+                        <button class="btn-tiny" onclick="resizeVM('${vmInfo.ip}')" title="Resize">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                        <button class="btn-tiny danger" onclick="closeVM('${vmInfo.ip}')" title="Close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            return slot;
+        }
+
+        function createEmptySlot(additionalClass = '') {
+            const slot = document.createElement('div');
+            slot.className = `vm-slot empty ${additionalClass}`;
+            slot.setAttribute('ondrop', 'dropVM(event)');
+            slot.setAttribute('ondragover', 'allowDrop(event)');
+            slot.innerHTML = `
+                <div class="slot-placeholder">
+                    <i class="fas fa-plus"></i>
+                    <span>Drop VM here</span>
+                </div>
+            `;
+            return slot;
+        }
+
+        async function updateAvailableVMs() {
+            try {
+                const fleetData = await app.makeRequest('/api/fleet/status');
+                const container = document.getElementById('availableVMs');
+                
+                if (fleetData.success && fleetData.fleet) {
+                    container.innerHTML = '';
+                    
+                    fleetData.fleet.forEach(vm => {
+                        const vmElement = createDraggableVM(vm);
+                        container.appendChild(vmElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating available VMs:', error);
+            }
+        }
+
+        function createDraggableVM(vm) {
+            const element = document.createElement('div');
+            element.className = `draggable-vm ${vm.status.toLowerCase()}`;
+            element.draggable = true;
+            element.setAttribute('data-vm-ip', vm.ip);
+            element.innerHTML = `
+                <div class="vm-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div class="vm-details">
+                    <div class="vm-name">${vm.callsign}</div>
+                    <div class="vm-ip">${vm.ip}</div>
+                    <div class="vm-status ${vm.status.toLowerCase()}">${vm.status}</div>
+                </div>
+            `;
+            
+            element.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', vm.ip);
+                e.dataTransfer.setData('application/json', JSON.stringify(vm));
+            });
+            
+            return element;
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        function dropVM(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            
+            const vmIp = ev.dataTransfer.getData('text/plain');
+            const workspaceElement = ev.currentTarget.closest('[data-workspace]');
+            const workspace = workspaceElement.getAttribute('data-workspace');
+            const isSpecial = workspaceElement.getAttribute('data-type') === 'scratchpad';
+            
+            if (vmIp && workspace) {
+                assignVMToWorkspace(vmIp, workspace, isSpecial);
+            }
+        }
+
+        async function assignVMToWorkspace(vmIp, workspace, useScratchpad) {
+            try {
+                app.addLog(`Assigning VM ${vmIp} to ${useScratchpad ? 'scratchpad' : `workspace ${workspace}`}`, 'INFO');
+                
+                const result = await app.makeRequest('/api/workspaces/assign', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        vm_ip: vmIp,
+                        workspace: parseInt(workspace),
+                        size_preset: currentSizePreset,
+                        position: 'center',
+                        use_scratchpad: useScratchpad
+                    })
+                });
+
+                if (result.success) {
+                    app.showNotification(result.message, 'success');
+                    app.addLog(result.message, 'SUCCESS');
+                    refreshWorkspaceState();
+                } else {
+                    app.showNotification(`Failed to assign VM: ${result.error}`, 'error');
+                    app.addLog(`Failed to assign VM ${vmIp}: ${result.error}`, 'ERROR');
+                }
+            } catch (error) {
+                console.error('Error assigning VM to workspace:', error);
+                app.addLog(`Error assigning VM ${vmIp}: ${error.message}`, 'ERROR');
+            }
+        }
+
+        async function resizeVM(vmIp) {
+            // Show size preset selection modal
+            const preset = prompt('Select size preset:\nfull, half-left, half-right, quarter, third, two-thirds', currentSizePreset);
+            if (preset) {
+                currentSizePreset = preset;
+                // Re-assign with new size
+                const currentWorkspace = findVMWorkspace(vmIp);
+                if (currentWorkspace) {
+                    assignVMToWorkspace(vmIp, currentWorkspace.workspace, currentWorkspace.isScratchpad);
+                }
+            }
+        }
+
+        async function closeVM(vmIp) {
+            if (confirm(`Close RDP connection to ${vmIp}?`)) {
+                try {
+                    const result = await app.makeRequest(`/api/rdp/connection/ip/${vmIp}/kill`, {
+                        method: 'POST'
+                    });
+                    
+                    if (result.success) {
+                        app.showNotification(`RDP connection to ${vmIp} closed`, 'success');
+                        refreshWorkspaceState();
+                    } else {
+                        app.showNotification(`Failed to close connection: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    app.addLog(`Error closing VM ${vmIp}: ${error.message}`, 'ERROR');
+                }
+            }
+        }
+
+        function findVMWorkspace(vmIp) {
+            // Search in workspaces
+            for (let wsId = 1; wsId <= 5; wsId++) {
+                const workspace = workspaceState.workspaces && workspaceState.workspaces[wsId];
+                if (workspace && workspace.windows) {
+                    const found = workspace.windows.find(w => w.vm_info && w.vm_info.ip === vmIp);
+                    if (found) {
+                        return { workspace: wsId, isScratchpad: false };
+                    }
+                }
+            }
+            
+            // Search in scratchpad
+            if (workspaceState.scratchpad && workspaceState.scratchpad.windows) {
+                const found = workspaceState.scratchpad.windows.find(w => w.vm_info && w.vm_info.ip === vmIp);
+                if (found) {
+                    return { workspace: 'special', isScratchpad: true };
+                }
+            }
+            
+            return null;
+        }
+
+        async function toggleScratchpad() {
+            try {
+                const result = await app.makeRequest('/api/hyprctl/dispatch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        command: 'togglespecialworkspace'
+                    })
+                });
+                
+                if (result.success) {
+                    app.addLog('Toggled scratchpad visibility', 'INFO');
+                    setTimeout(refreshWorkspaceState, 500); // Refresh after toggle
+                }
+            } catch (error) {
+                app.addLog(`Error toggling scratchpad: ${error.message}`, 'ERROR');
+            }
+        }
+
+        function openWorkspaceSettings() {
+            document.getElementById('workspaceModal').style.display = 'block';
+        }
+
+        function closeWorkspaceModal() {
+            document.getElementById('workspaceModal').style.display = 'none';
+        }
+
+        async function assignAllVMsToWorkspaces() {
+            try {
+                const fleetData = await app.makeRequest('/api/fleet/status');
+                if (fleetData.success && fleetData.fleet) {
+                    const assignments = [];
+                    
+                    fleetData.fleet.forEach((vm, index) => {
+                        if (vm.status === 'ONLINE') {
+                            const workspace = (index % 5) + 1; // Distribute across workspaces 1-5
+                            assignments.push({
+                                vm_ip: vm.ip,
+                                workspace: workspace,
+                                size_preset: 'full',
+                                position: 'center',
+                                use_scratchpad: false
+                            });
+                        }
+                    });
+                    
+                    const result = await app.makeRequest('/api/workspaces/batch-assign', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ assignments })
+                    });
+                    
+                    if (result.success) {
+                        app.showNotification(result.summary, 'success');
+                        refreshWorkspaceState();
+                        closeWorkspaceModal();
+                    } else {
+                        app.showNotification(`Batch assignment failed: ${result.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                app.addLog(`Error in auto-assign: ${error.message}`, 'ERROR');
+            }
+        }
+
+        async function clearAllWorkspaces() {
+            if (confirm('Clear all workspace assignments? This will not close connections, only remove workspace assignments.')) {
+                // Implementation would go here - moving all windows back to workspace 1
+                app.showNotification('Clear all workspaces not yet implemented', 'info');
+            }
+        }
+
+        function saveWorkspaceLayout() {
+            const layout = {
+                timestamp: Date.now(),
+                workspaces: workspaceState
+            };
+            localStorage.setItem('nz7dev_workspace_layout', JSON.stringify(layout));
+            app.showNotification('Workspace layout saved', 'success');
+            closeWorkspaceModal();
+        }
+
+        function loadWorkspaceLayout() {
+            const saved = localStorage.getItem('nz7dev_workspace_layout');
+            if (saved) {
+                try {
+                    const layout = JSON.parse(saved);
+                    app.showNotification(`Layout from ${new Date(layout.timestamp).toLocaleString()} loaded`, 'success');
+                    // Implementation would restore the layout
+                    closeWorkspaceModal();
+                } catch (error) {
+                    app.showNotification('Failed to load workspace layout', 'error');
+                }
+            } else {
+                app.showNotification('No saved layout found', 'info');
+            }
+        }
+
+        function saveWorkspaceSettings() {
+            const settings = {
+                defaultSizePreset: document.getElementById('defaultSizePreset').value,
+                refreshInterval: parseInt(document.getElementById('refreshInterval').value),
+                enableAutoPosition: document.getElementById('enableAutoPosition').checked
+            };
+            
+            localStorage.setItem('nz7dev_workspace_settings', JSON.stringify(settings));
+            currentSizePreset = settings.defaultSizePreset;
+            
+            app.showNotification('Workspace settings saved', 'success');
+            closeWorkspaceModal();
+        }
+
+        // Size preset selection
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Professional Application first
+            app = new MissionControlPro();
+            console.log('🚀 NZ7DEV Mission Control Professional Edition Initialized');
+            
+            // Initialize size preset selection
+            document.querySelectorAll('.preset-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    currentSizePreset = item.getAttribute('data-preset');
+                    app.addLog(`Size preset selected: ${currentSizePreset}`, 'INFO');
+                });
+            });
+            
+            // Initialize VM filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const filter = btn.getAttribute('data-filter');
+                    filterVMs(filter);
+                });
+            });
+            
+            // Load saved settings
+            const saved = localStorage.getItem('nz7dev_workspace_settings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    currentSizePreset = settings.defaultSizePreset;
+                    document.getElementById('defaultSizePreset').value = settings.defaultSizePreset;
+                    document.getElementById('refreshInterval').value = settings.refreshInterval;
+                    document.getElementById('enableAutoPosition').checked = settings.enableAutoPosition;
+                } catch (error) {
+                    console.warn('Failed to load workspace settings:', error);
+                }
+            }
+            
+            // Initial workspace state load - now that app exists
+            setTimeout(() => {
+                refreshWorkspaceState();
+            }, 1000); // Give app time to fully initialize
+            
+            // Auto-refresh workspace state
+            setInterval(refreshWorkspaceState, 10000); // Every 10 seconds
+        });
+
+        function filterVMs(filter) {
+            const vms = document.querySelectorAll('.draggable-vm');
+            vms.forEach(vm => {
+                const status = vm.querySelector('.vm-status').textContent.toLowerCase();
+                const isConnected = vm.getAttribute('data-connected') === 'true';
+                
+                let show = true;
+                switch (filter) {
+                    case 'online':
+                        show = status === 'online';
+                        break;
+                    case 'offline':
+                        show = status === 'offline';
+                        break;
+                    case 'connected':
+                        show = isConnected;
+                        break;
+                    case 'all':
+                    default:
+                        show = true;
+                }
+                
+                vm.style.display = show ? 'flex' : 'none';
+            });
+        }
+
         // Initialize Professional Application
         let app;
         document.addEventListener('DOMContentLoaded', () => {
@@ -1399,4 +3161,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

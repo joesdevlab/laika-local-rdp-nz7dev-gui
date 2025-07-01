@@ -1,57 +1,63 @@
 [Unit]
-Description=NZ7DEV Mission Control GUI - Optimized Edition
+Description=NZ7DEV Mission Control GUI - Professional Edition with Visual Workspace Manager
 Documentation=file:///README.md
 After=network.target graphical-session.target
-Wants=network.target
+Wants=network.target graphical-session.target
 
 [Service]
 Type=simple
 WorkingDirectory=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
-ExecStartPre=/bin/bash -c 'cd /mnt/WD/dev/laika-local-rdp-nz7dev-gui && chmod +x nz7dev && chmod +x launch_gui_optimized.sh'
 ExecStart=/usr/bin/python3 -O -u /mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_gui.py
 Restart=always
-RestartSec=10
+RestartSec=15
 KillMode=mixed
 KillSignal=SIGTERM
 TimeoutStopSec=30
+TimeoutStartSec=60
 
-# Resource limits
-MemoryMax=1G
-CPUQuota=75%
+# Enhanced Resource limits for optimal performance
+MemoryMax=2G
+CPUQuota=85%
+TasksMax=1024
+LimitNOFILE=65536
 
-# Security settings (relaxed for development environment)
-NoNewPrivileges=true
-PrivateTmp=false
-ProtectSystem=false
-ProtectHome=false
-
-# Optimized Environment
+# Optimized Environment for Professional Edition
 Environment=PYTHONPATH=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
 Environment=FLASK_ENV=production
 Environment=FLASK_DEBUG=0
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONDONTWRITEBYTECODE=1
-Environment=WERKZEUG_RUN_MAIN=true
-Environment=GEVENT_SUPPORT=True
-Environment=EVENTLET_NOPATCH=True
+
+# Display and window manager access for visual workspace management
 Environment=DISPLAY=:1
-Environment=HOME=%h
-Environment=PATH=/usr/bin:/usr/sbin:/bin:/sbin
-
-# Environment variables for X11 display access - Updated for :1 display
-Environment=XAUTHORITY=/home/nz7/.Xauthority
-Environment=XDG_RUNTIME_DIR=/run/user/1000
 Environment=WAYLAND_DISPLAY=wayland-1
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=XAUTHORITY=/home/nz7/.Xauthority
 
-# Logging
+# Hyprland integration for workspace manager (optional)
+Environment=HYPRLAND_INSTANCE_SIGNATURE=""
+Environment=HYPRLAND_CMD=hyprctl
+
+# Performance optimizations
+Environment=MALLOC_ARENA_MAX=4
+Environment=MALLOC_MMAP_THRESHOLD_=131072
+Environment=MALLOC_TRIM_THRESHOLD_=131072
+Environment=MALLOC_TOP_PAD_=131072
+Environment=MALLOC_MMAP_MAX_=1048576
+
+# Security key for production
+Environment=SECRET_KEY=nz7dev-mission-control-pro-2024-visual-workspace-manager
+
+# Network and connection settings
+Environment=FLASK_RUN_HOST=0.0.0.0
+Environment=FLASK_RUN_PORT=5000
+Environment=SOCKETIO_ASYNC_MODE=threading
+
+# Enhanced logging for professional edition
 StandardOutput=append:/mnt/WD/dev/laika-local-rdp-nz7dev-gui/mission_control.log
 StandardError=append:/mnt/WD/dev/laika-local-rdp-nz7dev-gui/mission_control.log
-SyslogIdentifier=nz7dev-gui
-
-# Ensure service runs in user session with display access
-User=nz7
-Group=nz7
+SyslogIdentifier=nz7dev-mission-control-pro
 
 [Install]
-WantedBy=default.target 
+WantedBy=default.target graphical-session.target 

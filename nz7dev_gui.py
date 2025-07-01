@@ -20,6 +20,7 @@ from functools import lru_cache, wraps
 from flask import Flask, render_template, request, jsonify, abort
 from flask_socketio import SocketIO, emit
 import psutil
+from colorama import Fore, Style
 
 # Configure logging
 logging.basicConfig(
@@ -468,6 +469,223 @@ class HyprlandManager:
         except Exception as e:
             logger.error(f"Failed to position window {window_title}: {e}")
             return False
+
+    def get_workspace_state(self) -> Dict[str, Any]:
+        """Get current state of all workspaces including VM assignments"""
+        try:
+            clients = self.get_clients()
+            workspaces_info = self.get_workspaces_info()
+            monitors = self.get_monitors()
+            
+            workspace_state = {
+                'workspaces': {},
+                'scratchpad': {
+                    'windows': [],
+                    'visible': False
+                },
+                'monitors': []
+            }
+            
+            # Process monitors
+            for monitor in monitors:
+                workspace_state['monitors'].append({
+                    'name': monitor.get('name', 'Unknown'),
+                    'width': monitor.get('width', 1920),
+                    'height': monitor.get('height', 1080),
+                    'scale': monitor.get('scale', 1.0),
+                    'focused': monitor.get('focused', False),
+                    'active_workspace': monitor.get('activeWorkspace', {}).get('id', 1)
+                })
+            
+            # Initialize workspaces 1-10
+            for ws_id in range(1, 11):
+                workspace_state['workspaces'][str(ws_id)] = {
+                    'id': ws_id,
+                    'windows': [],
+                    'active': False,
+                    'resolution': self.get_workspace_resolution(ws_id)
+                }
+            
+            # Process clients and assign to workspaces
+            for client in clients:
+                title = client.get('title', '')
+                workspace_info = client.get('workspace', {})
+                workspace_name = workspace_info.get('name', '')
+                workspace_id = workspace_info.get('id', 0)
+                
+                # Extract VM info from RDP window titles
+                vm_info = None
+                if title.startswith('FreeRDP: '):
+                    ip_address = title.replace('FreeRDP: ', '')
+                    vm_info = {
+                        'ip': ip_address,
+                        'type': 'rdp',
+                        'title': title,
+                        'position': {
+                            'x': client.get('at', [0, 0])[0],
+                            'y': client.get('at', [0, 0])[1] if len(client.get('at', [])) > 1 else 0
+                        },
+                        'size': {
+                            'width': client.get('size', [0, 0])[0],
+                            'height': client.get('size', [0, 0])[1] if len(client.get('size', [])) > 1 else 0
+                        },
+                        'floating': client.get('floating', False),
+                        'fullscreen': client.get('fullscreen', False)
+                    }
+                
+                # Assign to workspace or scratchpad
+                if workspace_name == 'special':
+                    workspace_state['scratchpad']['windows'].append({
+                        'title': title,
+                        'vm_info': vm_info,
+                        'client_data': client
+                    })
+                elif workspace_id > 0 and workspace_id <= 10:
+                    workspace_state['workspaces'][str(workspace_id)]['windows'].append({
+                        'title': title,
+                        'vm_info': vm_info,
+                        'client_data': client
+                    })
+            
+            # Check if scratchpad is visible
+            for workspace in workspaces_info:
+                if workspace.get('name') == 'special':
+                    workspace_state['scratchpad']['visible'] = True
+                    break
+            
+            # Mark active workspace
+            active_workspace = self.get_active_workspace()
+            if active_workspace and str(active_workspace) in workspace_state['workspaces']:
+                workspace_state['workspaces'][str(active_workspace)]['active'] = True
+            
+            return workspace_state
+            
+        except Exception as e:
+            logger.error(f"Failed to get workspace state: {e}")
+            return {
+                'workspaces': {},
+                'scratchpad': {'windows': [], 'visible': False},
+                'monitors': []
+            }
+    
+    def get_workspaces_info(self) -> List[Dict[str, Any]]:
+        """Get information about all workspaces"""
+        try:
+            result = subprocess.run(
+                ['hyprctl', 'workspaces', '-j'],
+                capture_output=True,
+                text=True,
+                timeout=3
+            )
+            if result.returncode == 0:
+                return json.loads(result.stdout)
+            return []
+        except (subprocess.TimeoutExpired, json.JSONDecodeError, Exception) as e:
+            logger.warning(f"Failed to get workspaces info: {e}")
+            return []
+    
+    def get_active_workspace(self) -> int:
+        """Get currently active workspace ID"""
+        try:
+            result = subprocess.run(
+                ['hyprctl', 'activeworkspace', '-j'],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            if result.returncode == 0:
+                data = json.loads(result.stdout)
+                return data.get('id', 1)
+            return 1
+        except (subprocess.TimeoutExpired, json.JSONDecodeError, Exception) as e:
+            logger.warning(f"Failed to get active workspace: {e}")
+            return 1
+    
+    def assign_to_scratchpad(self, window_title: str, size_preset: str, position: str, geometry: str) -> bool:
+        """Assign window to scratchpad with specific size and position"""
+        try:
+            width, height = map(int, geometry.split('x'))
+            
+            # Wait for window to be ready
+            max_retries = 5
+            for attempt in range(max_retries):
+                if self.check_window_exists(window_title):
+                    break
+                time.sleep(0.3)
+            else:
+                logger.warning(f"Window {window_title} not found for scratchpad assignment")
+                return False
+            
+            # Commands for scratchpad assignment
+            commands = [
+                f'movetoworkspacesilent special,title:"{window_title}"',
+                f'resizewindowpixel exact {width} {height},title:"{window_title}"'
+            ]
+            
+            # Calculate position for scratchpad based on preset and position
+            if size_preset == 'quarter':
+                # Quarter windows get specific grid positions
+                positions = {
+                    'center': (960, 540),
+                    'left': (480, 540), 
+                    'right': (1440, 540),
+                    'top-left': (480, 270),
+                    'top-right': (1440, 270),
+                    'bottom-left': (480, 810),
+                    'bottom-right': (1440, 810)
+                }
+                x, y = positions.get(position, positions['center'])
+            elif size_preset.startswith('half'):
+                # Half windows
+                if size_preset == 'half-left':
+                    x, y = (width // 4, 70)
+                elif size_preset == 'half-right':
+                    x, y = (1920 - width // 4 - width, 70)
+                else:
+                    x, y = ((1920 - width) // 2, 70)
+            else:
+                # Full or other sizes - center them
+                x, y = ((1920 - width) // 2, (1080 - height) // 2)
+            
+            commands.append(f'movewindowpixel exact {x} {y},title:"{window_title}"')
+            
+            # Execute commands
+            success = True
+            for i, cmd in enumerate(commands):
+                try:
+                    result = subprocess.run(['hyprctl', 'dispatch'] + cmd.split(' ', 1), 
+                                          capture_output=True, timeout=3)
+                    if result.returncode != 0:
+                        logger.warning(f"Scratchpad command {i+1} failed for {window_title}: {result.stderr.decode()}")
+                        success = False
+                    
+                    # Small delay between commands
+                    if i < len(commands) - 1:
+                        time.sleep(0.2)
+                        
+                except subprocess.TimeoutExpired:
+                    logger.warning(f"Scratchpad command {i+1} timed out for {window_title}")
+                    success = False
+                except Exception as e:
+                    logger.error(f"Error in scratchpad command {i+1} for {window_title}: {e}")
+                    success = False
+            
+            logger.info(f"Assigned {window_title} to scratchpad with {size_preset} size at position {x},{y}")
+            return success
+            
+        except Exception as e:
+            logger.error(f"Failed to assign {window_title} to scratchpad: {e}")
+            return False
+    
+    def invalidate_workspace_cache(self):
+        """Invalidate workspace-related caches"""
+        self._clients_cache = None
+        self._cache_time = None
+        self._monitors_cache = None
+        self._monitors_cache_time = None
+        # Clear LRU caches
+        self._get_cached_clients.cache_clear()
+        self._get_cached_monitors.cache_clear()
 
 class RDPManager:
     """Optimized RDP connection management"""
@@ -1104,27 +1322,56 @@ def api_validate_fleet_status():
     result = mission_control.validate_fleet_status()
     return jsonify(result), 200 if result['status'] == 'success' else 500
 
+@app.route('/api/fleet/status')
+def api_get_fleet_status():
+    """Get fleet status for Available VMs display"""
+    try:
+        fleet_data = mission_control.get_fleet_status()
+        
+        # Transform data to match expected format for Available VMs
+        fleet_list = []
+        for vm_name, vm_info in fleet_data.items():
+            fleet_list.append({
+                'name': vm_name,
+                'callsign': vm_info['callsign'],
+                'ip': vm_info['ip'],
+                'status': 'ONLINE' if vm_info['online'] else 'OFFLINE',
+                'connected': vm_info.get('rdp_connected', False),
+                'geometry': vm_info['geometry'],
+                'workspace': vm_info['workspace'],
+                'position': vm_info['position'],
+                'enabled': vm_info['enabled']
+            })
+        
+        return jsonify({
+            'success': True,
+            'fleet': fleet_list
+        })
+    except Exception as e:
+        logger.error(f"Failed to get fleet status: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/workspace/resolutions')
 def api_workspace_resolutions():
     """Get workspace resolutions for auto-geometry detection"""
     try:
-        resolutions = mission_control.hyprland_manager.get_all_workspace_resolutions()
+        workspace_resolutions = mission_control.hyprland_manager.get_all_workspace_resolutions()
         
-        # Convert to user-friendly format
-        workspace_data = {}
-        for workspace, (width, height) in resolutions.items():
-            workspace_data[f"workspace_{workspace}"] = {
-                'workspace': workspace,
-                'resolution': f"{width}x{height}",
+        formatted_resolutions = {}
+        for workspace, (width, height) in workspace_resolutions.items():
+            formatted_resolutions[f'workspace_{workspace}'] = {
                 'width': width,
                 'height': height,
-                'display_name': f"Workspace {workspace} Auto ({width}×{height})"
+                'display_name': f'Auto-detect (WS{workspace}: {width}×{height})'
             }
         
         return jsonify({
             'success': True,
-            'workspaces': workspace_data,
-            'note': 'Resolutions automatically account for 40px waybar at top'
+            'workspaces': formatted_resolutions,
+            'default_geometry': '1920x1080'
         })
     except Exception as e:
         logger.error(f"Failed to get workspace resolutions: {e}")
@@ -1133,6 +1380,191 @@ def api_workspace_resolutions():
             'error': str(e),
             'fallback_resolution': '1920x1040'
         }), 500
+
+@app.route('/api/workspaces/test')
+def workspace_test():
+    """Simple test for workspace API"""
+    return jsonify({'status': 'workspace API working', 'success': True})
+
+@app.route('/api/workspaces/state')
+def get_workspace_state():
+    """Get current workspace state including VM assignments and layout"""
+    try:
+        workspace_state = mission_control.hyprland_manager.get_workspace_state()
+        return jsonify({
+            'success': True,
+            'workspaces': workspace_state
+        })
+    except Exception as e:
+        logger.error(f"Failed to get workspace state: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/workspaces/assign', methods=['POST'])
+@validate_json('vm_ip', 'workspace', 'size_preset')
+def assign_vm_to_workspace(data):
+    """Assign VM to specific workspace with size and position presets"""
+    try:
+        vm_ip = data['vm_ip']
+        workspace = data['workspace']
+        size_preset = data['size_preset']  # 'full', 'half-left', 'half-right', 'quarter', 'custom'
+        position = data.get('position', 'center')
+        custom_geometry = data.get('custom_geometry', None)
+        use_scratchpad = data.get('use_scratchpad', False)
+        
+        # Validate workspace
+        if not use_scratchpad and (workspace < 1 or workspace > 10):
+            return jsonify({
+                'success': False,
+                'error': 'Workspace must be between 1 and 10'
+            }), 400
+            
+        # Calculate geometry based on preset
+        geometry = calculate_geometry_from_preset(workspace, size_preset, custom_geometry)
+        
+        # Find window title
+        window_title = f"FreeRDP: {vm_ip}"
+        
+        # Check if window exists
+        if not mission_control.hyprland_manager.check_window_exists(window_title):
+            return jsonify({
+                'success': False,
+                'error': f'VM window {vm_ip} not found. Please ensure the RDP session is active.'
+            }), 404
+        
+        # Assign to workspace or scratchpad
+        if use_scratchpad:
+            success = mission_control.hyprland_manager.assign_to_scratchpad(window_title, size_preset, position, geometry)
+        else:
+            success = mission_control.hyprland_manager.position_window(window_title, workspace, position, geometry)
+        
+        if success:
+            # Update workspace state cache
+            mission_control.hyprland_manager.invalidate_workspace_cache()
+            
+            return jsonify({
+                'success': True,
+                'message': f'VM {vm_ip} assigned to {"scratchpad" if use_scratchpad else f"workspace {workspace}"} with {size_preset} size'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to assign VM to workspace'
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Failed to assign VM to workspace: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/workspaces/batch-assign', methods=['POST'])
+@validate_json('assignments')
+def batch_assign_vms(data):
+    """Batch assign multiple VMs to workspaces"""
+    try:
+        assignments = data['assignments']
+        results = []
+        
+        for assignment in assignments:
+            vm_ip = assignment['vm_ip']
+            workspace = assignment.get('workspace', 1)
+            size_preset = assignment.get('size_preset', 'full')
+            position = assignment.get('position', 'center')
+            use_scratchpad = assignment.get('use_scratchpad', False)
+            custom_geometry = assignment.get('custom_geometry', None)
+            
+            try:
+                geometry = calculate_geometry_from_preset(workspace, size_preset, custom_geometry)
+                window_title = f"FreeRDP: {vm_ip}"
+                
+                if mission_control.hyprland_manager.check_window_exists(window_title):
+                    if use_scratchpad:
+                        success = mission_control.hyprland_manager.assign_to_scratchpad(window_title, size_preset, position, geometry)
+                    else:
+                        success = mission_control.hyprland_manager.position_window(window_title, workspace, position, geometry)
+                    
+                    results.append({
+                        'vm_ip': vm_ip,
+                        'success': success,
+                        'target': 'scratchpad' if use_scratchpad else f'workspace {workspace}'
+                    })
+                else:
+                    results.append({
+                        'vm_ip': vm_ip,
+                        'success': False,
+                        'error': 'Window not found'
+                    })
+                    
+                # Small delay between assignments for stability
+                time.sleep(0.2)
+                
+            except Exception as e:
+                results.append({
+                    'vm_ip': vm_ip,
+                    'success': False,
+                    'error': str(e)
+                })
+        
+        # Invalidate cache after batch operations
+        mission_control.hyprland_manager.invalidate_workspace_cache()
+        
+        successful = sum(1 for r in results if r['success'])
+        total = len(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results,
+            'summary': f'{successful}/{total} VMs assigned successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to batch assign VMs: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+def calculate_geometry_from_preset(workspace: int, size_preset: str, custom_geometry: str = None) -> str:
+    """Calculate window geometry based on size preset and workspace"""
+    try:
+        ws_width, ws_height = mission_control.hyprland_manager.get_workspace_resolution(workspace)
+        
+        # Define size presets
+        presets = {
+            'full': (int(ws_width * 0.95), int(ws_height * 0.95)),
+            'half-left': (int(ws_width * 0.48), int(ws_height * 0.95)),
+            'half-right': (int(ws_width * 0.48), int(ws_height * 0.95)),
+            'half-top': (int(ws_width * 0.95), int(ws_height * 0.47)),
+            'half-bottom': (int(ws_width * 0.95), int(ws_height * 0.47)),
+            'quarter': (int(ws_width * 0.48), int(ws_height * 0.47)),
+            'third': (int(ws_width * 0.31), int(ws_height * 0.95)),
+            'two-thirds': (int(ws_width * 0.63), int(ws_height * 0.95)),
+        }
+        
+        if size_preset == 'custom' and custom_geometry:
+            # Parse custom geometry (e.g., "1920x1080")
+            try:
+                width, height = map(int, custom_geometry.split('x'))
+                return f"{width}x{height}"
+            except (ValueError, IndexError):
+                logger.warning(f"Invalid custom geometry: {custom_geometry}, using full preset")
+                size_preset = 'full'
+        
+        if size_preset in presets:
+            width, height = presets[size_preset]
+            return f"{width}x{height}"
+        else:
+            logger.warning(f"Unknown size preset: {size_preset}, using full")
+            width, height = presets['full']
+            return f"{width}x{height}"
+            
+    except Exception as e:
+        logger.error(f"Failed to calculate geometry for preset {size_preset}: {e}")
+        return "1920x1080"  # Fallback
 
 # Optimized WebSocket handlers
 @socketio.on('connect')
@@ -1170,39 +1602,13 @@ if __name__ == '__main__':
     # Start optimized monitoring
     mission_control.start_monitoring()
     
-    print("🚀 NZ7DEV Mission Control GUI - OPTIMIZED EDITION")
-    print("📡 Navigate to http://localhost:5000")
-    print("🎯 High-performance mission control interface ready!")
-    print("⚡ Features: Async operations, caching, connection pooling, batch processing")
-    
-    # Detect if running as a service
-    is_service = (os.environ.get('INVOCATION_ID') is not None or 
-                  os.environ.get('FLASK_ENV') == 'production' or
-                  'systemd' in os.environ.get('_', ''))
-    
-    # Clear problematic Werkzeug environment variables
-    for env_var in ['WERKZEUG_SERVER_FD', 'WERKZEUG_RUN_MAIN']:
-        os.environ.pop(env_var, None)
+    print(f'\n🚀 {Fore.GREEN}NZ7DEV Mission Control GUI{Style.RESET_ALL} starting...')
+    print(f'📡 Navigate to {Fore.CYAN}http://localhost:5000{Style.RESET_ALL}')
+    print(f'🎯 Mission Control interface ready!\n')
+    print("⚡ Features: Visual workspace manager, drag-and-drop VM placement, size presets")
     
     try:
-        if is_service:
-            # Production mode - use simpler approach
-            logger.info("Starting in production service mode")
-            from werkzeug.serving import run_simple
-            
-            # Use run_simple directly to avoid Flask's startup complexity
-            run_simple(
-                hostname='0.0.0.0',
-                port=5000,
-                application=app,
-                threaded=True,
-                use_reloader=False,
-                use_debugger=False
-            )
-        else:
-            # Development mode with SocketIO features
-            logger.info("Starting in development mode")
-            socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+        socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
     except KeyboardInterrupt:
         logger.info("Received shutdown signal")
     finally:

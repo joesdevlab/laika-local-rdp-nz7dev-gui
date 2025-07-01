@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# NZ7DEV Mission Control GUI - OPTIMIZED LAUNCH SCRIPT
-# High-Performance Edition with Advanced Optimizations
+# NZ7DEV Mission Control GUI - PROFESSIONAL EDITION OPTIMIZED LAUNCHER
+# High-Performance Edition with Advanced Optimizations and Visual Workspace Manager
 
 set -euo pipefail
 
@@ -17,27 +17,31 @@ readonly NC='\033[0m' # No Color
 
 # Configuration
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly APP_NAME="NZ7DEV Mission Control GUI"
-readonly VERSION="2.0.0-OPTIMIZED"
+readonly APP_NAME="NZ7DEV Mission Control GUI Professional Edition"
+readonly VERSION="2.0.0-PROFESSIONAL-OPTIMIZED"
 readonly PORT=5000
 readonly LOG_FILE="${SCRIPT_DIR}/mission_control.log"
 readonly PID_FILE="${SCRIPT_DIR}/mission_control.pid"
 
-# Performance settings
+# Performance settings for professional edition
 readonly PYTHON_OPTS="-O -u"  # Optimize bytecode, unbuffered output
-readonly MAX_WORKERS=10
-readonly CACHE_SIZE="512M"
+readonly MAX_WORKERS=20
+readonly CACHE_SIZE="1024M"
+readonly PYTHON_CMD="/usr/bin/python3"
 
-# Fancy header
+# Professional header
 print_header() {
     clear
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║  🚀 ${WHITE}${APP_NAME} - ${VERSION}${CYAN} 🚀                             ║${NC}"
+    echo -e "${CYAN}║  🚀 ${WHITE}${APP_NAME} - ${VERSION}${CYAN} 🚀     ║${NC}"
+    echo -e "${CYAN}║                                                                                   ║${NC}"
+    echo -e "${CYAN}║  ⚡ Visual Workspace Manager  🎯 Advanced RDP Management                         ║${NC}"
+    echo -e "${CYAN}║  📊 Real-time Monitoring     🖥️  Hyprland Integration                            ║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo
 }
 
-# Logging function
+# Enhanced logging function
 log() {
     local level="$1"
     shift
@@ -49,85 +53,120 @@ log() {
         "WARN")  echo -e "${YELLOW}[WARN]${NC} $message" ;;
         "ERROR") echo -e "${RED}[ERROR]${NC} $message" ;;
         "DEBUG") echo -e "${PURPLE}[DEBUG]${NC} $message" ;;
+        "SUCCESS") echo -e "${GREEN}[SUCCESS]${NC} $message" ;;
         *)       echo -e "${WHITE}[$level]${NC} $message" ;;
     esac
     
     echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
 }
 
-# System optimization checks
+# Professional system optimization
 optimize_system() {
-    log "INFO" "🔧 Applying system optimizations..."
+    log "INFO" "🔧 Applying professional edition optimizations..."
     
-    # Set Python optimizations
+    # Enhanced Python optimizations
     export PYTHONOPTIMIZE=2
     export PYTHONUNBUFFERED=1
     export PYTHONDONTWRITEBYTECODE=1
+    export PYTHONHASHSEED=0
     
-    # Increase file descriptor limits
+    # Professional Flask settings
+    export FLASK_ENV=production
+    export FLASK_DEBUG=0
+    export SECRET_KEY="nz7dev-mission-control-pro-2024-visual-workspace-manager"
+    
+    # Memory and performance settings
+    export MALLOC_ARENA_MAX=4
+    export MALLOC_MMAP_THRESHOLD_=131072
+    export MALLOC_TRIM_THRESHOLD_=131072
+    
+    # Display environment for workspace manager
+    export DISPLAY="${DISPLAY:-:1}"
+    export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
+    export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+    
+    # Increase file descriptor limits for high-performance
     ulimit -n 65536 2>/dev/null || log "WARN" "Could not increase file descriptor limit"
     
-    # Set CPU frequency scaling to performance mode (if available)
-    if command -v cpupower >/dev/null 2>&1; then
-        sudo cpupower frequency-set -g performance 2>/dev/null || true
-    fi
+    # Set high priority if possible
+    renice -n -10 $$ 2>/dev/null || log "DEBUG" "Could not set higher priority"
     
-    # Enable TCP BBR congestion control (if available)
-    if [[ -w /proc/sys/net/ipv4/tcp_congestion_control ]]; then
-        echo "bbr" | sudo tee /proc/sys/net/ipv4/tcp_congestion_control >/dev/null 2>&1 || true
-    fi
-    
-    log "INFO" "✅ System optimizations applied"
+    log "SUCCESS" "Professional optimizations applied"
 }
 
-# Performance monitoring
-start_monitoring() {
-    log "INFO" "📊 Starting performance monitoring..."
+# Enhanced dependency check for professional edition
+check_professional_dependencies() {
+    log "INFO" "📦 Checking professional edition dependencies..."
     
-    # Create monitoring script
-    cat > "${SCRIPT_DIR}/monitor.py" << 'EOF'
-#!/usr/bin/env python3
-import psutil
-import time
-import json
-import sys
-from datetime import datetime
-
-def monitor_performance():
-    """Monitor system and application performance"""
-    try:
-        # Get process info
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline', 'cpu_percent', 'memory_percent']):
-            if 'nz7dev_gui.py' in ' '.join(proc.info['cmdline'] or []):
-                cpu = proc.info['cpu_percent']
-                memory = proc.info['memory_percent']
-                
-                # Log if usage is high
-                if cpu > 80:
-                    print(f"HIGH CPU: {cpu:.1f}%", file=sys.stderr)
-                if memory > 80:
-                    print(f"HIGH MEMORY: {memory:.1f}%", file=sys.stderr)
-                
-                # Output metrics
-                metrics = {
-                    'timestamp': datetime.now().isoformat(),
-                    'cpu_percent': cpu,
-                    'memory_percent': memory,
-                    'connections': len(psutil.net_connections()),
-                    'load_avg': psutil.getloadavg()[0] if hasattr(psutil, 'getloadavg') else 0
-                }
-                print(json.dumps(metrics))
-                break
-                
-    except Exception as e:
-        print(f"Monitoring error: {e}", file=sys.stderr)
-
-if __name__ == '__main__':
-    monitor_performance()
-EOF
+    local missing_packages=()
+    local system_packages=(
+        "python3:Python 3 interpreter"
+        "hyprctl:Hyprland window manager"
+        "xfreerdp:FreeRDP client"
+        "lsof:Network monitoring"
+    )
     
-    chmod +x "${SCRIPT_DIR}/monitor.py"
-    log "INFO" "✅ Performance monitoring configured"
+    # Check system dependencies
+    for package_info in "${system_packages[@]}"; do
+        local cmd="${package_info%:*}"
+        local desc="${package_info#*:}"
+        
+        if command -v "$cmd" >/dev/null 2>&1; then
+            log "INFO" "✓ $cmd - $desc"
+        else
+            log "WARN" "✗ $cmd - $desc (may limit functionality)"
+            [[ "$cmd" == "python3" ]] && missing_packages+=("python")
+            [[ "$cmd" == "hyprctl" ]] && missing_packages+=("hyprland")
+            [[ "$cmd" == "xfreerdp" ]] && missing_packages+=("freerdp")
+            [[ "$cmd" == "lsof" ]] && missing_packages+=("lsof")
+        fi
+    done
+    
+    # Check Python modules for professional edition
+    local python_modules=(
+        "flask:Flask web framework"
+        "flask_socketio:Real-time communication"
+        "psutil:System monitoring"
+        "yaml:Configuration parsing"
+        "threading:Concurrent operations"
+        "dataclasses:Professional data structures"
+        "functools:Performance optimizations"
+        "concurrent.futures:Advanced concurrency"
+    )
+    
+    local missing_python=()
+    for module_info in "${python_modules[@]}"; do
+        local module="${module_info%:*}"
+        local desc="${module_info#*:}"
+        
+        if $PYTHON_CMD -c "import $module" 2>/dev/null; then
+            log "DEBUG" "✓ $module - $desc"
+        else
+            log "ERROR" "✗ $module - $desc"
+            [[ "$module" == "flask" ]] && missing_python+=("python-flask")
+            [[ "$module" == "flask_socketio" ]] && missing_python+=("python-flask-socketio") 
+            [[ "$module" == "psutil" ]] && missing_python+=("python-psutil")
+            [[ "$module" == "yaml" ]] && missing_python+=("python-yaml")
+        fi
+    done
+    
+    # Auto-install missing packages for Arch Linux
+    if [[ ${#missing_python[@]} -gt 0 ]] && command -v pacman >/dev/null 2>&1; then
+        log "INFO" "Installing missing Python packages via pacman..."
+        sudo pacman -S --needed --noconfirm "${missing_python[@]}" || {
+            log "WARN" "Pacman install failed, trying pip fallback..."
+            $PYTHON_CMD -m pip install --break-system-packages flask flask-socketio psutil pyyaml eventlet
+        }
+    fi
+    
+    # Final verification
+    if $PYTHON_CMD -c "import flask, flask_socketio, psutil, yaml" 2>/dev/null; then
+        log "SUCCESS" "All professional edition dependencies satisfied"
+        return 0
+    else
+        log "ERROR" "Critical dependencies missing for professional edition"
+        return 1
+    fi
 }
 
 # Check if another instance is running
@@ -135,14 +174,15 @@ check_running() {
     if [[ -f "$PID_FILE" ]]; then
         local pid=$(cat "$PID_FILE")
         if ps -p "$pid" > /dev/null 2>&1; then
-            log "WARN" "Application already running with PID $pid"
+            log "WARN" "Professional edition already running with PID $pid"
             read -p "Kill existing instance? [y/N]: " -n 1 -r
             echo
             if [[ $REPLY =~ ^[Yy]$ ]]; then
                 kill "$pid" 2>/dev/null || true
-                sleep 2
+                sleep 3
                 kill -9 "$pid" 2>/dev/null || true
                 rm -f "$PID_FILE"
+                log "INFO" "Existing instance terminated"
             else
                 log "INFO" "Exiting..."
                 exit 0
@@ -153,267 +193,200 @@ check_running() {
     fi
 }
 
-# Install/update dependencies with caching
-install_dependencies() {
-    log "INFO" "📦 Checking dependencies..."
+# Enhanced cleanup with professional features
+cleanup_environment() {
+    log "INFO" "🧹 Cleaning up environment for professional launch..."
     
-    local packages=(
-        "python-flask"
-        "python-flask-socketio" 
-        "python-psutil"
-        "python-yaml"
-        "xfreerdp"
-        "hyprland"
-    )
+    # Kill any existing GUI processes
+    pkill -f "nz7dev_gui.py" 2>/dev/null || true
     
-    local missing_packages=()
+    # Clean up port 5000
+    lsof -ti:5000 | xargs -r kill -9 2>/dev/null || true
     
-    # Check which packages are missing
-    for package in "${packages[@]}"; do
-        if ! pacman -Q "$package" >/dev/null 2>&1; then
-            missing_packages+=("$package")
-        fi
-    done
+    # Remove stale PID files
+    rm -f "$PID_FILE" 2>/dev/null || true
     
-    # Install missing packages
-    if [[ ${#missing_packages[@]} -gt 0 ]]; then
-        log "INFO" "Installing missing packages: ${missing_packages[*]}"
-        sudo pacman -S --needed --noconfirm "${missing_packages[@]}"
-    else
-        log "INFO" "✅ All dependencies satisfied"
-    fi
+    # Create required directories
+    mkdir -p logs static/css static/js templates
     
-    # Verify Python modules
-    python3 -c "import flask, flask_socketio, psutil, yaml" 2>/dev/null || {
-        log "ERROR" "Python dependencies not properly installed"
-        exit 1
-    }
+    # Set proper permissions
+    chmod +x nz7dev *.sh 2>/dev/null || true
+    
+    log "SUCCESS" "Environment cleaned and ready"
 }
 
-# Pre-warm Python imports
-prewarm_python() {
-    log "INFO" "🔥 Pre-warming Python imports..."
+# Professional performance monitoring
+start_monitoring() {
+    log "INFO" "📊 Starting professional performance monitoring..."
     
-    python3 -c "
+    # Create enhanced monitoring script
+    cat > "${SCRIPT_DIR}/monitor_pro.py" << 'EOF'
+#!/usr/bin/env python3
+import psutil
+import time
+import json
+import sys
+import threading
+from datetime import datetime
+
+class ProfessionalMonitor:
+    def __init__(self):
+        self.metrics = {
+            'cpu_percent': 0,
+            'memory_percent': 0,
+            'connections': 0,
+            'threads': 0,
+            'load_avg': 0,
+            'startup_time': datetime.now().isoformat()
+        }
+    
+    def monitor_performance(self):
+        """Enhanced performance monitoring for professional edition"""
+        try:
+            # Find mission control process
+            for proc in psutil.process_iter(['pid', 'name', 'cmdline', 'cpu_percent', 'memory_percent', 'num_threads']):
+                if 'nz7dev_gui.py' in ' '.join(proc.info['cmdline'] or []):
+                    self.metrics.update({
+                        'cpu_percent': proc.info['cpu_percent'],
+                        'memory_percent': proc.info['memory_percent'],
+                        'threads': proc.info['num_threads'],
+                        'connections': len(psutil.net_connections()),
+                        'load_avg': psutil.getloadavg()[0] if hasattr(psutil, 'getloadavg') else 0,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                    
+                    # Professional alerting
+                    if self.metrics['cpu_percent'] > 85:
+                        print(f"HIGH CPU: {self.metrics['cpu_percent']:.1f}%", file=sys.stderr)
+                    if self.metrics['memory_percent'] > 85:
+                        print(f"HIGH MEMORY: {self.metrics['memory_percent']:.1f}%", file=sys.stderr)
+                    
+                    print(json.dumps(self.metrics))
+                    break
+                    
+        except Exception as e:
+            print(f"Professional monitoring error: {e}", file=sys.stderr)
+
+if __name__ == '__main__':
+    monitor = ProfessionalMonitor()
+    monitor.monitor_performance()
+EOF
+    
+    chmod +x "${SCRIPT_DIR}/monitor_pro.py"
+    log "SUCCESS" "Professional monitoring configured"
+}
+
+# Pre-warm Python for faster startup
+prewarm_python() {
+    log "INFO" "🔥 Pre-warming Python for professional edition..."
+    
+    $PYTHON_CMD -c "
 import flask
 import flask_socketio
 import psutil
 import yaml
-import json
-import subprocess
 import threading
+import json
 import time
-import os
+import subprocess
+import concurrent.futures
 from datetime import datetime
-print('Python modules pre-warmed')
-" && log "INFO" "✅ Python imports pre-warmed"
+from dataclasses import dataclass
+from functools import lru_cache
+print('Professional edition modules pre-loaded successfully')
+" 2>/dev/null || log "WARN" "Pre-warming failed, continuing anyway"
+    
+    log "SUCCESS" "Python environment ready"
 }
 
-# Network optimizations
-optimize_network() {
-    log "INFO" "🌐 Applying network optimizations..."
+# Professional startup sequence
+professional_startup() {
+    print_header
     
-    # Increase network buffer sizes
-    echo 'net.core.rmem_max = 134217728' | sudo tee -a /etc/sysctl.conf >/dev/null 2>&1 || true
-    echo 'net.core.wmem_max = 134217728' | sudo tee -a /etc/sysctl.conf >/dev/null 2>&1 || true
-    echo 'net.ipv4.tcp_rmem = 4096 87380 134217728' | sudo tee -a /etc/sysctl.conf >/dev/null 2>&1 || true
-    echo 'net.ipv4.tcp_wmem = 4096 65536 134217728' | sudo tee -a /etc/sysctl.conf >/dev/null 2>&1 || true
-    
-    # Apply settings
-    sudo sysctl -p >/dev/null 2>&1 || true
-    
-    log "INFO" "✅ Network optimizations applied"
-}
-
-# Create optimized environment
-setup_environment() {
-    log "INFO" "🔧 Setting up optimized environment..."
-    
-    # Create clean environment
-    export PATH="/usr/bin:/usr/sbin:/bin:/sbin"
-    export PYTHONPATH=""
-    export PYTHONHASHSEED=0  # Reproducible hash seeds
-    export MALLOC_TRIM_THRESHOLD_=100000  # Faster memory allocation
-    
-    # Set Flask optimizations
-    export FLASK_ENV="production"
-    export FLASK_DEBUG="0"
-    export WERKZEUG_RUN_MAIN="true"
-    
-    # WebSocket optimizations
-    export GEVENT_SUPPORT="True"
-    export EVENTLET_NOPATCH="True"
-    
-    log "INFO" "✅ Environment optimized"
-}
-
-# Main launch function
-launch_application() {
-    log "INFO" "🚀 Launching ${APP_NAME}..."
+    log "INFO" "Starting professional edition startup sequence..."
     
     # Change to script directory
     cd "$SCRIPT_DIR"
     
-    # Set CPU affinity (if available)
-    local cpu_count=$(nproc)
-    local affinity=""
-    if ((cpu_count > 4)); then
-        # Use last 4 cores for better performance
-        affinity="taskset -c $((cpu_count-4))-$((cpu_count-1))"
+    # Check for existing instances
+    check_running
+    
+    # Clean environment
+    cleanup_environment
+    
+    # Check dependencies
+    check_professional_dependencies || exit 1
+    
+    # Apply optimizations
+    optimize_system
+    
+    # Start monitoring
+    start_monitoring
+    
+    # Pre-warm Python
+    prewarm_python
+    
+    # Display access information
+    echo
+    echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║  🚀 MISSION CONTROL PROFESSIONAL EDITION READY FOR LAUNCH 🚀                     ║${NC}"
+    echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo
+    
+    local ip_address
+    ip_address=$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'src \K\S+' 2>/dev/null || echo "localhost")
+    
+    echo -e "${WHITE}[ACCESS URLS]${NC}"
+    echo -e "  🌐 Local:      ${BLUE}http://localhost:5000${NC}"
+    echo -e "  🖥️  Loopback:   ${BLUE}http://127.0.0.1:5000${NC}"
+    if [[ "$ip_address" != "localhost" ]]; then
+        echo -e "  📱 Network:    ${BLUE}http://$ip_address:5000${NC}"
     fi
+    echo
     
-    # Launch with optimizations
-    local cmd="$affinity /usr/bin/python3 $PYTHON_OPTS nz7dev_gui.py"
+    echo -e "${PURPLE}[PROFESSIONAL FEATURES]${NC}"
+    echo -e "  🎯 Visual Workspace Manager - Drag & drop VM placement"
+    echo -e "  📐 Advanced Size Presets - Full, half, quarter, third, custom"
+    echo -e "  🗂️  Scratchpad Integration - Floating window management" 
+    echo -e "  📊 Real-time Monitoring - Live performance metrics"
+    echo -e "  ⚡ Performance Optimized - Enhanced caching & concurrency"
+    echo -e "  🎨 Professional UI - Modern dark theme with animations"
+    echo
     
-    log "INFO" "Command: $cmd"
-    log "INFO" "🌐 Web Interface: http://localhost:$PORT"
-    
-    # Start application in background
-    nohup $cmd > "$LOG_FILE" 2>&1 &
-    local app_pid=$!
-    
-    # Save PID
-    echo "$app_pid" > "$PID_FILE"
-    
-    # Wait a moment and check if it started successfully
-    sleep 3
-    
-    if ps -p "$app_pid" > /dev/null 2>&1; then
-        log "INFO" "✅ Application started successfully (PID: $app_pid)"
-        
-        # Check if port is listening
-        for i in {1..10}; do
-            if netstat -ln | grep -q ":$PORT "; then
-                log "INFO" "🎯 Server listening on port $PORT"
-                break
-            fi
-            sleep 1
-        done
-        
-        # Open browser
-        if command -v xdg-open >/dev/null 2>&1; then
-            log "INFO" "🌍 Opening browser..."
-            xdg-open "http://localhost:$PORT" >/dev/null 2>&1 &
-        fi
-        
-        return 0
+    echo -e "${CYAN}[HYPRLAND STATUS]${NC}"
+    if command -v hyprctl >/dev/null 2>&1; then
+        echo -e "  ✅ Hyprland detected - Full workspace management enabled"
+        local workspaces=$(hyprctl workspaces -j 2>/dev/null | jq length 2>/dev/null || echo "N/A")
+        echo -e "  🖥️  Active workspaces: $workspaces"
     else
-        log "ERROR" "Failed to start application"
-        rm -f "$PID_FILE"
-        return 1
-    fi
-}
-
-# Performance monitoring loop
-monitor_loop() {
-    while true; do
-        if [[ -f "$PID_FILE" ]]; then
-            local pid=$(cat "$PID_FILE")
-            if ps -p "$pid" > /dev/null 2>&1; then
-                # Run performance check
-                "${SCRIPT_DIR}/monitor.py" 2>/dev/null || true
-            else
-                log "WARN" "Application process died"
-                rm -f "$PID_FILE"
-                break
-            fi
-        else
-            break
-        fi
-        sleep 30
-    done
-}
-
-# Cleanup function
-cleanup() {
-    log "INFO" "🧹 Cleaning up..."
-    
-    if [[ -f "$PID_FILE" ]]; then
-        local pid=$(cat "$PID_FILE")
-        if ps -p "$pid" > /dev/null 2>&1; then
-            kill "$pid" 2>/dev/null || true
-            sleep 2
-            kill -9 "$pid" 2>/dev/null || true
-        fi
-        rm -f "$PID_FILE"
+        echo -e "  ⚠️  Hyprland not detected - Limited workspace features"
     fi
     
-    # Clean up monitoring script
-    rm -f "${SCRIPT_DIR}/monitor.py"
-    
-    log "INFO" "✅ Cleanup complete"
+    echo
+    echo -e "${YELLOW}[READY]${NC} Press Ctrl+C to stop the professional server"
+    echo -e "${GREEN}[LAUNCH]${NC} Starting Mission Control Professional Edition..."
+    echo
 }
-
-# Signal handlers
-trap cleanup EXIT INT TERM
 
 # Main execution
 main() {
-    print_header
+    # Run professional startup
+    professional_startup
     
-    # Check if running as root
-    if [[ $EUID -eq 0 ]]; then
-        log "ERROR" "Do not run as root for security reasons"
-        exit 1
-    fi
+    # Store PID
+    echo $$ > "$PID_FILE"
     
-    # Performance optimizations
-    optimize_system
-    setup_environment
-    optimize_network
-    
-    # Application setup
-    check_running
-    install_dependencies
-    prewarm_python
-    start_monitoring
-    
-    # Launch application
-    if launch_application; then
-        echo
-        echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════════════════════════╗${NC}"
-        echo -e "${GREEN}║  🎉 ${WHITE}MISSION CONTROL GUI SUCCESSFULLY LAUNCHED!${GREEN} 🎉                          ║${NC}"
-        echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════════════════════════╝${NC}"
-        echo
-        echo -e "${CYAN}[ACCESS INFO]${NC}"
-        echo -e "  🌐 Web Interface: ${WHITE}http://localhost:$PORT${NC}"
-        echo -e "  🖥️  Local Access:  ${WHITE}http://127.0.0.1:$PORT${NC}"
-        echo -e "  📱 Network Access: ${WHITE}http://$(hostname -I | awk '{print $1}'):$PORT${NC}"
-        echo
-        echo -e "${CYAN}[OPTIMIZATIONS ACTIVE]${NC}"
-        echo -e "  ⚡ Python bytecode optimization"
-        echo -e "  🚀 Network buffer optimization"
-        echo -e "  📊 Performance monitoring"
-        echo -e "  🎯 Connection pooling & caching"
-        echo -e "  🔧 System resource optimization"
-        echo
-        echo -e "${CYAN}[FEATURES]${NC}"
-        echo -e "  ✅ Async operations & batch processing"
-        echo -e "  ✅ Real-time WebSocket updates"
-        echo -e "  ✅ Intelligent caching system"
-        echo -e "  ✅ Concurrent connection handling"
-        echo -e "  ✅ Auto window positioning"
-        echo
-        echo -e "${CYAN}[SHORTCUTS]${NC}"
-        echo -e "  • ${WHITE}Ctrl+Enter${NC} = Spawn RDP connection"
-        echo -e "  • ${WHITE}Alt+1-6${NC} = Quick preset selection"
-        echo -e "  • ${WHITE}Escape${NC} = Close modals"
-        echo
-        echo -e "${YELLOW}[READY]${NC} Press ${WHITE}Ctrl+C${NC} to stop the server"
-        echo
-        
-        # Start monitoring in background
-        monitor_loop &
-        
-        # Wait for user interrupt
-        while true; do
-            read -r -t 1 || continue
-        done
-    else
-        log "ERROR" "Failed to launch application"
-        exit 1
-    fi
+    # Launch with full optimizations
+    exec $PYTHON_CMD $PYTHON_OPTS nz7dev_gui.py 2>&1 | tee -a "$LOG_FILE"
 }
+
+# Cleanup on exit
+cleanup() {
+    rm -f "$PID_FILE" 2>/dev/null || true
+    log "INFO" "Professional edition shutdown complete"
+}
+
+trap cleanup EXIT
 
 # Execute main function
 main "$@" 
