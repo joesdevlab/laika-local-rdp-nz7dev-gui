@@ -547,6 +547,251 @@
                 width: 100%;
             }
         }
+
+        /* Quick RDP Spawner Styles */
+        .quick-rdp-panel {
+            background: linear-gradient(145deg, rgba(0, 168, 255, 0.1), rgba(0, 120, 212, 0.05));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .quick-rdp-panel h3 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rdp-quick-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quick-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .quick-input-ip {
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e6ed;
+            font-size: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .quick-input-ip:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+
+        .quick-input-select {
+            padding: 0.75rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e6ed;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-input-select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+
+        .quick-spawn-btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #00a8ff, #0078d4);
+            transition: all 0.3s ease;
+        }
+
+        .quick-spawn-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 168, 255, 0.4);
+        }
+
+        .quick-presets {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #00d4ff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Active Connections Panel */
+        .active-connections-panel {
+            background: linear-gradient(145deg, rgba(22, 163, 74, 0.1), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .active-connections-panel h3 {
+            color: #22c55e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .connections-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .connection-item:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .connection-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .connection-ip {
+            font-weight: bold;
+            color: #22c55e;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .connection-details {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .connection-kill-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .connection-kill-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Advanced RDP Modal */
+        .advanced-rdp-modal {
+            display: none;
+        }
+
+        .advanced-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #e0e6ed;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e6ed;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .quick-inputs {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .quick-presets {
+                justify-content: center;
+            }
+            
+            .advanced-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -576,10 +821,55 @@
         <button class="btn btn-danger" onclick="executeCommand('down')">
             <i class="fas fa-power-off"></i> Emergency Stop
         </button>
+        <button class="btn btn-primary" onclick="openQuickRDPModal()" style="margin-left: auto;">
+            <i class="fas fa-plus-circle"></i> Quick RDP
+        </button>
     </div>
 
     <div class="main-content">
         <div class="fleet-section">
+            <!-- Quick RDP Panel -->
+            <div class="quick-rdp-panel">
+                <h3><i class="fas fa-lightning-bolt"></i> Quick RDP Spawner</h3>
+                <div class="rdp-quick-form">
+                    <div class="quick-inputs">
+                        <input type="text" id="quickIP" placeholder="192.168.1.xxx" class="quick-input-ip">
+                        <select id="quickGeometry" class="quick-input-select">
+                            <option value="1920x1080">1920x1080 (Full HD)</option>
+                            <option value="1680x1050">1680x1050 (WSXGA+)</option>
+                            <option value="1440x900">1440x900 (WXGA+)</option>
+                            <option value="1280x720">1280x720 (HD)</option>
+                            <option value="fullscreen">Fullscreen</option>
+                        </select>
+                        <select id="quickWorkspace" class="quick-input-select">
+                            <option value="1">Workspace 1</option>
+                            <option value="2">Workspace 2</option>
+                            <option value="3">Workspace 3</option>
+                            <option value="4">Workspace 4</option>
+                        </select>
+                        <button class="btn btn-primary quick-spawn-btn" onclick="quickSpawnRDP()">
+                            <i class="fas fa-rocket"></i> SPAWN
+                        </button>
+                    </div>
+                    <div class="quick-presets">
+                        <button class="preset-btn" onclick="setPreset('192.168.1.20', '957x1042', 4)">ALPHA</button>
+                        <button class="preset-btn" onclick="setPreset('192.168.1.21', '1717x1402', 2)">BRAVO</button>
+                        <button class="preset-btn" onclick="setPreset('192.168.1.23', '1915x1042', 1)">CHARLIE</button>
+                        <button class="preset-btn" onclick="setPreset('192.168.1.24', '957x1042', 4)">DELTA</button>
+                        <button class="preset-btn" onclick="setPreset('192.168.1.25', '1717x1402', 2)">ECHO</button>
+                        <button class="preset-btn" onclick="setPreset('192.168.1.26', '1915x1042', 3)">FOXTROT</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Connections Panel -->
+            <div class="active-connections-panel">
+                <h3><i class="fas fa-plug"></i> Active Connections</h3>
+                <div id="activeConnectionsList" class="connections-list">
+                    <!-- Active connections will be populated here -->
+                </div>
+            </div>
+            
             <div class="fleet-grid" id="fleetGrid">
                 <!-- VM cards will be populated by JavaScript -->
             </div>
@@ -641,17 +931,15 @@
                 <h2><i class="fas fa-cog"></i> Configure <span id="configVmName"></span></h2>
                 <button class="modal-close" onclick="closeConfigModal()">&times;</button>
             </div>
-            
             <div class="modal-body">
                 <div class="config-grid">
                     <div class="config-group">
-                        <label>Display Geometry</label>
+                        <label for="configGeometry">Display Geometry</label>
                         <input type="text" id="configGeometry" placeholder="1920x1080">
                         <small>Format: WIDTHxHEIGHT</small>
                     </div>
-                    
                     <div class="config-group">
-                        <label>Workspace</label>
+                        <label for="configWorkspace">Workspace</label>
                         <select id="configWorkspace">
                             <option value="1">Workspace 1</option>
                             <option value="2">Workspace 2</option>
@@ -659,48 +947,110 @@
                             <option value="4">Workspace 4</option>
                         </select>
                     </div>
-                    
                     <div class="config-group">
-                        <label>Position</label>
+                        <label for="configPosition">Window Position</label>
                         <select id="configPosition">
                             <option value="left">Left</option>
                             <option value="center">Center</option>
                             <option value="right">Right</option>
                         </select>
                     </div>
-                    
                     <div class="config-group">
-                        <label>Scratchpad Mode</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="configScratchpad">
-                            <span class="slider"></span>
-                        </label>
-                        <small>Use scratchpad instead of workspace</small>
+                        <label for="configIp">IP Address</label>
+                        <input type="text" id="configIp" placeholder="192.168.1.x">
                     </div>
-                    
                     <div class="config-group">
-                        <label>Auto Connect</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="configEnabled">
-                            <span class="slider"></span>
+                        <label>
+                            <input type="checkbox" id="configScratchpad"> Scratchpad
                         </label>
-                        <small>Start with morning routine</small>
+                        <small>Send to scratchpad instead of workspace</small>
                     </div>
-                    
                     <div class="config-group">
-                        <label>IP Address</label>
-                        <input type="text" id="configIp" placeholder="192.168.1.20">
-                        <small>VM network address</small>
+                        <label>
+                            <input type="checkbox" id="configEnabled"> Enabled
+                        </label>
+                        <small>Include in fleet operations</small>
                     </div>
                 </div>
             </div>
-            
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="saveVmConfig()">
-                    <i class="fas fa-save"></i> Save Configuration
-                </button>
-                <button class="btn btn-secondary" onclick="closeConfigModal()">
-                    <i class="fas fa-times"></i> Cancel
+                <button class="btn btn-secondary" onclick="closeConfigModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveVmConfig()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced RDP Modal -->
+    <div id="advancedRDPModal" class="modal advanced-rdp-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-rocket"></i> Advanced RDP Connection</h2>
+                <button class="modal-close" onclick="closeAdvancedRDPModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="advanced-form-grid">
+                    <div class="form-group">
+                        <label for="advancedIP">IP Address *</label>
+                        <input type="text" id="advancedIP" placeholder="192.168.1.xxx" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="advancedUsername">Username</label>
+                        <input type="text" id="advancedUsername" placeholder="User" value="User">
+                    </div>
+                    <div class="form-group">
+                        <label for="advancedPassword">Password</label>
+                        <input type="password" id="advancedPassword" placeholder="Password" value="lemonlime">
+                    </div>
+                    <div class="form-group">
+                        <label for="advancedGeometry">Display Size</label>
+                        <select id="advancedGeometry">
+                            <option value="1920x1080">1920x1080 (Full HD)</option>
+                            <option value="1680x1050">1680x1050 (WSXGA+)</option>
+                            <option value="1440x900">1440x900 (WXGA+)</option>
+                            <option value="1366x768">1366x768 (WXGA)</option>
+                            <option value="1280x720">1280x720 (HD)</option>
+                            <option value="1024x768">1024x768 (XGA)</option>
+                            <option value="fullscreen">Fullscreen</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="advancedWorkspace">Workspace</label>
+                        <select id="advancedWorkspace">
+                            <option value="1">Workspace 1</option>
+                            <option value="2">Workspace 2</option>
+                            <option value="3">Workspace 3</option>
+                            <option value="4">Workspace 4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="advancedPosition">Window Position</label>
+                        <select id="advancedPosition">
+                            <option value="center">Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Options</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="advancedClipboard" checked>
+                            <label for="advancedClipboard">Clipboard Sharing</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="advancedDrives">
+                            <label for="advancedDrives">Drive Redirection</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="advancedSound">
+                            <label for="advancedSound">Sound Redirection</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAdvancedRDPModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="spawnAdvancedRDP()">
+                    <i class="fas fa-rocket"></i> Connect
                 </button>
             </div>
         </div>
@@ -709,17 +1059,255 @@
     <script>
         // WebSocket connection
         const socket = io();
+        
+        // Global variables
         let fleetStatus = {};
         let currentConfigVm = null;
-
-        // Socket event handlers
-        socket.on('connect', function() {
-            addLog('WebSocket connected to Mission Control');
+        let activeConnections = {};
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
             refreshStatus();
+            loadActiveConnections();
+            
+            // Set up auto-refresh
+            setInterval(refreshStatus, 10000); // Every 10 seconds
+            setInterval(loadActiveConnections, 5000); // Every 5 seconds
+            
+            // Auto-focus IP input
+            document.getElementById('quickIP').focus();
+        });
+
+        // Quick RDP Functions
+        function setPreset(ip, geometry, workspace) {
+            document.getElementById('quickIP').value = ip;
+            document.getElementById('quickGeometry').value = geometry;
+            document.getElementById('quickWorkspace').value = workspace;
+            
+            // Flash the preset button
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            presetBtns.forEach(btn => {
+                if (btn.textContent.includes(ip.split('.')[3])) {
+                    btn.style.background = 'rgba(0, 212, 255, 0.5)';
+                    setTimeout(() => {
+                        btn.style.background = 'rgba(0, 0, 0, 0.2)';
+                    }, 300);
+                }
+            });
+        }
+
+        function quickSpawnRDP() {
+            const ip = document.getElementById('quickIP').value.trim();
+            const geometry = document.getElementById('quickGeometry').value;
+            const workspace = parseInt(document.getElementById('quickWorkspace').value);
+            
+            if (!ip) {
+                showNotification('Please enter an IP address', 'error');
+                document.getElementById('quickIP').focus();
+                return;
+            }
+            
+            // Basic IP validation
+            if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+                showNotification('Invalid IP address format', 'error');
+                document.getElementById('quickIP').focus();
+                return;
+            }
+            
+            const connectionParams = {
+                ip: ip,
+                geometry: geometry === 'fullscreen' ? '1920x1080' : geometry,
+                fullscreen: geometry === 'fullscreen',
+                workspace: workspace,
+                position: 'center',
+                username: 'User',
+                password: 'lemonlime',
+                clipboard: true,
+                drive_redirection: false,
+                sound: false
+            };
+            
+            spawnRDPConnection(connectionParams);
+            
+            // Clear form
+            document.getElementById('quickIP').value = '';
+            document.getElementById('quickGeometry').selectedIndex = 0;
+            document.getElementById('quickWorkspace').selectedIndex = 0;
+        }
+
+        function openQuickRDPModal() {
+            document.getElementById('advancedRDPModal').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('advancedIP').focus();
+            }, 100);
+        }
+
+        function closeAdvancedRDPModal() {
+            document.getElementById('advancedRDPModal').style.display = 'none';
+        }
+
+        function spawnAdvancedRDP() {
+            const ip = document.getElementById('advancedIP').value.trim();
+            const username = document.getElementById('advancedUsername').value.trim();
+            const password = document.getElementById('advancedPassword').value;
+            const geometry = document.getElementById('advancedGeometry').value;
+            const workspace = parseInt(document.getElementById('advancedWorkspace').value);
+            const position = document.getElementById('advancedPosition').value;
+            
+            if (!ip) {
+                showNotification('Please enter an IP address', 'error');
+                return;
+            }
+            
+            if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+                showNotification('Invalid IP address format', 'error');
+                return;
+            }
+            
+            const connectionParams = {
+                ip: ip,
+                username: username || 'User',
+                password: password || 'lemonlime',
+                geometry: geometry === 'fullscreen' ? '1920x1080' : geometry,
+                fullscreen: geometry === 'fullscreen',
+                workspace: workspace,
+                position: position,
+                clipboard: document.getElementById('advancedClipboard').checked,
+                drive_redirection: document.getElementById('advancedDrives').checked,
+                sound: document.getElementById('advancedSound').checked
+            };
+            
+            spawnRDPConnection(connectionParams);
+            closeAdvancedRDPModal();
+        }
+
+        function spawnRDPConnection(connectionParams) {
+            showLoading(`Connecting to ${connectionParams.ip}...`);
+            
+            fetch('/api/rdp/spawn', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(connectionParams)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`RDP connection to ${connectionParams.ip} started!`, 'success');
+                    addLog(`Spawned RDP: ${connectionParams.ip} (${connectionParams.geometry}) → WS${connectionParams.workspace}`);
+                    setTimeout(loadActiveConnections, 2000); // Refresh connections
+                } else {
+                    showNotification(`Failed to connect: ${data.error}`, 'error');
+                    addLog(`Error spawning RDP to ${connectionParams.ip}: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification(`Connection error: ${error.message}`, 'error');
+                addLog(`Connection error: ${error.message}`, 'error');
+            });
+        }
+
+        function loadActiveConnections() {
+            fetch('/api/rdp/connections')
+                .then(response => response.json())
+                .then(connections => {
+                    activeConnections = connections;
+                    updateActiveConnectionsDisplay();
+                })
+                .catch(error => {
+                    console.error('Error loading connections:', error);
+                });
+        }
+
+        function updateActiveConnectionsDisplay() {
+            const container = document.getElementById('activeConnectionsList');
+            
+            if (Object.keys(activeConnections).length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 1rem;">No active connections</div>';
+                return;
+            }
+            
+            container.innerHTML = Object.entries(activeConnections).map(([connId, conn]) => `
+                <div class="connection-item">
+                    <div class="connection-info">
+                        <div class="connection-ip">${conn.ip}</div>
+                        <div class="connection-details">
+                            ${conn.geometry} • WS${conn.workspace} • ${conn.username}
+                            <br>Started: ${new Date(conn.started).toLocaleTimeString()}
+                        </div>
+                    </div>
+                    <button class="connection-kill-btn" onclick="killConnection('${connId}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function killConnection(connectionId) {
+            if (!confirm('Kill this RDP connection?')) return;
+            
+            fetch(`/api/rdp/connection/${connectionId}/kill`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Connection terminated', 'success');
+                        loadActiveConnections();
+                    } else {
+                        showNotification(`Failed to kill connection: ${data.error}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification(`Error: ${error.message}`, 'error');
+                });
+        }
+
+        // Enhanced keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Ctrl+Enter in IP field = Quick spawn
+            if (event.ctrlKey && event.key === 'Enter') {
+                const activeElement = document.activeElement;
+                if (activeElement.id === 'quickIP') {
+                    quickSpawnRDP();
+                    event.preventDefault();
+                } else if (activeElement.id === 'advancedIP') {
+                    spawnAdvancedRDP();
+                    event.preventDefault();
+                }
+            }
+            
+            // Escape to close modals
+            if (event.key === 'Escape') {
+                closeConfigModal();
+                closeAdvancedRDPModal();
+            }
+            
+            // Quick preset keys (Alt + number)
+            if (event.altKey && event.key >= '1' && event.key <= '6') {
+                const presets = [
+                    ['192.168.1.20', '957x1042', 4],
+                    ['192.168.1.21', '1717x1402', 2],
+                    ['192.168.1.23', '1915x1042', 1],
+                    ['192.168.1.24', '957x1042', 4],
+                    ['192.168.1.25', '1717x1402', 2],
+                    ['192.168.1.26', '1915x1042', 3]
+                ];
+                
+                const index = parseInt(event.key) - 1;
+                if (index < presets.length) {
+                    setPreset(...presets[index]);
+                    event.preventDefault();
+                }
+            }
+        });
+
+        // Socket events
+        socket.on('connect', function() {
+            console.log('Connected to Mission Control');
+            addLog('Connected to Mission Control server');
         });
 
         socket.on('disconnect', function() {
-            addLog('WebSocket disconnected from Mission Control', 'error');
+            console.log('Disconnected from Mission Control');
+            addLog('Disconnected from Mission Control server', 'error');
         });
 
         socket.on('status_update', function(data) {
@@ -728,12 +1316,7 @@
             updateWorkspaceDisplay();
         });
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            refreshStatus();
-            setInterval(refreshStatus, 30000); // Refresh every 30 seconds
-        });
-
+        // Existing functions continue...
         function refreshStatus() {
             fetch('/api/status')
                 .then(response => response.json())
@@ -1062,6 +1645,8 @@
 
         function addLog(message, type = 'info') {
             const logPanel = document.getElementById('logPanel');
+            if (!logPanel) return; // Skip if log panel doesn't exist
+            
             const entry = document.createElement('div');
             entry.className = 'log-entry';
             
@@ -1085,12 +1670,9 @@
             if (event.target === modal) {
                 closeConfigModal();
             }
-        });
-        
-        // Close modal with escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeConfigModal();
+            const advancedModal = document.getElementById('advancedRDPModal');
+            if (event.target === advancedModal) {
+                closeAdvancedRDPModal();
             }
         });
     </script>

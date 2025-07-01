@@ -92,6 +92,7 @@ class MissionControl:
     def __init__(self):
         self.status_thread = None
         self.running = False
+        self.active_connections = {}  # Track active RDP connections
         
     def start_monitoring(self):
         """Start background monitoring thread"""
@@ -155,6 +156,158 @@ class MissionControl:
         except:
             return False
     
+    def spawn_rdp_connection(self, connection_params):
+        """Spawn a custom RDP connection with specified parameters"""
+        try:
+            ip = connection_params['ip']
+            username = connection_params.get('username', 'User')
+            password = connection_params.get('password', 'lemonlime')
+            geometry = connection_params.get('geometry', '1920x1080')
+            workspace = connection_params.get('workspace', 1)
+            position = connection_params.get('position', 'center')
+            fullscreen = connection_params.get('fullscreen', False)
+            
+            # Build FreeRDP command
+            cmd = [
+                'freerdp3',
+                f'/v:{ip}',
+                f'/u:{username}',
+                f'/p:{password}',
+                '/cert-ignore',
+                '/compression',
+            ]
+            
+            # Add geometry or fullscreen
+            if fullscreen:
+                cmd.append('/f')
+            else:
+                cmd.append(f'/size:{geometry}')
+            
+            # Add additional parameters
+            if connection_params.get('drive_redirection', False):
+                cmd.append('/drive:home,/home')
+            
+            if connection_params.get('clipboard', True):
+                cmd.append('+clipboard')
+            
+            if connection_params.get('sound', False):
+                cmd.append('/sound:sys:pulse')
+            
+            # Start the connection
+            process = subprocess.Popen(cmd, 
+                                     stdout=subprocess.PIPE, 
+                                     stderr=subprocess.PIPE)
+            
+            # Track the connection
+            connection_id = f"custom_{ip}_{int(time.time())}"
+            self.active_connections[connection_id] = {
+                'process': process,
+                'ip': ip,
+                'username': username,
+                'geometry': geometry,
+                'workspace': workspace,
+                'position': position,
+                'started': datetime.now().isoformat()
+            }
+            
+            # Position window after a short delay
+            threading.Thread(target=self._position_custom_window, 
+                           args=(ip, workspace, position, geometry)).start()
+            
+            return {
+                'success': True,
+                'connection_id': connection_id,
+                'message': f'RDP connection to {ip} started'
+            }
+            
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+    
+    def _position_custom_window(self, ip, workspace, position, geometry):
+        """Position a custom RDP window"""
+        try:
+            # Wait for window to appear
+            time.sleep(3)
+            
+            window_title = f"FreeRDP: {ip}"
+            
+            # Move to workspace
+            subprocess.run([
+                'hyprctl', 'dispatch', 'movetoworkspacesilent',
+                str(workspace), f'title:{window_title}'
+            ])
+            
+            # Parse geometry
+            width, height = map(int, geometry.split('x'))
+            
+            # Calculate position based on preference
+            if position == 'center':
+                x, y = 960, 100  # Center of screen
+            elif position == 'left':
+                x, y = 100, 100
+            elif position == 'right':
+                x, y = 1800, 100
+            else:
+                x, y = 100, 100
+            
+            # Resize and move window
+            subprocess.run([
+                'hyprctl', 'dispatch', 'resizewindowpixel',
+                f'exact {width} {height}', f'title:{window_title}'
+            ])
+            
+            subprocess.run([
+                'hyprctl', 'dispatch', 'movewindowpixel',
+                f'exact {x} {y}', f'title:{window_title}'
+            ])
+            
+        except Exception as e:
+            print(f"Error positioning window: {e}")
+    
+    def get_active_connections(self):
+        """Get list of active custom connections"""
+        # Clean up dead processes
+        dead_connections = []
+        for conn_id, conn_info in self.active_connections.items():
+            if conn_info['process'].poll() is not None:
+                dead_connections.append(conn_id)
+        
+        for conn_id in dead_connections:
+            del self.active_connections[conn_id]
+        
+        return {
+            conn_id: {
+                'ip': conn_info['ip'],
+                'username': conn_info['username'],
+                'geometry': conn_info['geometry'],
+                'workspace': conn_info['workspace'],
+                'position': conn_info['position'],
+                'started': conn_info['started'],
+                'status': 'running' if conn_info['process'].poll() is None else 'stopped'
+            }
+            for conn_id, conn_info in self.active_connections.items()
+        }
+    
+    def kill_connection(self, connection_id):
+        """Kill a specific RDP connection"""
+        try:
+            if connection_id in self.active_connections:
+                process = self.active_connections[connection_id]['process']
+                process.terminate()
+                
+                # Wait for graceful shutdown, then force kill if needed
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                
+                del self.active_connections[connection_id]
+                return {'success': True, 'message': 'Connection terminated'}
+            else:
+                return {'success': False, 'error': 'Connection not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
     def get_fleet_status(self):
         """Get comprehensive status of all fleet members"""
         status = {}
@@ -358,6 +511,25 @@ def api_save_config():
     """Save configuration"""
     success = mission_control.save_config()
     return jsonify({'success': success})
+
+@app.route('/api/rdp/spawn', methods=['POST'])
+def api_spawn_rdp():
+    """Spawn a custom RDP connection"""
+    connection_params = request.json
+    result = mission_control.spawn_rdp_connection(connection_params)
+    return jsonify(result)
+
+@app.route('/api/rdp/connections')
+def api_get_connections():
+    """Get active custom RDP connections"""
+    connections = mission_control.get_active_connections()
+    return jsonify(connections)
+
+@app.route('/api/rdp/connection/<connection_id>/kill', methods=['POST'])
+def api_kill_connection(connection_id):
+    """Kill a specific RDP connection"""
+    result = mission_control.kill_connection(connection_id)
+    return jsonify(result)
 
 @socketio.on('connect')
 def handle_connect():
