@@ -1,5 +1,5 @@
 [Unit]
-Description=NZ7DEV Mission Control GUI
+Description=NZ7DEV Mission Control GUI - Optimized Edition
 Documentation=file:///README.md
 After=network.target graphical-session.target
 Wants=network.target
@@ -7,8 +7,8 @@ Wants=network.target
 [Service]
 Type=simple
 WorkingDirectory=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
-ExecStartPre=/bin/bash -c 'cd /mnt/WD/dev/laika-local-rdp-nz7dev-gui && chmod +x nz7dev'
-ExecStart=/bin/bash -c 'cd /mnt/WD/dev/laika-local-rdp-nz7dev-gui && source venv/bin/activate && exec python3 nz7dev_gui.py'
+ExecStartPre=/bin/bash -c 'cd /mnt/WD/dev/laika-local-rdp-nz7dev-gui && chmod +x nz7dev && chmod +x launch_gui_optimized.sh'
+ExecStart=/usr/bin/python3 -O -u /mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_gui.py
 Restart=always
 RestartSec=10
 KillMode=mixed
@@ -16,8 +16,8 @@ KillSignal=SIGTERM
 TimeoutStopSec=30
 
 # Resource limits
-MemoryMax=512M
-CPUQuota=50%
+MemoryMax=1G
+CPUQuota=75%
 
 # Security settings (relaxed for development environment)
 NoNewPrivileges=true
@@ -25,11 +25,19 @@ PrivateTmp=false
 ProtectSystem=false
 ProtectHome=false
 
-# Environment
+# Optimized Environment
 Environment=PYTHONPATH=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
 Environment=FLASK_ENV=production
+Environment=FLASK_DEBUG=0
+Environment=PYTHONOPTIMIZE=2
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=WERKZEUG_RUN_MAIN=true
+Environment=GEVENT_SUPPORT=True
+Environment=EVENTLET_NOPATCH=True
 Environment=DISPLAY=:0
 Environment=HOME=%h
+Environment=PATH=/usr/bin:/usr/sbin:/bin:/sbin
 
 # Logging
 StandardOutput=journal

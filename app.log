@@ -2,66 +2,125 @@ cursor-bin.AppImage: ignoring input
  * Restarting with watchdog (inotify)
  * Debugger is active!
  * Debugger PIN: 709-860-076
-(727962) wsgi starting up on http://0.0.0.0:5000
-(727962) accepted ('127.0.0.1', 51816)
-127.0.0.1 - - [01/Jul/2025 12:36:21] "GET / HTTP/1.1" 200 61394 0.007048
-(727962) accepted ('127.0.0.1', 35382)
-127.0.0.1 - - [01/Jul/2025 12:36:33] "GET / HTTP/1.1" 200 61418 0.000829
-127.0.0.1 - - [01/Jul/2025 12:36:34] "GET /socket.io/?EIO=4&transport=polling&t=PV3QWB3 HTTP/1.1" 200 300 0.000267
-(727962) accepted ('127.0.0.1', 35396)
-(727962) accepted ('127.0.0.1', 35408)
-127.0.0.1 - - [01/Jul/2025 12:36:36] "GET /api/status HTTP/1.1" 200 2135 2.134912
-127.0.0.1 - - [01/Jul/2025 12:36:36] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000492
-127.0.0.1 - - [01/Jul/2025 12:36:38] "POST /socket.io/?EIO=4&transport=polling&t=PV3QWHp&sid=2AkvhePCFDxGH4_5AAAA HTTP/1.1" 200 219 2.134642
-(727962) accepted ('127.0.0.1', 35414)
-(727962) accepted ('127.0.0.1', 35418)
-127.0.0.1 - - [01/Jul/2025 12:36:38] "GET /socket.io/?EIO=4&transport=polling&t=PV3QWHq&sid=2AkvhePCFDxGH4_5AAAA HTTP/1.1" 200 622 0.000343
-127.0.0.1 - - [01/Jul/2025 12:36:38] "GET /socket.io/?EIO=4&transport=polling&t=PV3QXK5&sid=2AkvhePCFDxGH4_5AAAA HTTP/1.1" 200 181 0.000082
-127.0.0.1 - - [01/Jul/2025 12:36:39] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000364
-127.0.0.1 - - [01/Jul/2025 12:36:46] "GET /api/status HTTP/1.1" 200 2135 2.136128
-127.0.0.1 - - [01/Jul/2025 12:36:46] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000456
-(727962) accepted ('127.0.0.1', 39408)
-(727962) accepted ('127.0.0.1', 39418)
-127.0.0.1 - - [01/Jul/2025 12:36:46] "GET / HTTP/1.1" 200 61418 0.000708
-127.0.0.1 - - [01/Jul/2025 12:36:46] "GET /socket.io/?EIO=4&transport=polling&t=PV3QZAG HTTP/1.1" 200 300 0.000667
-127.0.0.1 - - [01/Jul/2025 12:36:48] "GET /api/status HTTP/1.1" 200 2135 2.144769
-127.0.0.1 - - [01/Jul/2025 12:36:48] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000369
-(727962) accepted ('127.0.0.1', 39426)
-(727962) accepted ('127.0.0.1', 39430)
-(727962) accepted ('127.0.0.1', 39438)
-(727962) accepted ('127.0.0.1', 39452)
-127.0.0.1 - - [01/Jul/2025 12:36:50] "POST /socket.io/?EIO=4&transport=polling&t=PV3QZAU&sid=lCG2-929fp1hK7eHAAAC HTTP/1.1" 200 219 2.136202
-127.0.0.1 - - [01/Jul/2025 12:36:50] "GET /socket.io/?EIO=4&transport=polling&t=PV3QZAU.0&sid=lCG2-929fp1hK7eHAAAC HTTP/1.1" 200 181 0.000078
-127.0.0.1 - - [01/Jul/2025 12:36:50] "GET /favicon.ico HTTP/1.1" 404 355 0.000615
-127.0.0.1 - - [01/Jul/2025 12:36:50] "GET /socket.io/?EIO=4&transport=polling&t=PV3QaDQ&sid=lCG2-929fp1hK7eHAAAC HTTP/1.1" 200 181 0.000071
-127.0.0.1 - - [01/Jul/2025 12:36:51] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000349
-127.0.0.1 - - [01/Jul/2025 12:36:58] "GET /api/status HTTP/1.1" 200 2135 2.134002
-127.0.0.1 - - [01/Jul/2025 12:36:58] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000446
-127.0.0.1 - - [01/Jul/2025 12:37:01] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000412
-127.0.0.1 - - [01/Jul/2025 12:37:08] "GET /api/status HTTP/1.1" 200 2135 2.147959
-127.0.0.1 - - [01/Jul/2025 12:37:08] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000292
-127.0.0.1 - - [01/Jul/2025 12:37:11] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000375
-127.0.0.1 - - [01/Jul/2025 12:37:18] "GET /api/status HTTP/1.1" 200 2135 2.130101
-127.0.0.1 - - [01/Jul/2025 12:37:18] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000316
-127.0.0.1 - - [01/Jul/2025 12:37:21] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000377
-127.0.0.1 - - [01/Jul/2025 12:37:23] "GET /socket.io/?EIO=4&transport=websocket&sid=2AkvhePCFDxGH4_5AAAA HTTP/1.1" 200 0 45.010387
-127.0.0.1 - - [01/Jul/2025 12:37:28] "GET /api/status HTTP/1.1" 200 2135 2.130789
-127.0.0.1 - - [01/Jul/2025 12:37:28] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000329
-127.0.0.1 - - [01/Jul/2025 12:37:31] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000339
-127.0.0.1 - - [01/Jul/2025 12:37:32] "GET /socket.io/?EIO=4&transport=polling&t=PV3QkWu HTTP/1.1" 200 300 0.000178
-(727962) accepted ('127.0.0.1', 49282)
-127.0.0.1 - - [01/Jul/2025 12:37:34] "POST /socket.io/?EIO=4&transport=polling&t=PV3QkWx&sid=Re33knaSWXwGys2NAAAE HTTP/1.1" 200 219 2.134541
-127.0.0.1 - - [01/Jul/2025 12:37:34] "GET /socket.io/?EIO=4&transport=polling&t=PV3QkWx.0&sid=Re33knaSWXwGys2NAAAE HTTP/1.1" 200 181 0.000089
-127.0.0.1 - - [01/Jul/2025 12:37:35] "GET /socket.io/?EIO=4&transport=websocket&sid=lCG2-929fp1hK7eHAAAC HTTP/1.1" 200 0 45.005475
-127.0.0.1 - - [01/Jul/2025 12:37:38] "GET /api/status HTTP/1.1" 200 2135 2.131420
-127.0.0.1 - - [01/Jul/2025 12:37:38] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000327
-127.0.0.1 - - [01/Jul/2025 12:37:41] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000371
-127.0.0.1 - - [01/Jul/2025 12:37:48] "GET /api/status HTTP/1.1" 200 2135 2.129270
-127.0.0.1 - - [01/Jul/2025 12:37:48] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000455
-127.0.0.1 - - [01/Jul/2025 12:37:51] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000350
-127.0.0.1 - - [01/Jul/2025 12:37:58] "GET /api/status HTTP/1.1" 200 2135 2.129380
-127.0.0.1 - - [01/Jul/2025 12:37:58] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000357
-127.0.0.1 - - [01/Jul/2025 12:38:01] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000371
-127.0.0.1 - - [01/Jul/2025 12:38:08] "GET /api/status HTTP/1.1" 200 2135 2.127748
-127.0.0.1 - - [01/Jul/2025 12:38:08] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000304
-127.0.0.1 - - [01/Jul/2025 12:38:11] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000340
+(773685) wsgi starting up on http://0.0.0.0:5000
+(773685) accepted ('127.0.0.1', 44674)
+127.0.0.1 - - [01/Jul/2025 12:48:55] "GET /socket.io/?EIO=4&transport=polling&t=PV3TL85 HTTP/1.1" 200 300 0.000249
+(773685) accepted ('127.0.0.1', 44682)
+127.0.0.1 - - [01/Jul/2025 12:48:57] "POST /socket.io/?EIO=4&transport=polling&t=PV3TL88&sid=zFtg6f7-TfXB3XF5AAAA HTTP/1.1" 200 219 2.132176
+(773685) accepted ('127.0.0.1', 44692)
+(773685) accepted ('127.0.0.1', 44708)
+(773685) accepted ('127.0.0.1', 44724)
+127.0.0.1 - - [01/Jul/2025 12:48:57] "GET /socket.io/?EIO=4&transport=polling&t=PV3TL89&sid=zFtg6f7-TfXB3XF5AAAA HTTP/1.1" 200 181 0.000125
+127.0.0.1 - - [01/Jul/2025 12:48:59] "GET /api/status HTTP/1.1" 200 2135 2.132994
+127.0.0.1 - - [01/Jul/2025 12:48:59] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000576
+127.0.0.1 - - [01/Jul/2025 12:48:59] "GET /socket.io/?EIO=4&transport=polling&t=PV3TLfX&sid=zFtg6f7-TfXB3XF5AAAA HTTP/1.1" 200 181 0.000092
+127.0.0.1 - - [01/Jul/2025 12:49:01] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000337
+127.0.0.1 - - [01/Jul/2025 12:49:08] "GET /api/status HTTP/1.1" 200 2135 2.133847
+127.0.0.1 - - [01/Jul/2025 12:49:08] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000496
+127.0.0.1 - - [01/Jul/2025 12:49:11] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000365
+127.0.0.1 - - [01/Jul/2025 12:49:18] "GET /api/status HTTP/1.1" 200 2135 2.135046
+127.0.0.1 - - [01/Jul/2025 12:49:18] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000416
+127.0.0.1 - - [01/Jul/2025 12:49:21] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000322
+127.0.0.1 - - [01/Jul/2025 12:49:28] "GET /api/status HTTP/1.1" 200 2135 2.130028
+127.0.0.1 - - [01/Jul/2025 12:49:28] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000300
+127.0.0.1 - - [01/Jul/2025 12:49:31] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000370
+127.0.0.1 - - [01/Jul/2025 12:49:38] "GET /api/status HTTP/1.1" 200 2135 2.129797
+127.0.0.1 - - [01/Jul/2025 12:49:38] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000390
+127.0.0.1 - - [01/Jul/2025 12:49:40] "GET /socket.io/?EIO=4&transport=polling&t=PV3TWHs HTTP/1.1" 200 300 0.000202
+(773685) accepted ('127.0.0.1', 39470)
+127.0.0.1 - - [01/Jul/2025 12:49:43] "POST /socket.io/?EIO=4&transport=polling&t=PV3TWHv&sid=ikN9hKhF_T0iyXPyAAAC HTTP/1.1" 200 219 2.129008
+127.0.0.1 - - [01/Jul/2025 12:49:43] "GET /socket.io/?EIO=4&transport=polling&t=PV3TWHw&sid=ikN9hKhF_T0iyXPyAAAC HTTP/1.1" 200 181 0.000320
+127.0.0.1 - - [01/Jul/2025 12:49:43] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000455
+127.0.0.1 - - [01/Jul/2025 12:49:44] "GET /socket.io/?EIO=4&transport=websocket&sid=zFtg6f7-TfXB3XF5AAAA HTTP/1.1" 200 0 49.277311
+127.0.0.1 - - [01/Jul/2025 12:49:48] "GET /api/status HTTP/1.1" 200 2135 2.133197
+127.0.0.1 - - [01/Jul/2025 12:49:48] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000452
+127.0.0.1 - - [01/Jul/2025 12:49:51] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000373
+127.0.0.1 - - [01/Jul/2025 12:49:58] "GET /api/status HTTP/1.1" 200 2135 2.131124
+127.0.0.1 - - [01/Jul/2025 12:49:58] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000255
+127.0.0.1 - - [01/Jul/2025 12:50:01] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000370
+127.0.0.1 - - [01/Jul/2025 12:50:08] "GET /api/status HTTP/1.1" 200 2135 2.129856
+127.0.0.1 - - [01/Jul/2025 12:50:08] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000544
+127.0.0.1 - - [01/Jul/2025 12:50:11] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000395
+127.0.0.1 - - [01/Jul/2025 12:50:18] "GET /api/status HTTP/1.1" 200 2135 2.136496
+127.0.0.1 - - [01/Jul/2025 12:50:18] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000602
+127.0.0.1 - - [01/Jul/2025 12:50:21] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000387
+127.0.0.1 - - [01/Jul/2025 12:50:28] "GET /api/status HTTP/1.1" 200 2135 2.133810
+127.0.0.1 - - [01/Jul/2025 12:50:28] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000334
+127.0.0.1 - - [01/Jul/2025 12:50:28] "GET /socket.io/?EIO=4&transport=polling&t=PV3Thd- HTTP/1.1" 200 300 0.000155
+127.0.0.1 - - [01/Jul/2025 12:50:28] "GET /socket.io/?EIO=4&transport=websocket&sid=ikN9hKhF_T0iyXPyAAAC HTTP/1.1" 200 0 47.513175
+(773685) accepted ('127.0.0.1', 33994)
+127.0.0.1 - - [01/Jul/2025 12:50:30] "POST /socket.io/?EIO=4&transport=polling&t=PV3ThuM&sid=U8EeiOax365fOWHZAAAE HTTP/1.1" 200 219 2.135315
+127.0.0.1 - - [01/Jul/2025 12:50:30] "GET /socket.io/?EIO=4&transport=polling&t=PV3ThuN&sid=U8EeiOax365fOWHZAAAE HTTP/1.1" 200 181 0.000082
+127.0.0.1 - - [01/Jul/2025 12:50:31] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000368
+127.0.0.1 - - [01/Jul/2025 12:50:38] "GET /api/status HTTP/1.1" 200 2135 2.134089
+127.0.0.1 - - [01/Jul/2025 12:50:38] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000394
+127.0.0.1 - - [01/Jul/2025 12:50:41] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000320
+127.0.0.1 - - [01/Jul/2025 12:50:48] "GET /api/status HTTP/1.1" 200 2135 2.136868
+127.0.0.1 - - [01/Jul/2025 12:50:48] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000426
+127.0.0.1 - - [01/Jul/2025 12:50:51] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000362
+127.0.0.1 - - [01/Jul/2025 12:50:58] "GET /api/status HTTP/1.1" 200 2135 2.133564
+127.0.0.1 - - [01/Jul/2025 12:50:58] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000461
+127.0.0.1 - - [01/Jul/2025 12:51:01] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000375
+127.0.0.1 - - [01/Jul/2025 12:51:08] "GET /api/status HTTP/1.1" 200 2135 2.134212
+127.0.0.1 - - [01/Jul/2025 12:51:08] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000449
+127.0.0.1 - - [01/Jul/2025 12:51:11] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000373
+127.0.0.1 - - [01/Jul/2025 12:51:14] "GET /socket.io/?EIO=4&transport=polling&t=PV3Tt6q HTTP/1.1" 200 300 0.000196
+(773685) accepted ('127.0.0.1', 36482)
+127.0.0.1 - - [01/Jul/2025 12:51:16] "POST /socket.io/?EIO=4&transport=polling&t=PV3Tt6t&sid=R42rd_jodjNS-H_wAAAG HTTP/1.1" 200 219 2.133540
+127.0.0.1 - - [01/Jul/2025 12:51:16] "GET /socket.io/?EIO=4&transport=polling&t=PV3Tt6t.0&sid=R42rd_jodjNS-H_wAAAG HTTP/1.1" 200 181 0.000222
+127.0.0.1 - - [01/Jul/2025 12:51:16] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000300
+127.0.0.1 - - [01/Jul/2025 12:51:18] "GET /api/status HTTP/1.1" 200 2135 2.140746
+127.0.0.1 - - [01/Jul/2025 12:51:18] "GET /socket.io/?EIO=4&transport=websocket&sid=U8EeiOax365fOWHZAAAE HTTP/1.1" 200 0 50.261626
+127.0.0.1 - - [01/Jul/2025 12:51:18] "GET /socket.io/?EIO=4&transport=polling&t=PV3TteH&sid=R42rd_jodjNS-H_wAAAG HTTP/1.1" 200 181 0.000087
+127.0.0.1 - - [01/Jul/2025 12:51:21] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000445
+127.0.0.1 - - [01/Jul/2025 12:51:28] "GET /api/status HTTP/1.1" 200 2135 2.135311
+127.0.0.1 - - [01/Jul/2025 12:51:28] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000308
+127.0.0.1 - - [01/Jul/2025 12:51:31] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000377
+127.0.0.1 - - [01/Jul/2025 12:51:38] "GET /api/status HTTP/1.1" 200 2135 2.135180
+127.0.0.1 - - [01/Jul/2025 12:51:38] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000231
+127.0.0.1 - - [01/Jul/2025 12:51:41] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000341
+127.0.0.1 - - [01/Jul/2025 12:51:48] "GET /api/status HTTP/1.1" 200 2135 2.135150
+127.0.0.1 - - [01/Jul/2025 12:51:48] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000427
+127.0.0.1 - - [01/Jul/2025 12:51:51] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000347
+127.0.0.1 - - [01/Jul/2025 12:51:58] "GET /api/status HTTP/1.1" 200 2135 2.136197
+127.0.0.1 - - [01/Jul/2025 12:51:58] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000458
+127.0.0.1 - - [01/Jul/2025 12:52:00] "GET /socket.io/?EIO=4&transport=polling&t=PV3U2T9 HTTP/1.1" 200 300 0.000198
+(773685) accepted ('127.0.0.1', 37606)
+127.0.0.1 - - [01/Jul/2025 12:52:03] "POST /socket.io/?EIO=4&transport=polling&t=PV3U2TC&sid=RjveMQsTtXzZPEKOAAAI HTTP/1.1" 200 219 2.132164
+127.0.0.1 - - [01/Jul/2025 12:52:03] "GET /socket.io/?EIO=4&transport=polling&t=PV3U2TC.0&sid=RjveMQsTtXzZPEKOAAAI HTTP/1.1" 200 181 0.000084
+127.0.0.1 - - [01/Jul/2025 12:52:03] "GET /api/rdp/connections HTTP/1.1" 200 134 0.000300
+127.0.0.1 - - [01/Jul/2025 12:52:03] "GET /socket.io/?EIO=4&transport=websocket&sid=R42rd_jodjNS-H_wAAAG HTTP/1.1" 200 0 49.284413
+ * Detected change in '/mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_gui.py', reloading
+ * Detected change in '/mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_gui.py', reloading
+ * Detected change in '/mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_gui.py', reloading
+🚀 NZ7DEV Mission Control GUI starting...
+📡 Navigate to http://localhost:5000
+🎯 Mission Control interface ready!
+Client connected
+Client connected
+Client disconnected
+Client disconnected
+Client connected
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+ * Restarting with watchdog (inotify)
+2025-07-01 12:52:07,935 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 12:52:07,936 - __main__ - INFO - Mission Control monitoring stopped
+🚀 NZ7DEV Mission Control GUI - OPTIMIZED EDITION
+📡 Navigate to http://localhost:5000
+🎯 High-performance mission control interface ready!
+⚡ Features: Async operations, caching, connection pooling, batch processing
+Traceback (most recent call last):
+  File "/mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_gui.py", line 727, in <module>
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/flask_socketio/__init__.py", line 650, in run
+    raise RuntimeError('The Werkzeug web server is not '
+    ...<2 lines>...
+                       'run() method to disable this error.')
+RuntimeError: The Werkzeug web server is not designed to run in production. Pass allow_unsafe_werkzeug=True to the run() method to disable this error.
+🚀 NZ7DEV Mission Control GUI starting...
+📡 Navigate to http://localhost:5000
+🎯 Mission Control interface ready!

@@ -1,0 +1,24 @@
+2025-07-01 12:52:07,935 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 12:52:07,936 - __main__ - INFO - Mission Control monitoring stopped
+[2025-07-01 12:55:30] [INFO] 🔧 Applying system optimizations...
+[2025-07-01 12:55:30] [INFO] ✅ System optimizations applied
+[2025-07-01 12:55:30] [INFO] 🔧 Setting up optimized environment...
+[2025-07-01 12:55:30] [INFO] ✅ Environment optimized
+[2025-07-01 12:55:30] [INFO] 🌐 Applying network optimizations...
+2025-07-01 12:55:59,507 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 12:55:59,514 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 12:55:59,515 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 12:55:59,515 - werkzeug - INFO -  * Restarting with watchdog (inotify)
+2025-07-01 13:06:49,228 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:11:23,917 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:11:23,918 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:11:23,918 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:11:35,758 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:11:35,759 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:11:35,760 - __main__ - INFO - Mission Control monitoring stopped
+2025-07-01 13:11:47,750 - __main__ - INFO - Mission Control monitoring started
+2025-07-01 13:11:47,750 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2025-07-01 13:11:47,750 - __main__ - INFO - Mission Control monitoring stopped
