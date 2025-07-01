@@ -398,29 +398,72 @@ class HyprlandManager:
         return any(client.get('title', '').startswith(window_title) for client in clients)
     
     def position_window(self, window_title: str, workspace: int, position: str, geometry: str) -> bool:
-        """Position window with batch operations"""
+        """Position window with improved commands and timing"""
         try:
             width, height = map(int, geometry.split('x'))
             
-            # Calculate position
-            position_map = {
-                'center': (960, 100),
-                'left': (100, 100),
-                'right': (1800, 100)
-            }
-            x, y = position_map.get(position, (100, 100))
+            # Wait for window to be ready
+            max_retries = 10
+            for attempt in range(max_retries):
+                if self.check_window_exists(window_title):
+                    break
+                time.sleep(0.5)
+            else:
+                logger.warning(f"Window {window_title} not found after {max_retries} attempts")
+                return False
             
-            # Batch hyprctl commands for efficiency
+            # Calculate position based on workspace resolution
+            try:
+                ws_width, ws_height = self.get_workspace_resolution(workspace)
+                
+                if position == 'center':
+                    x = max(0, (ws_width - width) // 2)
+                    y = max(40, (ws_height - height) // 2 + 40)  # Account for waybar
+                elif position == 'left':
+                    x = 50
+                    y = 90  # Below waybar with margin
+                elif position == 'right':
+                    x = max(50, ws_width - width - 50)
+                    y = 90
+                else:
+                    x, y = 100, 100  # Default fallback
+                    
+                logger.info(f"Calculated position for {window_title}: {x},{y} (workspace {workspace}, {position})")
+                
+            except Exception as e:
+                logger.warning(f"Failed to calculate optimal position: {e}, using defaults")
+                x, y = 100, 100
+            
+            # Execute positioning commands individually with delays for reliability
             commands = [
                 f'movetoworkspacesilent {workspace},title:"{window_title}"',
                 f'resizewindowpixel exact {width} {height},title:"{window_title}"',
                 f'movewindowpixel exact {x} {y},title:"{window_title}"'
             ]
             
-            # Execute as batch
-            cmd = ['hyprctl', '--batch'] + [';'.join(commands)]
-            result = subprocess.run(cmd, capture_output=True, timeout=5)
-            return result.returncode == 0
+            success = True
+            for i, cmd in enumerate(commands):
+                try:
+                    result = subprocess.run(['hyprctl', 'dispatch'] + cmd.split(' ', 1), 
+                                          capture_output=True, timeout=3)
+                    if result.returncode != 0:
+                        logger.warning(f"Positioning command {i+1} failed for {window_title}: {result.stderr.decode()}")
+                        success = False
+                    else:
+                        logger.debug(f"Positioning step {i+1}/3 successful for {window_title}")
+                    
+                    # Small delay between commands for reliability
+                    if i < len(commands) - 1:
+                        time.sleep(0.3)
+                        
+                except subprocess.TimeoutExpired:
+                    logger.warning(f"Positioning command {i+1} timed out for {window_title}")
+                    success = False
+                except Exception as e:
+                    logger.error(f"Error in positioning command {i+1} for {window_title}: {e}")
+                    success = False
+            
+            return success
             
         except Exception as e:
             logger.error(f"Failed to position window {window_title}: {e}")
@@ -847,7 +890,8 @@ class MissionControl:
     
     def execute_script_command(self, command: str) -> Dict[str, Any]:
         """Execute nz7dev script with timeout and validation"""
-        if not command or command not in ['up', 'down', 'morning', 'fastup', 'windows']:
+        valid_commands = ['up', 'down', 'morning', 'fastup', 'windows', 'scratchpad']
+        if not command or command not in valid_commands:
             logger.warning(f"Invalid fleet command attempted: {command}")
             return {'success': False, 'error': 'Invalid command'}
         
@@ -858,11 +902,19 @@ class MissionControl:
             env = os.environ.copy()
             env['NZ7DEV_GUI_PROTECTED'] = '1'  # Signal to script to protect GUI service
             
+            # Handle scratchpad command specially
+            if command == 'scratchpad':
+                script_path = './nz7dev_scratchpad_launcher.sh'
+                cmd = [script_path, 'launch']
+            else:
+                script_path = self.config_manager.script_path
+                cmd = [script_path, command]
+            
             result = subprocess.run(
-                [self.config_manager.script_path, command],
+                cmd,
                 capture_output=True,
                 text=True,
-                timeout=60,  # Increased timeout for fleet operations
+                timeout=90,  # Increased timeout for scratchpad operations
                 env=env
             )
             
@@ -887,10 +939,10 @@ class MissionControl:
                 'error': result.stderr if result.returncode != 0 else None
             }
         except subprocess.TimeoutExpired:
-            logger.error(f"Fleet command '{command}' timed out after 60 seconds")
-            return {'success': False, 'error': 'Command timed out after 60 seconds'}
+            logger.error(f"Fleet command '{command}' timed out after 90 seconds")
+            return {'success': False, 'error': 'Command timed out after 90 seconds'}
         except FileNotFoundError:
-            logger.error(f"Fleet script not found: {self.config_manager.script_path}")
+            logger.error(f"Script not found: {script_path if command != 'scratchpad' else './nz7dev_scratchpad_launcher.sh'}")
             return {'success': False, 'error': 'Script not found'}
         except Exception as e:
             logger.error(f"Fleet command '{command}' execution error: {e}")

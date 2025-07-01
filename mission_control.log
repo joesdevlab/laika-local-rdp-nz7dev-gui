@@ -1500,3 +1500,218 @@ Syntax:
 2025-07-01 15:06:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:06:49] "GET /api/rdp/connections HTTP/1.1" 200 -
 2025-07-01 15:06:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:06:52] "GET /api/rdp/connections HTTP/1.1" 200 -
 2025-07-01 15:06:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:06:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:06:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:06:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:25,266 - __main__ - INFO - Fleet status update #30: 5/6 online, 0/6 RDP connected
+2025-07-01 15:07:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:34,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:07:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:07:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:30,590 - __main__ - INFO - Fleet status update #40: 5/6 online, 0/6 RDP connected
+2025-07-01 15:08:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:34,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:08:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:08:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:34,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:36,078 - __main__ - INFO - Fleet status update #50: 5/6 online, 0/6 RDP connected
+2025-07-01 15:09:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:09:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:09:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:34,259 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:41,676 - __main__ - INFO - Fleet status update #60: 5/6 online, 0/6 RDP connected
+2025-07-01 15:10:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:10:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:10:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:34,259 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:47,019 - __main__ - INFO - Fleet status update #70: 5/6 online, 0/6 RDP connected
+2025-07-01 15:11:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:11:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:11:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:34,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:53,343 - __main__ - INFO - Fleet status update #80: 5/6 online, 0/6 RDP connected
+2025-07-01 15:12:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:12:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:12:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:16,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:34,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:47,179 - __main__ - INFO - Background monitoring thread started
+2025-07-01 15:13:47,179 - __main__ - INFO - Mission Control monitoring started - real-time fleet status tracking active
+2025-07-01 15:13:47,180 - __main__ - INFO - Starting in production service mode
+2025-07-01 15:13:47,185 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 15:13:47,186 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 15:13:47,502 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:47] "GET /socket.io/?EIO=4&transport=polling&t=PV3-VFi HTTP/1.1" 200 -
+2025-07-01 15:13:47,507 - __main__ - INFO - Client connected: nC4ZPw6urzy4_2k8AAAB
+2025-07-01 15:13:47,507 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:47] "GET /socket.io/?EIO=4&transport=polling&t=PV3-VFn.0&sid=03YCKl6VNjLzFY3aAAAA HTTP/1.1" 200 -
+2025-07-01 15:13:47,511 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:47] "GET /socket.io/?EIO=4&transport=polling&t=PV3-VFs&sid=03YCKl6VNjLzFY3aAAAA HTTP/1.1" 200 -
+2025-07-01 15:13:48,537 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:48] "POST /socket.io/?EIO=4&transport=polling&t=PV3-VFn&sid=03YCKl6VNjLzFY3aAAAA HTTP/1.1" 200 -
+2025-07-01 15:13:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:13:57,400 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:57] "[31m[1mGET /api/fleet/scratchpad HTTP/1.1[0m" 405 -
+2025-07-01 15:13:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:13:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:04,168 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:04] "[31m[1mGET /api/fleet/scratchpad HTTP/1.1[0m" 405 -
+2025-07-01 15:14:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:07,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:07] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:10,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:10] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:10,675 - __main__ - INFO - Executing fleet command: scratchpad (timeout: 60s)
+2025-07-01 15:14:13,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:13] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:16,262 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:16] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:19,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:19] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:22,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:22] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:25,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:25] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:28,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:28] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:31,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:31] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:34,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:34] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:37,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:37] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:40,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:40] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:42,342 - __main__ - INFO - Fleet command 'scratchpad' completed successfully
+2025-07-01 15:14:42,342 - __main__ - INFO - Fleet status cache invalidated after command execution
+2025-07-01 15:14:42,342 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:42] "POST /api/fleet/scratchpad HTTP/1.1" 200 -
+2025-07-01 15:14:43,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:43] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:46,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:46] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:46,537 - __main__ - INFO - Fleet status update #10: 5/6 online, 6/6 RDP connected
+2025-07-01 15:14:49,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:49] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:52,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:52] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:53,906 - __main__ - INFO - Workspace 4 resolution: 1920x1040 (monitor: 1920x1080 - 40px waybar)
+2025-07-01 15:14:53,906 - __main__ - INFO - Auto-detected geometry for workspace 4: 1728x936 (requested: auto-ws4)
+2025-07-01 15:14:53,906 - __main__ - INFO - Spawning RDP connection to 192.168.1.20 (1728x936, workspace 4) with user nz7dev
+2025-07-01 15:14:53,910 - __main__ - INFO - RDP process started for 192.168.1.20 (PID: 1263166) with DISPLAY=:1
+2025-07-01 15:14:53,911 - __main__ - INFO - RDP connection rdp_192.168.1.20_1751339693 registered and tracking started
+2025-07-01 15:14:53,911 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:53] "POST /api/rdp/spawn HTTP/1.1" 200 -
+2025-07-01 15:14:55,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:55] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:56,911 - __main__ - INFO - RDP connection to 192.168.1.20 is running successfully
+2025-07-01 15:14:58,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:14:58] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:14:58,917 - __main__ - INFO - Workspace 4 resolution: 1920x1040 (monitor: 1920x1080 - 40px waybar)
+2025-07-01 15:14:58,918 - __main__ - INFO - Calculated position for FreeRDP: 192.168.1.20: 96,92 (workspace 4, center)
+2025-07-01 15:14:59,537 - __main__ - INFO - Window positioned successfully for 192.168.1.20
+2025-07-01 15:15:01,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:15:01] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:15:04,258 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:15:04] "GET /api/rdp/connections HTTP/1.1" 200 -
+2025-07-01 15:17:30,291 - __main__ - INFO - Background monitoring thread started
+2025-07-01 15:17:30,291 - __main__ - INFO - Mission Control monitoring started - real-time fleet status tracking active
+2025-07-01 15:17:30,291 - __main__ - INFO - Starting in production service mode
+2025-07-01 15:17:30,296 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.3:5000
+2025-07-01 15:17:30,296 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-01 15:17:46,117 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:17:46] "GET / HTTP/1.1" 200 -
+2025-07-01 15:17:52,681 - __main__ - INFO - Executing fleet command: scratchpad (timeout: 60s)
+2025-07-01 15:18:24,470 - __main__ - INFO - Fleet command 'scratchpad' completed successfully
+2025-07-01 15:18:24,470 - __main__ - INFO - Fleet status cache invalidated after command execution
+2025-07-01 15:18:24,470 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:18:24] "POST /api/fleet/scratchpad HTTP/1.1" 200 -
+2025-07-01 15:18:36,789 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:18:36] "GET /api/workspace/resolutions HTTP/1.1" 200 -
+2025-07-01 15:18:42,840 - werkzeug - INFO - 127.0.0.1 - - [01/Jul/2025 15:18:42] "GET /api/status HTTP/1.1" 200 -
+2025-07-01 15:18:47,619 - __main__ - INFO - Fleet status update #10: 5/6 online, 6/6 RDP connected
