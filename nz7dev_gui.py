@@ -1292,6 +1292,27 @@ def api_kill_connection(connection_id):
     result = mission_control.rdp_manager.kill_connection(connection_id)
     return jsonify(result), 200 if result['success'] else 404
 
+@app.route('/api/rdp/connection/ip/<ip>/kill', methods=['POST'])
+def api_kill_connection_by_ip(ip):
+    """Kill RDP connection by IP address"""
+    if not ip:
+        abort(400)
+    
+    # Find connection by IP
+    connections = mission_control.rdp_manager.get_active_connections()
+    connection_id = None
+    
+    for conn_id, conn_info in connections.items():
+        if conn_info['ip'] == ip:
+            connection_id = conn_id
+            break
+    
+    if not connection_id:
+        return jsonify({'success': False, 'error': f'No active connection found for {ip}'}), 404
+    
+    result = mission_control.rdp_manager.kill_connection(connection_id)
+    return jsonify(result), 200 if result['success'] else 500
+
 @app.route('/api/vm/<vm_name>/config', methods=['POST'])
 @validate_json()
 def api_update_vm_config(data, vm_name):

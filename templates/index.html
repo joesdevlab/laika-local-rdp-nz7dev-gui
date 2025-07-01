@@ -1179,6 +1179,12 @@
         .vm-slot.drag-over {
             border-color: var(--accent-primary);
             background: rgba(var(--accent-primary-rgb), 0.05);
+            animation: pulseGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.3); }
+            50% { box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.6); }
         }
 
         .vm-slot.occupied {
@@ -1338,6 +1344,11 @@
 
         .draggable-vm.offline {
             border-left: 3px solid var(--text-muted);
+        }
+
+        .draggable-vm.connected {
+            border-left: 3px solid var(--accent-primary);
+            background: rgba(var(--accent-primary-rgb), 0.05);
         }
 
         .vm-icon {
@@ -1611,6 +1622,72 @@
         .draggable-vm.dragging {
             opacity: 0.7;
             transform: rotate(5deg) scale(0.95);
+        }
+
+        .vm-connection-status {
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-xs);
+        }
+
+        .vm-connection-status.connected {
+            color: var(--accent-success);
+        }
+
+        .vm-connection-status.disconnected {
+            color: var(--text-muted);
+        }
+
+        .draggable-vm:hover .vm-connection-status.disconnected {
+            color: var(--accent-primary);
+        }
+
+        /* Enhanced hover states */
+        .draggable-vm:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .draggable-vm:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .draggable-vm.online {
+            border-left: 3px solid var(--accent-success);
+        }
+
+        .draggable-vm.offline {
+            border-left: 3px solid var(--text-muted);
+        }
+
+        .draggable-vm.connected {
+            border-left: 3px solid var(--accent-primary);
+            background: rgba(var(--accent-primary-rgb), 0.05);
+        }
+
+        /* Slot visual feedback improvements */
+        .vm-slot.empty:hover,
+        .vm-slot.drag-over {
+            border-color: var(--accent-primary);
+            background: rgba(var(--accent-primary-rgb), 0.05);
+            animation: pulseGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.3); }
+            50% { box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.6); }
+        }
+
+        .vm-slot.occupied {
+            border-style: solid;
+            border-color: var(--accent-success);
+            background: rgba(var(--accent-success-rgb), 0.05);
         }
 
         /* Responsive Design for Workspace Manager */
@@ -2836,6 +2913,13 @@
             element.className = `draggable-vm ${vm.status.toLowerCase()}`;
             element.draggable = true;
             element.setAttribute('data-vm-ip', vm.ip);
+            element.setAttribute('data-connected', vm.connected || false);
+            
+            // Add connection status indicator
+            const connectionStatus = vm.connected ? 'connected' : 'disconnected';
+            const connectionIcon = vm.connected ? 'fa-link' : 'fa-unlink';
+            const connectionColor = vm.connected ? 'var(--accent-success)' : 'var(--text-muted)';
+            
             element.innerHTML = `
                 <div class="vm-icon">
                     <i class="fas fa-server"></i>
@@ -2844,12 +2928,22 @@
                     <div class="vm-name">${vm.callsign}</div>
                     <div class="vm-ip">${vm.ip}</div>
                     <div class="vm-status ${vm.status.toLowerCase()}">${vm.status}</div>
+                    <div class="vm-connection-status ${connectionStatus}" style="color: ${connectionColor}">
+                        <i class="fas ${connectionIcon}"></i>
+                        ${vm.connected ? 'Connected' : 'Click to connect'}
+                    </div>
                 </div>
             `;
             
             element.addEventListener('dragstart', (e) => {
+                element.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', vm.ip);
                 e.dataTransfer.setData('application/json', JSON.stringify(vm));
+                app.addLog(`Dragging ${vm.callsign} (${vm.ip}) - ${vm.connected ? 'will reposition' : 'will connect and position'}`, 'INFO');
+            });
+            
+            element.addEventListener('dragend', (e) => {
+                element.classList.remove('dragging');
             });
             
             return element;
@@ -2865,19 +2959,53 @@
             ev.currentTarget.classList.remove('drag-over');
             
             const vmIp = ev.dataTransfer.getData('text/plain');
+            const vmDataJson = ev.dataTransfer.getData('application/json');
             const workspaceElement = ev.currentTarget.closest('[data-workspace]');
             const workspace = workspaceElement.getAttribute('data-workspace');
             const isSpecial = workspaceElement.getAttribute('data-type') === 'scratchpad';
             
             if (vmIp && workspace) {
-                assignVMToWorkspace(vmIp, workspace, isSpecial);
+                // Parse VM data if available
+                let vmData = null;
+                try {
+                    vmData = JSON.parse(vmDataJson);
+                } catch (e) {
+                    // Fallback if JSON parsing fails
+                    vmData = { ip: vmIp };
+                }
+                
+                assignVMToWorkspace(vmIp, workspace, isSpecial, vmData);
             }
         }
 
-        async function assignVMToWorkspace(vmIp, workspace, useScratchpad) {
+        async function assignVMToWorkspace(vmIp, workspace, useScratchpad, vmData = null) {
             try {
-                app.addLog(`Assigning VM ${vmIp} to ${useScratchpad ? 'scratchpad' : `workspace ${workspace}`}`, 'INFO');
+                app.addLog(`Deploying VM ${vmIp} to ${useScratchpad ? 'scratchpad' : `workspace ${workspace}`}`, 'INFO');
+                app.showNotification(`Deploying ${vmIp}...`, 'success');
                 
+                // First, check if an RDP connection already exists for this VM
+                const connections = await app.makeRequest('/api/rdp/connections');
+                const existingConnection = Object.values(connections).find(conn => conn.ip === vmIp);
+                
+                if (existingConnection) {
+                    // Connection exists, just position it
+                    app.addLog(`RDP connection to ${vmIp} already exists, positioning window`, 'INFO');
+                    await positionExistingConnection(vmIp, workspace, useScratchpad);
+                } else {
+                    // No connection exists, spawn one first
+                    app.addLog(`No RDP connection to ${vmIp}, spawning new connection`, 'INFO');
+                    await spawnAndPositionVM(vmIp, workspace, useScratchpad, vmData);
+                }
+                
+            } catch (error) {
+                console.error('Error assigning VM to workspace:', error);
+                app.addLog(`Error deploying VM ${vmIp}: ${error.message}`, 'ERROR');
+                app.showNotification(`Failed to deploy ${vmIp}: ${error.message}`, 'error');
+            }
+        }
+
+        async function positionExistingConnection(vmIp, workspace, useScratchpad) {
+            try {
                 const result = await app.makeRequest('/api/workspaces/assign', {
                     method: 'POST',
                     headers: {
@@ -2897,12 +3025,70 @@
                     app.addLog(result.message, 'SUCCESS');
                     refreshWorkspaceState();
                 } else {
-                    app.showNotification(`Failed to assign VM: ${result.error}`, 'error');
-                    app.addLog(`Failed to assign VM ${vmIp}: ${result.error}`, 'ERROR');
+                    app.showNotification(`Failed to position VM: ${result.error}`, 'error');
+                    app.addLog(`Failed to position VM ${vmIp}: ${result.error}`, 'ERROR');
                 }
             } catch (error) {
-                console.error('Error assigning VM to workspace:', error);
-                app.addLog(`Error assigning VM ${vmIp}: ${error.message}`, 'ERROR');
+                throw error;
+            }
+        }
+
+        async function spawnAndPositionVM(vmIp, workspace, useScratchpad, vmData) {
+            try {
+                // Get VM configuration from fleet data to get credentials
+                const fleetData = await app.makeRequest('/api/fleet/status');
+                let vmConfig = null;
+                
+                if (fleetData.success && fleetData.fleet) {
+                    vmConfig = fleetData.fleet.find(vm => vm.ip === vmIp);
+                }
+                
+                if (!vmConfig) {
+                    throw new Error(`VM configuration not found for ${vmIp}`);
+                }
+                
+                // Prepare RDP spawn parameters
+                const rdpParams = {
+                    ip: vmIp,
+                    username: vmIp.includes('192.168.1.23') || vmIp.includes('192.168.1.25') || vmIp.includes('192.168.1.26') ? 'User' : 'nz7dev',
+                    password: 'lemonlime',
+                    geometry: 'auto-ws' + workspace, // Use auto-detect for the target workspace
+                    workspace: parseInt(workspace),
+                    position: 'center',
+                    clipboard: true
+                };
+                
+                app.addLog(`Spawning RDP connection to ${vmIp} with auto-positioning`, 'INFO');
+                
+                // Spawn RDP connection
+                const spawnResult = await app.makeRequest('/api/rdp/spawn', {
+                    method: 'POST',
+                    body: JSON.stringify(rdpParams)
+                });
+
+                if (spawnResult.success) {
+                    app.addLog(`RDP connection to ${vmIp} spawned successfully`, 'SUCCESS');
+                    
+                    // Wait a moment for the connection to establish and window to appear
+                    app.showNotification(`Connecting to ${vmIp}... positioning window`, 'success');
+                    
+                    // Wait for window to appear, then position it
+                    setTimeout(async () => {
+                        try {
+                            await positionExistingConnection(vmIp, workspace, useScratchpad);
+                            app.showNotification(`${vmIp} deployed successfully!`, 'success');
+                        } catch (error) {
+                            app.addLog(`Failed to position window after spawn: ${error.message}`, 'WARNING');
+                            app.showNotification(`${vmIp} connected but positioning failed - window may need manual positioning`, 'warning');
+                        }
+                    }, 5000); // Wait 5 seconds for RDP to establish
+                    
+                } else {
+                    throw new Error(spawnResult.error || 'Failed to spawn RDP connection');
+                }
+                
+            } catch (error) {
+                throw error;
             }
         }
 
