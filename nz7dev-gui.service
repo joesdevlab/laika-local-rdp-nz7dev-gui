@@ -35,14 +35,23 @@ Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=WERKZEUG_RUN_MAIN=true
 Environment=GEVENT_SUPPORT=True
 Environment=EVENTLET_NOPATCH=True
-Environment=DISPLAY=:0
+Environment=DISPLAY=:1
 Environment=HOME=%h
 Environment=PATH=/usr/bin:/usr/sbin:/bin:/sbin
 
+# Environment variables for X11 display access - Updated for :1 display
+Environment=XAUTHORITY=/home/nz7/.Xauthority
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=WAYLAND_DISPLAY=wayland-1
+
 # Logging
-StandardOutput=journal
-StandardError=journal
+StandardOutput=append:/mnt/WD/dev/laika-local-rdp-nz7dev-gui/mission_control.log
+StandardError=append:/mnt/WD/dev/laika-local-rdp-nz7dev-gui/mission_control.log
 SyslogIdentifier=nz7dev-gui
+
+# Ensure service runs in user session with display access
+User=nz7
+Group=nz7
 
 [Install]
 WantedBy=default.target 

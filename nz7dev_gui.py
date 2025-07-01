@@ -229,13 +229,133 @@ class NetworkOptimizer:
             del self._ping_cache[ip]
 
 class HyprlandManager:
-    """Optimized Hyprland window management"""
+    """Optimized Hyprland window management with workspace resolution detection"""
     
     def __init__(self):
         self._clients_cache = None
         self._cache_time = None
         self._cache_duration = timedelta(seconds=2)  # Cache clients for 2 seconds
+        self._monitors_cache = None
+        self._monitors_cache_time = None
+        self._monitors_cache_duration = timedelta(seconds=30)  # Cache monitors for 30 seconds
     
+    @lru_cache(maxsize=16)
+    def _get_cached_monitors(self, timestamp: float) -> str:
+        """Cache hyprctl monitors output"""
+        try:
+            result = subprocess.run(
+                ['hyprctl', 'monitors', '-j'],
+                capture_output=True,
+                text=True,
+                timeout=3
+            )
+            return result.stdout if result.returncode == 0 else ""
+        except subprocess.TimeoutExpired:
+            logger.warning("hyprctl monitors timed out")
+            return ""
+    
+    def get_monitors(self) -> List[Dict[str, Any]]:
+        """Get Hyprland monitors with caching"""
+        now = datetime.now()
+        
+        if (self._monitors_cache is None or 
+            self._monitors_cache_time is None or 
+            now - self._monitors_cache_time > self._monitors_cache_duration):
+            
+            timestamp = time.time()
+            monitors_json = self._get_cached_monitors(timestamp)
+            
+            try:
+                self._monitors_cache = json.loads(monitors_json) if monitors_json else []
+                self._monitors_cache_time = now
+            except json.JSONDecodeError:
+                logger.error("Failed to parse hyprctl monitors JSON")
+                self._monitors_cache = []
+        
+        return self._monitors_cache or []
+    
+    def get_workspace_resolution(self, workspace: int) -> Tuple[int, int]:
+        """Get resolution for specific workspace with waybar compensation"""
+        monitors = self.get_monitors()
+        
+        # Find monitor containing the workspace
+        target_monitor = None
+        for monitor in monitors:
+            active_ws_id = monitor.get('activeWorkspace', {}).get('id', 0)
+            if workspace == active_ws_id:
+                target_monitor = monitor
+                break
+            
+            # Check specialWorkspace for scratchpad workspaces
+            special_ws = monitor.get('specialWorkspace', {})
+            if special_ws and special_ws.get('id') == workspace:
+                target_monitor = monitor
+                break
+        
+        # If workspace not found on any monitor, use primary monitor
+        if not target_monitor:
+            target_monitor = next((m for m in monitors if m.get('focused', False)), 
+                                 monitors[0] if monitors else None)
+        
+        if not target_monitor:
+            logger.warning(f"No monitor found for workspace {workspace}, using default resolution")
+            return (1920, 1040)  # Default with waybar compensation
+        
+        # Get monitor resolution
+        width = target_monitor.get('width', 1920)
+        height = target_monitor.get('height', 1080)
+        
+        # Subtract 40px for waybar at top
+        effective_height = max(height - 40, 600)  # Ensure minimum height
+        
+        logger.info(f"Workspace {workspace} resolution: {width}x{effective_height} (monitor: {width}x{height} - 40px waybar)")
+        return (width, effective_height)
+    
+    def get_all_workspace_resolutions(self) -> Dict[int, Tuple[int, int]]:
+        """Get resolutions for all workspaces 1-10"""
+        resolutions = {}
+        monitors = self.get_monitors()
+        
+        if not monitors:
+            # Fallback resolutions if no monitors detected
+            default_res = (1920, 1040)
+            return {i: default_res for i in range(1, 11)}
+        
+        # Map workspaces to monitors based on Hyprland configuration
+        # This is a simplified mapping - in practice, workspace distribution 
+        # depends on Hyprland config, but we'll use intelligent defaults
+        
+        total_monitors = len(monitors)
+        workspaces_per_monitor = 10 // total_monitors if total_monitors > 0 else 10
+        
+        for workspace in range(1, 11):
+            # Determine which monitor this workspace would typically be on
+            monitor_index = min((workspace - 1) // workspaces_per_monitor, total_monitors - 1)
+            monitor = monitors[monitor_index] if monitor_index < len(monitors) else monitors[0]
+            
+            width = monitor.get('width', 1920)
+            height = monitor.get('height', 1080)
+            effective_height = max(height - 40, 600)  # Waybar compensation
+            
+            resolutions[workspace] = (width, effective_height)
+        
+        return resolutions
+    
+    def get_optimal_geometry_for_workspace(self, workspace: int, position: str = 'center') -> str:
+        """Get optimal geometry string for workspace with position consideration"""
+        width, height = self.get_workspace_resolution(workspace)
+        
+        # Adjust size based on position for better window management
+        if position == 'left' or position == 'right':
+            # For side positions, use approximately half width
+            width = int(width * 0.48)  # Leave some margin
+        elif position == 'center':
+            # For center, use most of the screen but leave margins
+            width = int(width * 0.9)
+            height = int(height * 0.9)
+        
+        return f"{width}x{height}"
+
     @lru_cache(maxsize=32)
     def _get_cached_clients(self, timestamp: float) -> str:
         """Cache hyprctl clients output"""
@@ -341,7 +461,7 @@ class RDPManager:
             del self.active_connections[conn_id]
     
     def spawn_connection(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """Spawn RDP connection with optimization"""
+        """Spawn RDP connection with optimization and workspace-aware geometry"""
         try:
             # Validate input
             required_fields = ['ip']
@@ -357,27 +477,59 @@ class RDPManager:
             position = params.get('position', 'center')
             fullscreen = params.get('fullscreen', False)
             
+            # Auto-detect workspace geometry if requested
+            if geometry.startswith('auto'):
+                try:
+                    # Handle auto-ws# format (e.g., "auto-ws4")
+                    if geometry.startswith('auto-ws'):
+                        # Extract workspace number from geometry string
+                        ws_match = geometry.replace('auto-ws', '')
+                        if ws_match.isdigit():
+                            detected_workspace = int(ws_match)
+                            auto_geometry = self.hyprland.get_optimal_geometry_for_workspace(detected_workspace, position)
+                            logger.info(f"Auto-detected geometry for workspace {detected_workspace}: {auto_geometry} (requested: {geometry})")
+                            geometry = auto_geometry
+                        else:
+                            # Fallback to current workspace
+                            auto_geometry = self.hyprland.get_optimal_geometry_for_workspace(workspace, position)
+                            logger.info(f"Auto-detected geometry for workspace {workspace}: {auto_geometry}")
+                            geometry = auto_geometry
+                    else:
+                        # Handle generic "auto" - use current workspace
+                        auto_geometry = self.hyprland.get_optimal_geometry_for_workspace(workspace, position)
+                        logger.info(f"Auto-detected geometry for workspace {workspace}: {auto_geometry}")
+                        geometry = auto_geometry
+                        
+                except Exception as e:
+                    logger.warning(f"Failed to auto-detect geometry, using default: {e}")
+                    geometry = '1920x1080'
+            
             logger.info(f"Spawning RDP connection to {ip} ({geometry}, workspace {workspace}) with user {username}")
             
-            # Build optimized FreeRDP command
+            # Build optimized FreeRDP command for version 2.11.7
             cmd = [
                 'xfreerdp',
                 f'/v:{ip}',
                 f'/u:{username}',
                 f'/p:{password}',
-                '/cert-ignore',
-                '/compression',
-                '/gfx:progressive',  # Better graphics performance
-                '/network:auto',     # Automatic network optimization
-                '/timeout:10000',    # Connection timeout
-                '/log-level:WARN',   # Reduce log verbosity but capture errors
+                '/cert:ignore',        # Fixed from /cert-ignore
+                '+compression',        # Fixed from /compression  
+                '+gfx-progressive',    # Fixed from /gfx:progressive
+                f'/timeout:{10000}',   # Connection timeout
+                '/log-level:WARN',     # Reduce log verbosity but capture errors
             ]
             
-            # Add geometry or fullscreen
+            # Add geometry or fullscreen - fixed for FreeRDP 2.11.7
             if fullscreen:
                 cmd.append('/f')
             else:
-                cmd.append(f'/size:{geometry}')
+                # Parse geometry and use /w: and /h: parameters
+                try:
+                    width, height = geometry.split('x')
+                    cmd.extend([f'/w:{width}', f'/h:{height}'])
+                except ValueError:
+                    # Fallback if geometry parsing fails
+                    cmd.extend(['/w:1920', '/h:1080'])
             
             # Add optional features
             if params.get('drive_redirection', False):
@@ -389,15 +541,23 @@ class RDPManager:
             if params.get('sound', False):
                 cmd.append('/sound:sys:pulse')
             
-            # Start connection with better error handling
+            # Start connection with better error handling and X11 environment
             try:
+                # Prepare environment with X11 display access
+                rdp_env = os.environ.copy()
+                rdp_env['DISPLAY'] = ':1'  # Ensure correct display is used
+                if 'XAUTHORITY' not in rdp_env:
+                    rdp_env['XAUTHORITY'] = f'/home/{os.getenv("USER", "nz7")}/.Xauthority'
+                rdp_env['XDG_RUNTIME_DIR'] = f'/run/user/{os.getuid()}'
+                
                 process = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
+                    env=rdp_env,  # Pass environment with correct DISPLAY
                     preexec_fn=os.setsid  # Create new process group for better cleanup
                 )
-                logger.info(f"RDP process started for {ip} (PID: {process.pid})")
+                logger.info(f"RDP process started for {ip} (PID: {process.pid}) with DISPLAY={rdp_env.get('DISPLAY')}")
             except OSError as e:
                 logger.error(f"Failed to start RDP client for {ip}: {e}")
                 return {'success': False, 'error': f'Failed to start RDP client: {e}'}
@@ -421,35 +581,54 @@ class RDPManager:
             # Monitor connection status asynchronously
             def monitor_connection():
                 try:
-                    # Wait briefly for connection to establish or fail
-                    time.sleep(2)
+                    # Wait briefly for connection to establish or fail - increased timeout
+                    time.sleep(3)  # Increased from 2 to 3 seconds
                     poll_result = process.poll()
                     
                     if poll_result is not None:
-                        # Process has exited, check for errors
-                        stdout, stderr = process.communicate(timeout=5)
-                        if poll_result != 0:
-                            # Connection failed
-                            error_msg = "Connection failed"
-                            if stderr:
-                                stderr_str = stderr.decode('utf-8', errors='ignore')
-                                if 'LOGON_FAILURE' in stderr_str:
-                                    error_msg = f"Authentication failed - check username/password for {ip}"
-                                elif 'CONNECTION_REFUSED' in stderr_str:
-                                    error_msg = f"Connection refused by {ip} - RDP service may not be running"
-                                elif 'NETWORK_ERROR' in stderr_str:
-                                    error_msg = f"Network error connecting to {ip}"
-                                else:
-                                    error_msg = f"RDP connection to {ip} failed: {stderr_str.strip()[:200]}"
+                        # Process has exited, get detailed error information
+                        try:
+                            stdout, stderr = process.communicate(timeout=10)  # Increased timeout
+                            stdout_str = stdout.decode('utf-8', errors='ignore') if stdout else ""
+                            stderr_str = stderr.decode('utf-8', errors='ignore') if stderr else ""
                             
-                            logger.error(f"RDP connection to {ip} failed: {error_msg}")
-                            # Connection will be cleaned up by the cleanup thread
-                        else:
-                            logger.info(f"RDP connection to {ip} established successfully")
+                            logger.info(f"RDP process for {ip} exited with code {poll_result}")
+                            if stdout_str.strip():
+                                logger.info(f"RDP stdout for {ip}: {stdout_str.strip()[:500]}")
+                            if stderr_str.strip():
+                                logger.info(f"RDP stderr for {ip}: {stderr_str.strip()[:500]}")
+                            
+                            if poll_result != 0:
+                                # Connection failed - parse detailed error
+                                error_msg = "Connection failed"
+                                if stderr_str:
+                                    if 'LOGON_FAILURE' in stderr_str or 'Authentication failed' in stderr_str:
+                                        error_msg = f"Authentication failed - check username/password for {ip}"
+                                    elif 'CONNECTION_REFUSED' in stderr_str or 'Connection refused' in stderr_str:
+                                        error_msg = f"Connection refused by {ip} - RDP service may not be running"
+                                    elif 'NETWORK_ERROR' in stderr_str or 'Network' in stderr_str:
+                                        error_msg = f"Network error connecting to {ip}"
+                                    elif 'CONNECT_CANCELLED' in stderr_str:
+                                        error_msg = f"Connection cancelled - may be due to certificate or policy issues on {ip}"
+                                    elif 'timeout' in stderr_str.lower():
+                                        error_msg = f"Connection timeout to {ip}"
+                                    else:
+                                        # Include more of the error for debugging
+                                        error_msg = f"RDP connection to {ip} failed: {stderr_str.strip()[:300]}"
+                                
+                                logger.error(f"RDP connection to {ip} failed: {error_msg}")
+                            else:
+                                logger.info(f"RDP connection to {ip} established successfully")
+                        except subprocess.TimeoutExpired:
+                            logger.warning(f"Timeout getting process output for {ip}")
+                            logger.error(f"RDP connection to {ip} failed: Process communication timeout")
+                    else:
+                        # Process is still running - this is good!
+                        logger.info(f"RDP connection to {ip} is running successfully")
                     
                     # Position window if process is still running
                     if process.poll() is None:
-                        time.sleep(1)  # Additional wait for window to appear
+                        time.sleep(2)  # Wait for window to appear
                         window_title = f"FreeRDP: {ip}"
                         success = self.hyprland.position_window(window_title, workspace, position, geometry)
                         if success:
@@ -459,7 +638,8 @@ class RDPManager:
                             alternate_titles = [
                                 f"{ip} - FreeRDP",
                                 f"RDP - {ip}",
-                                f"FreeRDP ({ip})"
+                                f"FreeRDP ({ip})",
+                                f"192.168.1.{ip.split('.')[-1]} - FreeRDP"  # Try last octet format
                             ]
                             for title in alternate_titles:
                                 success = self.hyprland.position_window(title, workspace, position, geometry)
@@ -871,6 +1051,36 @@ def api_validate_fleet_status():
     """Validate fleet status"""
     result = mission_control.validate_fleet_status()
     return jsonify(result), 200 if result['status'] == 'success' else 500
+
+@app.route('/api/workspace/resolutions')
+def api_workspace_resolutions():
+    """Get workspace resolutions for auto-geometry detection"""
+    try:
+        resolutions = mission_control.hyprland_manager.get_all_workspace_resolutions()
+        
+        # Convert to user-friendly format
+        workspace_data = {}
+        for workspace, (width, height) in resolutions.items():
+            workspace_data[f"workspace_{workspace}"] = {
+                'workspace': workspace,
+                'resolution': f"{width}x{height}",
+                'width': width,
+                'height': height,
+                'display_name': f"Workspace {workspace} Auto ({width}×{height})"
+            }
+        
+        return jsonify({
+            'success': True,
+            'workspaces': workspace_data,
+            'note': 'Resolutions automatically account for 40px waybar at top'
+        })
+    except Exception as e:
+        logger.error(f"Failed to get workspace resolutions: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'fallback_resolution': '1920x1040'
+        }), 500
 
 # Optimized WebSocket handlers
 @socketio.on('connect')

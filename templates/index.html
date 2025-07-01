@@ -1018,7 +1018,74 @@
             requestInitialData() {
                 this.socket.emit('request_status');
                 this.updateActiveConnections();
+                this.loadWorkspaceResolutions();
                 this.addLog('System initialized - requesting initial fleet status', 'INFO');
+            }
+
+            async loadWorkspaceResolutions() {
+                try {
+                    const response = await fetch('/api/workspace/resolutions');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.populateGeometryDropdown(data.workspaces);
+                        this.addLog('Workspace resolutions loaded for auto-geometry detection', 'INFO');
+                    } else {
+                        this.addLog(`Failed to load workspace resolutions: ${data.error}`, 'WARNING');
+                    }
+                } catch (error) {
+                    this.addLog(`Error loading workspace resolutions: ${error.message}`, 'ERROR');
+                }
+            }
+
+            populateGeometryDropdown(workspaces) {
+                const select = document.getElementById('rdpGeometry');
+                const currentValue = select.value;
+                
+                // Clear existing options
+                select.innerHTML = '';
+                
+                // Add auto-detect options (workspace-aware)
+                const autoGroup = document.createElement('optgroup');
+                autoGroup.label = 'Auto-Detect (Waybar Compensated)';
+                
+                for (let i = 1; i <= 5; i++) {
+                    const wsKey = `workspace_${i}`;
+                    if (workspaces[wsKey]) {
+                        const option = document.createElement('option');
+                        option.value = `auto-ws${i}`;
+                        option.textContent = workspaces[wsKey].display_name;
+                        autoGroup.appendChild(option);
+                    }
+                }
+                select.appendChild(autoGroup);
+                
+                // Add manual options
+                const manualGroup = document.createElement('optgroup');
+                manualGroup.label = 'Manual Resolution Override';
+                
+                const manualOptions = [
+                    { value: '1920x1080', text: '1920×1080 (Full HD)' },
+                    { value: '1680x1050', text: '1680×1050 (16:10)' },
+                    { value: '1440x900', text: '1440×900 (16:10)' },
+                    { value: '1280x720', text: '1280×720 (HD)' },
+                    { value: '1024x768', text: '1024×768 (4:3)' }
+                ];
+                
+                manualOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.text;
+                    manualGroup.appendChild(option);
+                });
+                select.appendChild(manualGroup);
+                
+                // Restore previous selection or set default
+                if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+                    select.value = currentValue;
+                } else {
+                    select.value = 'auto-ws4'; // Default to workspace 4 auto-detect
+                }
             }
 
             updateConnectionStatus(connected) {
@@ -1226,7 +1293,14 @@
             }
 
             try {
-                app.addLog(`Deploying RDP connection to ${ip} (${username}, ${geometry}, WS${workspace})`, 'INFO');
+                // Determine geometry type for logging
+                let geometryDisplay = geometry;
+                if (geometry.startsWith('auto-ws')) {
+                    const autoWs = geometry.replace('auto-ws', '');
+                    geometryDisplay = `Auto-Detect WS${autoWs}`;
+                }
+                
+                app.addLog(`Deploying RDP connection to ${ip} (${username}, ${geometryDisplay}, WS${workspace})`, 'INFO');
                 
                 const result = await app.makeRequest('/api/rdp/spawn', {
                     method: 'POST',
