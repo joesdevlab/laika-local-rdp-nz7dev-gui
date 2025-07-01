@@ -38,6 +38,25 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'nz7dev-mission-control-
 app.config['JSON_SORT_KEYS'] = False  # Disable key sorting for performance
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
+# Custom log handler for WebSocket emission
+class WebSocketLogHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            log_data = {
+                'message': record.getMessage(),
+                'level': record.levelname,
+                'timestamp': datetime.fromtimestamp(record.created).isoformat(),
+                'logger': record.name
+            }
+            socketio.emit('log_message', log_data)
+        except Exception:
+            pass  # Silently ignore errors in log emission
+
+# Add WebSocket handler to logger
+websocket_handler = WebSocketLogHandler()
+websocket_handler.setLevel(logging.INFO)
+logger.addHandler(websocket_handler)
+
 # Configuration Management
 @dataclass
 class VMConfig:
@@ -327,6 +346,7 @@ class RDPManager:
             # Validate input
             required_fields = ['ip']
             if not all(field in params for field in required_fields):
+                logger.warning("RDP spawn failed: Missing required fields")
                 return {'success': False, 'error': 'Missing required fields'}
             
             ip = params['ip']
@@ -336,6 +356,8 @@ class RDPManager:
             workspace = params.get('workspace', 1)
             position = params.get('position', 'center')
             fullscreen = params.get('fullscreen', False)
+            
+            logger.info(f"Spawning RDP connection to {ip} ({geometry}, workspace {workspace}) with user {username}")
             
             # Build optimized FreeRDP command
             cmd = [
@@ -348,6 +370,7 @@ class RDPManager:
                 '/gfx:progressive',  # Better graphics performance
                 '/network:auto',     # Automatic network optimization
                 '/timeout:10000',    # Connection timeout
+                '/log-level:WARN',   # Reduce log verbosity but capture errors
             ]
             
             # Add geometry or fullscreen
@@ -374,7 +397,9 @@ class RDPManager:
                     stderr=subprocess.PIPE,
                     preexec_fn=os.setsid  # Create new process group for better cleanup
                 )
+                logger.info(f"RDP process started for {ip} (PID: {process.pid})")
             except OSError as e:
+                logger.error(f"Failed to start RDP client for {ip}: {e}")
                 return {'success': False, 'error': f'Failed to start RDP client: {e}'}
             
             # Track connection
@@ -391,21 +416,68 @@ class RDPManager:
             )
             
             self.active_connections[connection_id] = conn_info
+            logger.info(f"RDP connection {connection_id} registered and tracking started")
             
-            # Position window asynchronously
-            def position_window_async():
-                time.sleep(3)  # Wait for window to appear
-                window_title = f"FreeRDP: {ip}"
-                success = self.hyprland.position_window(window_title, workspace, position, geometry)
-                if not success:
-                    logger.warning(f"Failed to position window for {ip}")
+            # Monitor connection status asynchronously
+            def monitor_connection():
+                try:
+                    # Wait briefly for connection to establish or fail
+                    time.sleep(2)
+                    poll_result = process.poll()
+                    
+                    if poll_result is not None:
+                        # Process has exited, check for errors
+                        stdout, stderr = process.communicate(timeout=5)
+                        if poll_result != 0:
+                            # Connection failed
+                            error_msg = "Connection failed"
+                            if stderr:
+                                stderr_str = stderr.decode('utf-8', errors='ignore')
+                                if 'LOGON_FAILURE' in stderr_str:
+                                    error_msg = f"Authentication failed - check username/password for {ip}"
+                                elif 'CONNECTION_REFUSED' in stderr_str:
+                                    error_msg = f"Connection refused by {ip} - RDP service may not be running"
+                                elif 'NETWORK_ERROR' in stderr_str:
+                                    error_msg = f"Network error connecting to {ip}"
+                                else:
+                                    error_msg = f"RDP connection to {ip} failed: {stderr_str.strip()[:200]}"
+                            
+                            logger.error(f"RDP connection to {ip} failed: {error_msg}")
+                            # Connection will be cleaned up by the cleanup thread
+                        else:
+                            logger.info(f"RDP connection to {ip} established successfully")
+                    
+                    # Position window if process is still running
+                    if process.poll() is None:
+                        time.sleep(1)  # Additional wait for window to appear
+                        window_title = f"FreeRDP: {ip}"
+                        success = self.hyprland.position_window(window_title, workspace, position, geometry)
+                        if success:
+                            logger.info(f"Window positioned successfully for {ip}")
+                        else:
+                            # Try alternate window title formats
+                            alternate_titles = [
+                                f"{ip} - FreeRDP",
+                                f"RDP - {ip}",
+                                f"FreeRDP ({ip})"
+                            ]
+                            for title in alternate_titles:
+                                success = self.hyprland.position_window(title, workspace, position, geometry)
+                                if success:
+                                    logger.info(f"Window positioned successfully for {ip} using title: {title}")
+                                    break
+                            else:
+                                logger.warning(f"Failed to position window for {ip} - window title may not match expected format")
+                    
+                except Exception as e:
+                    logger.error(f"Error monitoring connection to {ip}: {e}")
             
-            threading.Thread(target=position_window_async, daemon=True).start()
+            threading.Thread(target=monitor_connection, daemon=True).start()
             
             return {
                 'success': True,
                 'connection_id': connection_id,
-                'message': f'RDP connection to {ip} started successfully'
+                'message': f'RDP connection to {ip} initiated - establishing connection...'
             }
             
         except Exception as e:
@@ -433,23 +505,29 @@ class RDPManager:
     def kill_connection(self, connection_id: str) -> Dict[str, Any]:
         """Kill specific connection"""
         if connection_id not in self.active_connections:
+            logger.warning(f"Attempted to kill non-existent connection: {connection_id}")
             return {'success': False, 'error': 'Connection not found'}
         
         try:
             conn_info = self.active_connections[connection_id]
+            logger.info(f"Terminating RDP connection {connection_id} to {conn_info.ip}")
             
             # Graceful shutdown first
             try:
                 os.killpg(os.getpgid(conn_info.process.pid), 15)  # SIGTERM to process group
                 conn_info.process.wait(timeout=5)
+                logger.info(f"Connection {connection_id} terminated gracefully")
             except (subprocess.TimeoutExpired, ProcessLookupError, OSError):
                 # Force kill if graceful shutdown fails
                 try:
                     os.killpg(os.getpgid(conn_info.process.pid), 9)  # SIGKILL to process group
+                    logger.warning(f"Connection {connection_id} force-killed after graceful shutdown failed")
                 except (ProcessLookupError, OSError):
+                    logger.info(f"Connection {connection_id} process already terminated")
                     pass  # Process already dead
             
             del self.active_connections[connection_id]
+            logger.info(f"Connection {connection_id} removed from tracking")
             return {'success': True, 'message': 'Connection terminated successfully'}
             
         except Exception as e:
@@ -477,7 +555,7 @@ class MissionControl:
             self.running = True
             self.status_thread = threading.Thread(target=self._monitor_status, daemon=True)
             self.status_thread.start()
-            logger.info("Mission Control monitoring started")
+            logger.info("Mission Control monitoring started - real-time fleet status tracking active")
     
     def stop_monitoring(self):
         """Stop monitoring"""
@@ -486,6 +564,10 @@ class MissionControl:
     
     def _monitor_status(self):
         """Optimized background monitoring with rate limiting"""
+        logger.info("Background monitoring thread started")
+        consecutive_errors = 0
+        max_errors = 5
+        
         while self.running:
             try:
                 # Clean up caches periodically
@@ -495,14 +577,38 @@ class MissionControl:
                 status = self.get_fleet_status()
                 socketio.emit('status_update', status)
                 
+                # Log status summary periodically (every 10th update)
+                if hasattr(self, '_status_update_count'):
+                    self._status_update_count += 1
+                else:
+                    self._status_update_count = 1
+                
+                if self._status_update_count % 10 == 0:
+                    online_count = sum(1 for vm_data in status.values() if vm_data.get('online', False))
+                    connected_count = sum(1 for vm_data in status.values() if vm_data.get('rdp_connected', False))
+                    logger.info(f"Fleet status update #{self._status_update_count}: {online_count}/6 online, {connected_count}/6 RDP connected")
+                
+                # Reset error counter on success
+                consecutive_errors = 0
+                
                 # Adaptive sleep based on number of connected clients
                 connected_clients = len(socketio.server.manager.rooms.get('/', {}).keys())
                 sleep_time = max(3, 8 - connected_clients)  # 3-8 seconds based on load
                 time.sleep(sleep_time)
                 
             except Exception as e:
-                logger.error(f"Monitoring error: {e}")
-                time.sleep(10)
+                consecutive_errors += 1
+                logger.error(f"Monitoring error #{consecutive_errors}: {e}")
+                
+                # If too many consecutive errors, increase sleep time
+                if consecutive_errors >= max_errors:
+                    logger.warning(f"Too many consecutive monitoring errors ({consecutive_errors}), increasing sleep time")
+                    time.sleep(30)  # Sleep longer on persistent errors
+                    consecutive_errors = 0  # Reset counter
+                else:
+                    time.sleep(10)
+        
+        logger.info("Background monitoring thread stopped")
     
     def get_fleet_status(self) -> Dict[str, Any]:
         """Get comprehensive fleet status with caching"""
@@ -550,36 +656,131 @@ class MissionControl:
                 ['systemctl', '--user', 'is-active', service_name],
                 capture_output=True,
                 text=True,
-                timeout=2
+                timeout=3  # Increased timeout for reliability
             )
-            return result.stdout.strip() == 'active'
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
+            is_active = result.stdout.strip() == 'active'
+            if is_active:
+                logger.debug(f"RDP service {service_name} is active")
+            return is_active
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
             return False
     
     def execute_script_command(self, command: str) -> Dict[str, Any]:
         """Execute nz7dev script with timeout and validation"""
         if not command or command not in ['up', 'down', 'morning', 'fastup', 'windows']:
+            logger.warning(f"Invalid fleet command attempted: {command}")
             return {'success': False, 'error': 'Invalid command'}
         
         try:
+            logger.info(f"Executing fleet command: {command} (timeout: 60s)")
+            
+            # Add environment variable to prevent GUI service interference
+            env = os.environ.copy()
+            env['NZ7DEV_GUI_PROTECTED'] = '1'  # Signal to script to protect GUI service
+            
             result = subprocess.run(
                 [self.config_manager.script_path, command],
                 capture_output=True,
                 text=True,
-                timeout=30  # 30 second timeout for script commands
+                timeout=60,  # Increased timeout for fleet operations
+                env=env
             )
+            
+            if result.returncode == 0:
+                logger.info(f"Fleet command '{command}' completed successfully")
+                if result.stdout.strip():
+                    logger.debug(f"Command output: {result.stdout.strip()[:500]}...")  # Limit log output
+                
+                # Invalidate status cache after successful fleet operation
+                self._status_cache = None
+                self._last_status_update = None
+                logger.info("Fleet status cache invalidated after command execution")
+                
+            else:
+                logger.error(f"Fleet command '{command}' failed with exit code {result.returncode}")
+                if result.stderr.strip():
+                    logger.error(f"Command error: {result.stderr.strip()[:500]}...")  # Limit error output
+            
             return {
                 'success': result.returncode == 0,
                 'output': result.stdout,
                 'error': result.stderr if result.returncode != 0 else None
             }
         except subprocess.TimeoutExpired:
-            return {'success': False, 'error': 'Command timed out'}
+            logger.error(f"Fleet command '{command}' timed out after 60 seconds")
+            return {'success': False, 'error': 'Command timed out after 60 seconds'}
         except FileNotFoundError:
+            logger.error(f"Fleet script not found: {self.config_manager.script_path}")
             return {'success': False, 'error': 'Script not found'}
         except Exception as e:
-            logger.error(f"Script execution error: {e}")
+            logger.error(f"Fleet command '{command}' execution error: {e}")
             return {'success': False, 'error': str(e)}
+
+    def validate_fleet_status(self) -> Dict[str, Any]:
+        """Comprehensive fleet status validation and health check"""
+        try:
+            status = self.get_fleet_status()
+            
+            # Calculate health metrics
+            total_vms = len(status)
+            online_vms = sum(1 for vm_data in status.values() if vm_data.get('online', False))
+            connected_vms = sum(1 for vm_data in status.values() if vm_data.get('rdp_connected', False))
+            window_active_vms = sum(1 for vm_data in status.values() if vm_data.get('window_active', False))
+            
+            # Calculate percentages
+            online_percentage = (online_vms / total_vms * 100) if total_vms > 0 else 0
+            connectivity_percentage = (connected_vms / online_vms * 100) if online_vms > 0 else 0
+            
+            # Determine overall health status
+            if online_percentage >= 80 and connectivity_percentage >= 70:
+                health_status = "EXCELLENT"
+                health_color = "#00ff88"
+            elif online_percentage >= 60 and connectivity_percentage >= 50:
+                health_status = "GOOD"
+                health_color = "#00d4ff"
+            elif online_percentage >= 40:
+                health_status = "DEGRADED"
+                health_color = "#ffb800"
+            else:
+                health_status = "CRITICAL"
+                health_color = "#ff4757"
+            
+            # Identify problem VMs
+            offline_vms = [vm_data['callsign'] for vm_data in status.values() if not vm_data.get('online', False)]
+            disconnected_vms = [vm_data['callsign'] for vm_data in status.values() 
+                              if vm_data.get('online', False) and not vm_data.get('rdp_connected', False)]
+            
+            return {
+                'status': 'success',
+                'timestamp': datetime.now().isoformat(),
+                'fleet_health': {
+                    'overall_status': health_status,
+                    'health_color': health_color,
+                    'online_percentage': round(online_percentage, 1),
+                    'connectivity_percentage': round(connectivity_percentage, 1)
+                },
+                'metrics': {
+                    'total_vms': total_vms,
+                    'online_vms': online_vms,
+                    'connected_vms': connected_vms,
+                    'window_active_vms': window_active_vms,
+                    'offline_vms': len(offline_vms),
+                    'disconnected_vms': len(disconnected_vms)
+                },
+                'issues': {
+                    'offline_vms': offline_vms,
+                    'disconnected_vms': disconnected_vms
+                },
+                'fleet_data': status
+            }
+            
+        except Exception as e:
+            logger.error(f"Fleet status validation failed: {e}")
+            return {
+                'status': 'error',
+                'error': str(e),
+                'timestamp': datetime.now().isoformat()
+            }
 
 # Global optimized instance
 mission_control = MissionControl()
@@ -665,6 +866,12 @@ def api_fleet_command(command):
     result = mission_control.execute_script_command(command)
     return jsonify(result), 200 if result['success'] else 400
 
+@app.route('/api/fleet/validate')
+def api_validate_fleet_status():
+    """Validate fleet status"""
+    result = mission_control.validate_fleet_status()
+    return jsonify(result), 200 if result['status'] == 'success' else 500
+
 # Optimized WebSocket handlers
 @socketio.on('connect')
 def handle_connect():
@@ -706,24 +913,35 @@ if __name__ == '__main__':
     print("🎯 High-performance mission control interface ready!")
     print("⚡ Features: Async operations, caching, connection pooling, batch processing")
     
-    # Production vs Development mode
-    is_service = os.environ.get('INVOCATION_ID') is not None
-    debug_mode = not is_service
+    # Detect if running as a service
+    is_service = (os.environ.get('INVOCATION_ID') is not None or 
+                  os.environ.get('FLASK_ENV') == 'production' or
+                  'systemd' in os.environ.get('_', ''))
+    
+    # Clear problematic Werkzeug environment variables
+    for env_var in ['WERKZEUG_SERVER_FD', 'WERKZEUG_RUN_MAIN']:
+        os.environ.pop(env_var, None)
     
     try:
         if is_service:
-            # Production mode with optimizations
-            socketio.run(
-                app, 
-                host='0.0.0.0', 
-                port=5000, 
-                debug=False, 
-                allow_unsafe_werkzeug=True,
-                use_reloader=False,  # Disable reloader for performance
-                threaded=True        # Enable threading for better concurrency
+            # Production mode - use simpler approach
+            logger.info("Starting in production service mode")
+            from werkzeug.serving import run_simple
+            
+            # Use run_simple directly to avoid Flask's startup complexity
+            run_simple(
+                hostname='0.0.0.0',
+                port=5000,
+                application=app,
+                threaded=True,
+                use_reloader=False,
+                use_debugger=False
             )
         else:
-            # Development mode
+            # Development mode with SocketIO features
+            logger.info("Starting in development mode")
             socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    except KeyboardInterrupt:
+        logger.info("Received shutdown signal")
     finally:
         mission_control.stop_monitoring() 
