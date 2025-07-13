@@ -1,0 +1,50 @@
+{
+  "full_hd": {
+    "name": "Full HD",
+    "width": 1920,
+    "height": 1080,
+    "description": "Standard 1080p resolution"
+  },
+  "hd": {
+    "name": "HD",
+    "width": 1280,
+    "height": 720,
+    "description": "Standard 720p resolution"
+  },
+  "4k": {
+    "name": "4K",
+    "width": 3840,
+    "height": 2160,
+    "description": "4K Ultra HD resolution"
+  },
+  "wide": {
+    "name": "Wide",
+    "width": 1920,
+    "height": 1200,
+    "description": "Wide screen resolution"
+  },
+  "compact": {
+    "name": "Compact",
+    "width": 1024,
+    "height": 768,
+    "description": "Compact resolution for smaller screens"
+  },
+  "custom_wide": {
+    "name": "Custom Wide",
+    "width": 1918,
+    "height": 1040,
+    "description": "Custom wide format resolution"
+  },
+  "tall_screen": {
+    "name": "Tall Screen",
+    "width": 1720,
+    "height": 1400,
+    "description": "Tall aspect ratio screen"
+  },
+  "ultrawide": {
+    "name": "Ultrawide",
+    "width": 3438,
+    "height": 1400,
+    "description": "Ultrawide monitor resolution"
+  }
+}

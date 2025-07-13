@@ -1,0 +1,18 @@
+[Unit]
+Description=NZ7DEV RDP/VNC/SSH Manager
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/WD/dev/laika-local-rdp-nz7dev-gui
+ExecStart=/usr/bin/python3 /mnt/WD/dev/laika-local-rdp-nz7dev-gui/nz7dev_rdp_simple.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nz7dev-rdp-manager
+
+[Install]
+WantedBy=default.target

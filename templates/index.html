@@ -1,3350 +1,833 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NZ7DEV Mission Control - Professional Edition</title>
-    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4" crossorigin="anonymous"></script>
-    <script>
-        // Fallback for Socket.IO if CDN fails
-        if (typeof io === 'undefined') {
-            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"><\/script>');
-        }
-    </script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    <title>NZ7DEV Remote Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Professional Dark Mode Toolkit CSS */
         :root {
-            /* Professional Dark Palette */
-            --bg-primary: #0a0a0b;
-            --bg-secondary: #111113;
-            --bg-tertiary: #1a1a1d;
-            --bg-card: #1e1e21;
-            --bg-card-hover: #242428;
-            
-            /* Accent Colors */
-            --accent-primary: #00d4ff;
-            --accent-primary-rgb: 0, 212, 255;
-            --accent-secondary: #0099cc;
-            --accent-success: #00ff88;
-            --accent-success-rgb: 0, 255, 136;
-            --accent-warning: #ffb800;
-            --accent-warning-rgb: 255, 184, 0;
-            --accent-danger: #ff4757;
-            --accent-info: #3742fa;
-            
-            /* Text Colors */
-            --text-primary: #ffffff;
-            --text-secondary: #b8bcc5;
-            --text-muted: #6c7085;
-            --text-accent: var(--accent-primary);
-            
-            /* Border & Shadow */
-            --border-primary: #2a2a2e;
-            --border-secondary: #3a3a3e;
-            --border-accent: var(--accent-primary);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --shadow-accent: 0 0 20px rgba(0, 212, 255, 0.2);
-            
-            /* Sizing */
-            --border-radius: 12px;
-            --border-radius-sm: 8px;
-            --border-radius-md: 10px;
-            --spacing-xs: 4px;
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
-            --spacing-xl: 32px;
-            
-            /* Transitions */
-            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
+            --bs-dark: #1a1a1a;
+            --bs-body-bg: #0d1117;
+            --bs-body-color: #f0f6fc;
+            --bs-card-bg: #161b22;
+            --bs-border-color: #30363d;
+            --bs-table-bg: #0d1117;
+            --bs-table-striped-bg: #161b22;
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Background Pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 80%, rgba(255, 184, 0, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Header */
-        .header {
-            background: rgba(30, 30, 33, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-primary);
-            padding: var(--spacing-lg) 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-md);
-        }
-
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-lg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-        }
-
-        .header-title h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-success));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid var(--accent-success);
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-success);
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 10px var(--accent-success);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: var(--spacing-xl);
-        }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: var(--spacing-lg);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        /* Hero Panel Styling */
-        .hero-panel {
-            grid-column: 1 / -1; /* Full width */
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-            border: 2px solid var(--accent-primary);
-            box-shadow: 0 8px 32px rgba(var(--accent-primary-rgb), 0.15);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .hero-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success), var(--accent-warning), var(--accent-primary));
-            background-size: 200% 100%;
-            animation: heroGradient 3s ease-in-out infinite;
-        }
-
-        @keyframes heroGradient {
-            0%, 100% { background-position: 200% 0; }
-            50% { background-position: 0% 0; }
-        }
-
-        .hero-panel .card-header {
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            border-bottom: 3px solid var(--accent-primary);
-            padding: var(--spacing-xl) var(--spacing-lg);
-        }
-
-        .hero-panel .card-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-lg);
-        }
-
-        .hero-panel .card-title .card-icon {
-            width: 36px;
-            height: 36px;
-            color: var(--accent-primary);
-            text-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.5);
-        }
-
-        .hero-badge {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: var(--bg-primary);
-            padding: var(--spacing-xs) var(--spacing-md);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-left: auto;
-            box-shadow: 0 4px 12px rgba(var(--accent-primary-rgb), 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        /* Secondary Panel Styling */
-        .secondary-panel {
-            grid-column: 1 / -1; /* Full width */
-            border-left: 4px solid var(--accent-secondary);
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .secondary-panel .card-header {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-            border-bottom: 2px solid var(--accent-secondary);
-        }
-
-        .secondary-panel .card-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-
-        .secondary-panel .card-title .card-icon {
-            color: var(--accent-secondary);
-        }
-
-        /* Specific layout for different sections */
-        .quick-actions {
-            grid-column: 1 / -1; /* Full width for quick actions */
-        }
-
-        .workspace-manager {
-            grid-column: 1 / -1; /* Full width for workspace manager */
-            margin-top: var(--spacing-xl);
-        }
-
-        /* Two-column layout for status panels */
-        .dashboard-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: var(--spacing-lg);
-            grid-column: 1 / -1;
-        }
-
-        .dashboard-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-md);
-            transition: all var(--transition-normal);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dashboard-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--border-secondary);
-            background: var(--bg-card-hover);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .card-icon {
-            width: 24px;
-            height: 24px;
-            color: var(--accent-primary);
-        }
-
-        /* Quick Actions Panel */
-        .quick-actions {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
-            border: 1px solid var(--accent-primary);
-            box-shadow: var(--shadow-accent);
-        }
-
-        .action-form {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto;
-            gap: var(--spacing-md);
-            align-items: end;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
-        }
-
-        .input-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-field, .select-field {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            padding: var(--spacing-md);
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: all var(--transition-fast);
-        }
-
-        .input-field:focus, .select-field:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-            background: var(--bg-tertiary);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md) var(--spacing-lg);
-            border: none;
-            border-radius: var(--border-radius-sm);
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left var(--transition-normal);
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: var(--bg-primary);
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-secondary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--accent-danger), #ff3742);
-            color: white;
-        }
-
-        .btn-sm {
-            padding: var(--spacing-sm) var(--spacing-md);
-            font-size: 0.875rem;
-        }
-
-        /* Preset Buttons Grid */
-        .preset-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-lg);
-        }
-
-        .preset-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            padding: var(--spacing-md);
-            color: var(--text-primary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            text-align: center;
-        }
-
-        .preset-btn:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--accent-primary);
-            transform: translateY(-1px);
-        }
-
-        /* Fleet Status */
-        .fleet-grid {
-            display: grid;
-            gap: var(--spacing-md);
-        }
-
-        .fleet-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            padding: var(--spacing-md);
-            transition: all var(--transition-fast);
-        }
-
-        .fleet-item:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--border-secondary);
-        }
-
-        .fleet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .fleet-callsign {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-        }
-
-        .fleet-status {
-            display: flex;
-            gap: var(--spacing-sm);
-        }
-
-        .status-chip {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-chip.online {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--accent-success);
-            border: 1px solid var(--accent-success);
-        }
-
-        .status-chip.offline {
-            background: rgba(255, 71, 87, 0.2);
-            color: var(--accent-danger);
-            border: 1px solid var(--accent-danger);
-        }
-
-        .status-chip.connected {
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--accent-primary);
-            border: 1px solid var(--accent-primary);
-        }
-
-        .fleet-details {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        /* Connections Panel */
-        .connection-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-        }
-
-        .connection-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            padding: var(--spacing-md);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all var(--transition-fast);
-        }
-
-        .connection-item:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--border-secondary);
-        }
-
-        .connection-info h4 {
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .connection-meta {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        /* System Metrics */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-md);
-        }
-
-        .metric-item {
-            text-align: center;
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--border-primary);
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .metric-label {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Fleet Controls */
-        .fleet-controls {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-lg);
-        }
-
-        /* Live Log Panel */
-        .log-container {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            height: 300px;
-            overflow-y: auto;
-            padding: var(--spacing-sm);
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 0.875rem;
-            line-height: 1.4;
-            position: relative;
-        }
-
-        .log-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .log-container::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-            border-radius: 3px;
-        }
-
-        .log-container::-webkit-scrollbar-thumb {
-            background: var(--border-secondary);
-            border-radius: 3px;
-        }
-
-        .log-container::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-primary);
-        }
-
-        .log-item {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-xs) var(--spacing-sm);
-            margin-bottom: 2px;
-            border-radius: 4px;
-            transition: background-color var(--transition-fast);
-            word-wrap: break-word;
-        }
-
-        .log-item:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .log-timestamp {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            min-width: 60px;
-            flex-shrink: 0;
-        }
-
-        .log-level {
-            font-weight: 700;
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-align: center;
-            min-width: 50px;
-            flex-shrink: 0;
-        }
-
-        .log-level.INFO {
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--accent-primary);
-            border: 1px solid var(--accent-primary);
-        }
-
-        .log-level.SUCCESS {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--accent-success);
-            border: 1px solid var(--accent-success);
-        }
-
-        .log-level.WARNING {
-            background: rgba(255, 184, 0, 0.2);
-            color: var(--accent-warning);
-            border: 1px solid var(--accent-warning);
-        }
-
-        .log-level.ERROR {
-            background: rgba(255, 71, 87, 0.2);
-            color: var(--accent-danger);
-            border: 1px solid var(--accent-danger);
-        }
-
-        .log-level.DEBUG {
-            background: rgba(116, 112, 133, 0.2);
-            color: var(--text-muted);
-            border: 1px solid var(--text-muted);
-        }
-
-        .log-message {
-            color: var(--text-primary);
-            flex: 1;
-            word-break: break-word;
-        }
-
-        .log-item.log-info {
-            border-left: 2px solid var(--accent-primary);
-        }
-
-        .log-item.log-success {
-            border-left: 2px solid var(--accent-success);
-        }
-
-        .log-item.log-warning {
-            border-left: 2px solid var(--accent-warning);
-        }
-
-        .log-item.log-error {
-            border-left: 2px solid var(--accent-danger);
-            background: rgba(255, 71, 87, 0.05);
-        }
-
-        .log-item.log-debug {
-            border-left: 2px solid var(--text-muted);
-            opacity: 0.7;
-        }
-
-        /* Loading States */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-primary);
-            border-radius: 50%;
-            border-top-color: var(--accent-primary);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: var(--spacing-lg);
-            right: var(--spacing-lg);
-            max-width: 400px;
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius);
-            color: white;
-            font-weight: 600;
-            z-index: 1000;
-            transform: translateX(450px);
-            transition: transform var(--transition-normal);
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(10px);
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.9), rgba(0, 200, 100, 0.9));
-            border: 1px solid var(--accent-success);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, rgba(255, 71, 87, 0.9), rgba(255, 55, 71, 0.9));
-            border: 1px solid var(--accent-danger);
-        }
-
-        .notification.warning {
-            background: linear-gradient(135deg, rgba(255, 184, 0, 0.9), rgba(255, 160, 0, 0.9));
-            border: 1px solid var(--accent-warning);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1400px) {
-            .action-form {
-                grid-template-columns: 1fr 1fr 1fr;
-                grid-template-rows: auto auto auto;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: var(--spacing-md);
-            }
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .action-form {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-lg);
-            }
-            .header-content {
-                flex-direction: column;
-                gap: var(--spacing-md);
-                text-align: center;
-            }
-            .header-title h1 {
-                font-size: 2rem;
-            }
-            .preset-grid {
-                grid-template-columns: 1fr;
-            }
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            .fleet-controls {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Accessibility */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* Focus states for accessibility */
-        .btn:focus-visible,
-        .input-field:focus-visible,
-        .select-field:focus-visible {
-            outline: 2px solid var(--accent-primary);
-            outline-offset: 2px;
-        }
-
-        /* Custom Resolution Section */
-        #customResolutionGroup {
-            transition: all var(--transition-normal);
-            transform-origin: top;
-        }
-
-        #customResolutionGroup.show {
-            animation: slideDown var(--transition-normal) ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-                max-height: 0;
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-                max-height: 200px;
-            }
-        }
-
-        .custom-resolution-inputs {
-            display: flex;
-            gap: var(--spacing-sm);
-            align-items: center;
-        }
-
-        .custom-resolution-inputs input[type="number"] {
-            flex: 1;
-            text-align: center;
-        }
-
-        .custom-resolution-separator {
-            display: flex;
-            align-items: center;
-            color: var(--text-muted);
-            font-weight: bold;
-            font-size: 1.2rem;
-            min-width: 20px;
-            justify-content: center;
-        }
-
-        .custom-resolution-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: var(--spacing-xs);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-
-        .custom-resolution-hint i {
-            color: var(--accent-primary);
-        }
-
-        /* Workspace Manager Specific Improvements */
-        .workspace-manager .card-header {
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            border-bottom: 2px solid var(--accent-primary);
-            margin-bottom: 0;
-        }
-
-        .workspace-manager .card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .workspace-manager .card-title .card-icon {
-            width: 28px;
-            height: 28px;
-            color: var(--accent-primary);
-        }
-
-        /* Fleet and Connection Grid Improvements */
-        .fleet-grid, .connection-list, .metrics-grid {
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-md);
-            min-height: auto;
-        }
-
-        .metric-item {
-            text-align: center;
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--border-primary);
-            transition: all var(--transition-fast);
-        }
-
-        .metric-item:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--accent-primary);
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .metric-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Log Panel Improvements */
-        .log-panel {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            padding: var(--spacing-md);
-            height: 200px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
-            line-height: 1.4;
-        }
-
-        /* Fleet Controls Improvements */
-        .fleet-controls {
-            display: flex;
-            gap: var(--spacing-sm);
-            margin-top: var(--spacing-lg);
-            flex-wrap: wrap;
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100px;
-            color: var(--text-muted);
-        }
-
-        .loading::after {
-            content: 'Loading...';
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Responsive Grid Adjustments */
-        @media (max-width: 1400px) {
-            .dashboard-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-form {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
         }
         
-        @media (max-width: 768px) {
-            .action-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .fleet-controls {
-                justify-content: center;
-            }
-            
-            .workspace-manager .card-title {
-                font-size: 1.25rem;
-            }
+        .card {
+            background-color: var(--bs-card-bg);
+            border-color: var(--bs-border-color);
         }
-
-        /* ==================================================
-           VISUAL WORKSPACE MANAGER STYLES
-           ================================================== */
-
-        .workspace-controls {
-            display: flex;
-            gap: var(--spacing-sm);
-            align-items: center;
+        
+        .table-dark {
+            --bs-table-bg: var(--bs-table-bg);
+            --bs-table-striped-bg: var(--bs-table-striped-bg);
         }
-
-        .workspace-grid {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-xl);
-            margin-top: var(--spacing-lg);
+        
+        .status-online { color: #00d084; }
+        .status-offline { color: #ff6b6b; }
+        .status-connected { color: #58a6ff; }
+        .status-vnc { color: #f78c6c; }
+        .status-rdp { color: #82aaff; }
+        .status-ssh { color: #a9dc76; }
+        
+        .btn-sm { font-size: 0.875rem; }
+        .table-responsive { min-height: 400px; }
+        .last-scan { font-size: 0.875rem; color: #8b949e; }
+        .loading { opacity: 0.6; }
+        
+        .machine-row.connected { 
+            background-color: rgba(88, 166, 255, 0.1) !important;
+            border-left: 3px solid #58a6ff;
         }
-
-        .workspace-section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-lg);
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            padding: 0 var(--spacing-sm);
-            border-bottom: 2px solid var(--border-primary);
-            padding-bottom: var(--spacing-sm);
-        }
-
-        .scratchpad-controls {
-            margin-left: auto;
-            display: flex;
-            gap: var(--spacing-xs);
-        }
-
-        .workspaces-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: var(--spacing-lg);
-            padding: var(--spacing-md);
-        }
-
-        .scratchpad-container {
-            display: flex;
-            justify-content: center;
-            padding: var(--spacing-md);
-        }
-
-        .workspace-item {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-primary);
-            border-radius: var(--border-radius-md);
-            overflow: hidden;
-            transition: all 0.3s var(--transition-smooth);
-            min-height: 180px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .workspace-item:hover {
-            border-color: var(--accent-primary);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(var(--accent-primary-rgb), 0.15);
-        }
-
-        .workspace-item.scratchpad-item {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-            border-color: var(--accent-secondary);
-            max-width: 280px;
-            min-height: 200px;
-        }
-
-        .workspace-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-primary);
-        }
-
-        .workspace-id {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 24px;
-            height: 24px;
-        }
-
-        .workspace-status {
-            display: flex;
-            align-items: center;
-        }
-
-        .status-indicator.active {
-            background: var(--accent-success);
-            box-shadow: 0 0 8px rgba(var(--accent-success-rgb), 0.6);
-        }
-
-        .status-indicator.inactive {
-            background: var(--text-muted);
-        }
-
-        .status-indicator.visible {
-            background: var(--accent-warning);
-            box-shadow: 0 0 8px rgba(var(--accent-warning-rgb), 0.6);
-        }
-
-        .status-indicator.hidden {
-            background: var(--text-muted);
-        }
-
-        .workspace-content {
-            flex: 1;
-            padding: var(--spacing-sm);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .vm-slots {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-xs);
-            min-height: 80px;
-        }
-
-        .scratchpad-slots {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-xs);
-            min-height: 120px;
-        }
-
-        .vm-slot {
-            padding: var(--spacing-sm);
-            border: 1px dashed var(--border-secondary);
-            border-radius: var(--border-radius-sm);
-            transition: all 0.3s var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 60px;
-        }
-
-        .vm-slot.empty:hover,
-        .vm-slot.drag-over {
-            border-color: var(--accent-primary);
-            background: rgba(var(--accent-primary-rgb), 0.05);
-            animation: pulseGlow 1s ease-in-out infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.3); }
-            50% { box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.6); }
-        }
-
-        .vm-slot.occupied {
-            border-style: solid;
-            border-color: var(--accent-success);
-            background: rgba(var(--accent-success-rgb), 0.05);
-        }
-
-        .slot-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--spacing-xs);
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            text-align: center;
-        }
-
-        .slot-placeholder i {
-            font-size: 1.2rem;
-            opacity: 0.6;
-        }
-
-        .vm-info {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-xs);
-            text-align: center;
-        }
-
-        .vm-ip {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        .vm-size {
+        
+        
+        .service-badge {
             font-size: 0.75rem;
-            color: var(--text-muted);
+            padding: 0.25rem 0.5rem;
+            margin: 0.1rem;
+            border-radius: 0.375rem;
         }
-
-        .vm-actions {
-            display: flex;
-            justify-content: center;
-            gap: var(--spacing-xs);
-            margin-top: var(--spacing-xs);
-        }
-
-        .workspace-info {
-            padding: var(--spacing-xs) var(--spacing-md);
-            background: var(--bg-primary);
-            border-top: 1px solid var(--border-primary);
-            text-align: center;
-        }
-
-        .resolution-info {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Available VMs Panel */
-        .available-vms-panel {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-md);
-            margin-top: var(--spacing-lg);
-            overflow: hidden;
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: var(--spacing-lg);
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-primary);
-        }
-
-        .panel-header h4 {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .vm-filters {
-            display: flex;
-            gap: var(--spacing-xs);
-        }
-
-        .filter-btn {
-            padding: var(--spacing-xs) var(--spacing-md);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .filter-btn:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--accent-primary);
-            color: var(--text-primary);
-        }
-
-        .filter-btn.active {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-            color: var(--bg-primary);
-        }
-
-        .vms-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: var(--spacing-md);
-            padding: var(--spacing-lg);
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .draggable-vm {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            padding: var(--spacing-md);
-            cursor: grab;
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            user-select: none;
-        }
-
-        .draggable-vm:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .draggable-vm:active {
-            cursor: grabbing;
-            transform: scale(0.95);
-        }
-
-        .draggable-vm.online {
-            border-left: 3px solid var(--accent-success);
-        }
-
-        .draggable-vm.offline {
-            border-left: 3px solid var(--text-muted);
-        }
-
-        .draggable-vm.connected {
-            border-left: 3px solid var(--accent-primary);
-            background: rgba(var(--accent-primary-rgb), 0.05);
-        }
-
-        .vm-icon {
-            font-size: 1.2rem;
-            color: var(--accent-primary);
-        }
-
-        .vm-details {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .vm-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            margin-bottom: 2px;
-        }
-
-        .vm-status {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .vm-status.online {
-            color: var(--accent-success);
-        }
-
-        .vm-status.offline {
-            color: var(--text-muted);
-        }
-
-        /* Size Preset Panel */
-        .size-preset-panel {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-md);
-            margin-top: var(--spacing-lg);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .preset-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-md);
-        }
-
-        .preset-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            text-align: center;
-            user-select: none;
-        }
-
-        .preset-item:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .preset-item.selected {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 16px rgba(var(--accent-primary-rgb), 0.3);
-        }
-
-        .preset-icon {
-            font-size: 1.5rem;
-            color: var(--accent-primary);
-        }
-
-        .preset-item.selected .preset-icon {
-            color: var(--bg-primary);
-        }
-
-        .preset-item span {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .preset-item.selected span {
-            color: var(--bg-primary);
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            animation: fadeIn 0.3s ease-out;
-        }
-
+        
+        .service-rdp { background-color: rgba(130, 170, 255, 0.2); color: #82aaff; }
+        .service-vnc { background-color: rgba(247, 140, 108, 0.2); color: #f78c6c; }
+        .service-ssh { background-color: rgba(169, 220, 118, 0.2); color: #a9dc76; }
+        
         .modal-content {
-            background: var(--bg-card);
-            margin: 5% auto;
-            padding: 0;
-            border: 1px solid var(--border-primary);
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 600px;
-            box-shadow: var(--shadow-lg);
-            animation: modalSlideIn 0.3s ease-out;
+            background-color: var(--bs-card-bg);
+            border-color: var(--bs-border-color);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        
+        .form-control, .form-select {
+            background-color: #0d1117;
+            border-color: var(--bs-border-color);
+            color: var(--bs-body-color);
         }
-
-        @keyframes modalSlideIn {
-            from { 
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to { 
-                transform: translateY(0);
-                opacity: 1;
-            }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: #0d1117;
+            border-color: #58a6ff;
+            color: var(--bs-body-color);
+            box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
         }
-
-        .modal-header {
+        
+        .alert-info {
+            background-color: rgba(88, 166, 255, 0.1);
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+        
+        .btn-group .btn {
+            border-color: var(--bs-border-color);
+        }
+        
+        .connection-type-selector {
+            margin-bottom: 1rem;
+        }
+        
+        .connection-buttons {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: var(--spacing-lg);
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-primary);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+        
+        .navbar-brand {
+            color: var(--bs-body-color) !important;
+        }
+        
+        .text-muted {
+            color: #8b949e !important;
+        }
+        
+        h1, h5 {
+            color: var(--bs-body-color);
+        }
+        
+        .card-header {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-bottom-color: var(--bs-border-color);
         }
 
-        .modal-header h3 {
-            margin: 0;
-            color: var(--text-primary);
-            font-size: 1.25rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
+        .os-type {
+            font-size: 0.85rem;
+            color: #8b949e;
+            font-style: italic;
         }
 
-        .close {
-            color: var(--text-muted);
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .close:hover {
-            color: var(--accent-danger);
-            transform: scale(1.1);
-        }
-
-        .modal-body {
-            padding: var(--spacing-lg);
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: var(--spacing-md);
-            justify-content: flex-end;
-            padding: var(--spacing-lg);
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-primary);
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-        }
-
-        .settings-section {
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .settings-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .settings-section h4 {
-            margin: 0 0 var(--spacing-md) 0;
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            border-bottom: 1px solid var(--border-secondary);
-            padding-bottom: var(--spacing-sm);
-        }
-
-        .quick-actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--spacing-sm);
-        }
-
-        .config-form {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-xs);
-        }
-
-        .form-group label {
-            font-weight: 500;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        .form-group input[type="checkbox"] {
-            width: auto;
-            margin-right: var(--spacing-xs);
-        }
-
-        /* Tiny button styles */
-        .btn-tiny {
-            padding: 2px 4px;
-            font-size: 0.7rem;
-            border: 1px solid var(--border-secondary);
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            border-radius: 3px;
-            cursor: pointer;
-            transition: all 0.2s var(--transition-smooth);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 20px;
-            height: 20px;
-        }
-
-        .btn-tiny:hover {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            border-color: var(--accent-primary);
-        }
-
-        .btn-tiny.danger:hover {
-            background: var(--accent-danger);
-            border-color: var(--accent-danger);
-        }
-
-        /* Drag and drop visual feedback */
-        .vm-slot.drag-over {
-            border-color: var(--accent-primary);
-            background: rgba(var(--accent-primary-rgb), 0.1);
-            transform: scale(1.02);
-        }
-
-        .draggable-vm.dragging {
-            opacity: 0.7;
-            transform: rotate(5deg) scale(0.95);
-        }
-
-        .vm-connection-status {
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            margin-top: var(--spacing-xs);
-        }
-
-        .vm-connection-status.connected {
-            color: var(--accent-success);
-        }
-
-        .vm-connection-status.disconnected {
-            color: var(--text-muted);
-        }
-
-        .draggable-vm:hover .vm-connection-status.disconnected {
-            color: var(--accent-primary);
-        }
-
-        /* Enhanced hover states */
-        .draggable-vm:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .draggable-vm:active {
-            cursor: grabbing;
-            transform: scale(0.95);
-        }
-
-        .draggable-vm.online {
-            border-left: 3px solid var(--accent-success);
-        }
-
-        .draggable-vm.offline {
-            border-left: 3px solid var(--text-muted);
-        }
-
-        .draggable-vm.connected {
-            border-left: 3px solid var(--accent-primary);
-            background: rgba(var(--accent-primary-rgb), 0.05);
-        }
-
-        /* Slot visual feedback improvements */
-        .vm-slot.empty:hover,
-        .vm-slot.drag-over {
-            border-color: var(--accent-primary);
-            background: rgba(var(--accent-primary-rgb), 0.05);
-            animation: pulseGlow 1s ease-in-out infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.3); }
-            50% { box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.6); }
-        }
-
-        .vm-slot.occupied {
-            border-style: solid;
-            border-color: var(--accent-success);
-            background: rgba(var(--accent-success-rgb), 0.05);
-        }
-
-        /* Responsive Design for Workspace Manager */
-        @media (max-width: 1200px) {
-            .workspaces-container {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: var(--spacing-md);
-            }
-            
-            .vms-container {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            .workspaces-container {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                gap: var(--spacing-sm);
-                padding: var(--spacing-sm);
-            }
-            
-            .vms-container {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-sm);
-            }
-            
-            .workspace-item {
-                min-height: 150px;
-            }
-            
-            .scratchpad-item {
-                max-width: none;
-                min-height: 150px;
-            }
-            
-            .vm-filters {
-                flex-wrap: wrap;
-            }
-            
-            .filter-btn {
-                padding: var(--spacing-xs) var(--spacing-sm);
-                font-size: 0.75rem;
-            }
+        .resolution-note {
+            font-size: 0.8rem;
+            color: #8b949e;
+            margin-top: 0.25rem;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="header-title">
-                <h1><i class="fas fa-rocket"></i> NZ7DEV Mission Control</h1>
-                <div class="status-badge">
-                    <div class="status-indicator" id="connectionStatus"></div>
-                    <span>OPERATIONAL</span>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1><i class="fas fa-network-wired"></i> NZ7DEV Remote Manager</h1>
+                    <div>
+                        <button class="btn btn-primary" onclick="refreshMachines()">
+                            <i class="fas fa-sync-alt"></i> Refresh Scan
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="header-meta">
-                <span class="text-muted">Professional Edition • Optimized Performance</span>
             </div>
         </div>
-    </header>
 
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Visual Workspace Manager - MAIN HERO PANEL -->
-            <div class="dashboard-card workspace-manager hero-panel">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-th-large card-icon"></i>
-                        <span>Visual Workspace Manager</span>
-                        <span class="hero-badge">PRIMARY CONTROL</span>
+        <!-- Machines Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-server"></i> Discovered Machines</h5>
+                        <span class="last-scan" id="lastScan">Last scan: Never</span>
                     </div>
-                    <div class="workspace-controls">
-                        <button class="btn btn-secondary btn-sm" onclick="refreshWorkspaceState()" title="Refresh workspace state">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="btn btn-primary btn-sm" onclick="openWorkspaceSettings()" title="Workspace Settings">
-                            <i class="fas fa-cogs"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Workspace Grid -->
-                <div class="workspace-grid">
-                    <!-- Regular Workspaces -->
-                    <div class="workspace-section">
-                        <div class="section-title">
-                            <i class="fas fa-desktop"></i>
-                            <span>Workspaces</span>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Machine Types:</strong> 
+                            <span class="badge service-rdp">RDP</span> Windows machines, 
+                            <span class="badge service-vnc">VNC</span> Ubuntu Desktop, 
+                            <span class="badge service-ssh">SSH</span> Linux servers.
                         </div>
-                        <div class="workspaces-container">
-                            <div class="workspace-item" data-workspace="1" data-type="workspace">
-                                <div class="workspace-header">
-                                    <span class="workspace-id">1</span>
-                                    <div class="workspace-status">
-                                        <span class="status-indicator inactive"></span>
-                                    </div>
-                                </div>
-                                <div class="workspace-content">
-                                    <div class="vm-slots">
-                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
-                                            <div class="slot-placeholder">
-                                                <i class="fas fa-plus"></i>
-                                                <span>Drop VM here</span>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped table-hover" id="machinesTable">
+                                <thead>
+                                    <tr>
+                                        <th>IP Address</th>
+                                        <th>Hostname</th>
+                                        <th>OS Type</th>
+                                        <th>Status</th>
+                                        <th>Services</th>
+                                        <th>Connection</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="machinesBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Scanning...</span>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="workspace-info">
-                                    <span class="resolution-info">1920×1080</span>
-                                </div>
-                            </div>
-
-                            <div class="workspace-item" data-workspace="2" data-type="workspace">
-                                <div class="workspace-header">
-                                    <span class="workspace-id">2</span>
-                                    <div class="workspace-status">
-                                        <span class="status-indicator active"></span>
-                                    </div>
-                                </div>
-                                <div class="workspace-content">
-                                    <div class="vm-slots">
-                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
-                                            <div class="slot-placeholder">
-                                                <i class="fas fa-plus"></i>
-                                                <span>Drop VM here</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="workspace-info">
-                                    <span class="resolution-info">1920×1080</span>
-                                </div>
-                            </div>
-            
-                            <div class="workspace-item" data-workspace="3" data-type="workspace">
-                                <div class="workspace-header">
-                                    <span class="workspace-id">3</span>
-                                    <div class="workspace-status">
-                                        <span class="status-indicator inactive"></span>
-                                    </div>
-                                </div>
-                                <div class="workspace-content">
-                                    <div class="vm-slots">
-                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
-                                            <div class="slot-placeholder">
-                                                <i class="fas fa-plus"></i>
-                                                <span>Drop VM here</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="workspace-info">
-                                    <span class="resolution-info">1920×1080</span>
-                                </div>
-                            </div>
-                    
-                            <div class="workspace-item" data-workspace="4" data-type="workspace">
-                                <div class="workspace-header">
-                                    <span class="workspace-id">4</span>
-                                    <div class="workspace-status">
-                                        <span class="status-indicator inactive"></span>
-                                    </div>
-                                </div>
-                                <div class="workspace-content">
-                                    <div class="vm-slots">
-                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
-                                            <div class="slot-placeholder">
-                                                <i class="fas fa-plus"></i>
-                                                <span>Drop VM here</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="workspace-info">
-                                    <span class="resolution-info">1920×1080</span>
-                                </div>
-                            </div>
-                    
-                            <div class="workspace-item" data-workspace="5" data-type="workspace">
-                                <div class="workspace-header">
-                                    <span class="workspace-id">5</span>
-                                    <div class="workspace-status">
-                                        <span class="status-indicator inactive"></span>
-                                    </div>
-                                </div>
-                                <div class="workspace-content">
-                                    <div class="vm-slots">
-                                        <div class="vm-slot empty" ondrop="dropVM(event)" ondragover="allowDrop(event)">
-                                            <div class="slot-placeholder">
-                                                <i class="fas fa-plus"></i>
-                                                <span>Drop VM here</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="workspace-info">
-                                    <span class="resolution-info">1920×1080</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Scratchpad -->
-                    <div class="workspace-section">
-                        <div class="section-title">
-                            <i class="fas fa-layer-group"></i>
-                            <span>Scratchpad</span>
-                            <div class="scratchpad-controls">
-                                <button class="btn btn-tiny" onclick="toggleScratchpad()" title="Toggle Scratchpad Visibility">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="scratchpad-container">
-                            <div class="workspace-item scratchpad-item" data-workspace="special" data-type="scratchpad">
-                                <div class="workspace-header">
-                                    <span class="workspace-id">
-                                        <i class="fas fa-layer-group"></i>
-                                    </span>
-                                    <div class="workspace-status">
-                                        <span class="status-indicator scratchpad-status hidden"></span>
-                                    </div>
-                                </div>
-                                <div class="workspace-content">
-                                    <div class="vm-slots scratchpad-slots">
-                                        <div class="vm-slot empty scratchpad-slot" ondrop="dropVM(event)" ondragover="allowDrop(event)">
-                                            <div class="slot-placeholder">
-                                                <i class="fas fa-plus"></i>
-                                                <span>Drop VM here</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="workspace-info">
-                                    <span class="resolution-info">Floating</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                    
-                <!-- Available VMs Panel -->
-                <div class="available-vms-panel">
-                    <div class="panel-header">
-                        <h4>
-                            <i class="fas fa-server"></i>
-                            Available VMs
-                        </h4>
-                        <div class="vm-filters">
-                            <button class="filter-btn active" data-filter="all">All</button>
-                            <button class="filter-btn" data-filter="online">Online</button>
-                            <button class="filter-btn" data-filter="offline">Offline</button>
-                            <button class="filter-btn" data-filter="connected">Connected</button>
-                        </div>
-                    </div>
-                    <div class="vms-container" id="availableVMs">
-                        <!-- VMs will be populated dynamically -->
-                    </div>
-                </div>
-                    
-                <!-- Size Preset Panel -->
-                <div class="size-preset-panel">
-                    <div class="panel-header">
-                        <h4>
-                            <i class="fas fa-expand-arrows-alt"></i>
-                            Size Presets
-                        </h4>
-                    </div>
-                    <div class="preset-grid">
-                        <div class="preset-item" data-preset="full">
-                            <div class="preset-icon">
-                                <i class="fas fa-square"></i>
-                            </div>
-                            <span>Full</span>
-                        </div>
-                        <div class="preset-item" data-preset="half-left">
-                            <div class="preset-icon">
-                                <i class="fas fa-columns"></i>
-                            </div>
-                            <span>Half Left</span>
-                        </div>
-                        <div class="preset-item" data-preset="half-right">
-                            <div class="preset-icon">
-                                <i class="fas fa-columns"></i>
-                            </div>
-                            <span>Half Right</span>
-                        </div>
-                        <div class="preset-item" data-preset="half-top">
-                            <div class="preset-icon">
-                                <i class="fas fa-window-maximize"></i>
-                            </div>
-                            <span>Half Top</span>
-                        </div>
-                        <div class="preset-item" data-preset="half-bottom">
-                            <div class="preset-icon">
-                                <i class="fas fa-window-minimize"></i>
-                            </div>
-                            <span>Half Bottom</span>
-                        </div>
-                        <div class="preset-item" data-preset="quarter">
-                            <div class="preset-icon">
-                                <i class="fas fa-th"></i>
-                            </div>
-                            <span>Quarter</span>
-                        </div>
-                        <div class="preset-item" data-preset="third">
-                            <div class="preset-icon">
-                                <i class="fas fa-bars"></i>
-                            </div>
-                            <span>Third</span>
-                        </div>
-                        <div class="preset-item" data-preset="two-thirds">
-                            <div class="preset-icon">
-                                <i class="fas fa-align-left"></i>
-                            </div>
-                            <span>Two Thirds</span>
+                                            <p class="mt-2">Scanning network for machines with RDP/VNC/SSH...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Quick Actions Panel - SECONDARY PANEL -->
-            <div class="dashboard-card quick-actions secondary-panel">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-bolt card-icon"></i>
-                        <span>Quick RDP Deployment</span>
-                    </div>
-                </div>
-                
-                <div class="action-form">
-                    <div class="input-group">
-                        <label class="input-label">Target IP Address</label>
-                        <input type="text" id="rdpIp" class="input-field" placeholder="192.168.1.24" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Username</label>
-                        <input type="text" id="rdpUsername" class="input-field" placeholder="User" value="User">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Password</label>
-                        <input type="password" id="rdpPassword" class="input-field" placeholder="password" value="lemonlime">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Resolution</label>
-                        <select id="rdpGeometry" class="select-field" onchange="toggleCustomResolution()">
-                            <option value="1920x1080">1920×1080</option>
-                            <option value="1680x1050">1680×1050</option>
-                            <option value="1440x900">1440×900</option>
-                            <option value="1280x720">1280×720</option>
-                            <option value="1024x768">1024×768</option>
-                            <option value="custom">🎯 Custom Resolution</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Custom Resolution Inputs (Hidden by default) -->
-                    <div id="customResolutionGroup" class="input-group" style="display: none;">
-                        <label class="input-label">Custom Resolution</label>
-                        <div class="custom-resolution-inputs">
-                            <input type="number" id="customWidth" class="input-field" placeholder="Width" min="640" max="3840" value="1920">
-                            <span class="custom-resolution-separator">×</span>
-                            <input type="number" id="customHeight" class="input-field" placeholder="Height" min="480" max="2160" value="1080">
-                        </div>
-                        <div class="custom-resolution-hint">
-                            <i class="fas fa-info-circle"></i> Enter width and height in pixels (640×480 to 3840×2160)
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Workspace</label>
-                        <select id="rdpWorkspace" class="select-field">
-                            <option value="1">Workspace 1</option>
-                            <option value="2">Workspace 2</option>
-                            <option value="3">Workspace 3</option>
-                            <option value="4">Workspace 4</option>
-                            <option value="5">Workspace 5</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Action</label>
-                        <button class="btn btn-primary" onclick="spawnRDP()">
-                            <i class="fas fa-rocket"></i>
-                            Deploy
-                        </button>
-                    </div>
-                </div>
-
-                <div class="preset-grid">
-                    <button class="preset-btn" onclick="setPreset('192.168.1.20', 'nz7dev', 'lemonlime', 'ALPHA')">
-                        <i class="fas fa-server"></i> ALPHA
-                    </button>
-                    <button class="preset-btn" onclick="setPreset('192.168.1.21', 'nz7dev', 'lemonlime', 'BRAVO')">
-                        <i class="fas fa-server"></i> BRAVO
-                    </button>
-                    <button class="preset-btn" onclick="setPreset('192.168.1.23', 'User', 'lemonlime', 'CHARLIE')">
-                        <i class="fas fa-server"></i> CHARLIE
-                    </button>
-                    <button class="preset-btn" onclick="setPreset('192.168.1.24', 'nz7dev', 'lemonlime', 'DELTA')">
-                        <i class="fas fa-server"></i> DELTA
-                    </button>
-                    <button class="preset-btn" onclick="setPreset('192.168.1.25', 'User', 'lemonlime', 'ECHO')">
-                        <i class="fas fa-server"></i> ECHO
-                    </button>
-                    <button class="preset-btn" onclick="setPreset('192.168.1.26', 'User', 'lemonlime', 'FOXTROT')">
-                        <i class="fas fa-server"></i> FOXTROT
-                    </button>
-                </div>
-            </div>
-
-            <!-- Status Panels Row -->
-            <div class="dashboard-row">
-                <!-- Fleet Status -->
-                <div class="dashboard-card">
+        <!-- Resolution Presets -->
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
                     <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-network-wired card-icon"></i>
-                            <span>Fleet Status</span>
+                        <h5><i class="fas fa-display"></i> Resolution Presets (RDP Only)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning mb-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Note:</strong> Resolution presets are only used for RDP connections to Windows machines. 
+                            VNC and SSH connections use automatic resolution or don't require resolution settings.
                         </div>
-                    </div>
-                    
-                    <div class="fleet-grid" id="fleetStatus">
-                        <div class="loading"></div>
-                    </div>
-
-                    <div class="fleet-controls">
-                        <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('up')">
-                            <i class="fas fa-play"></i> Start Fleet
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('morning')">
-                            <i class="fas fa-sun"></i> Morning Routine
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="executeFleetCommand('fastup')">
-                            <i class="fas fa-fighter-jet"></i> Ludicrous Speed
-                        </button>
-                        <button class="btn btn-primary btn-sm" onclick="executeFleetCommand('scratchpad')" title="Launch all RDP sessions in 3x2 grid on scratchpad workspace 2">
-                            <i class="fas fa-th-large"></i> Scratchpad Launch
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="executeFleetCommand('down')">
-                            <i class="fas fa-stop"></i> Emergency Stop
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Active Connections -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-link card-icon"></i>
-                            <span>Active Connections</span>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm" id="presetsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Resolution</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="presetsBody">
+                                    <!-- Presets will be loaded here -->
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    
-                    <div class="connection-list" id="activeConnections">
-                        <div class="text-muted">No active connections</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom Status Row -->
-            <div class="dashboard-row">
-                <!-- System Metrics -->
-                <div class="dashboard-card">
+            <div class="col-md-4">
+                <div class="card">
                     <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-chart-line card-icon"></i>
-                            <span>System Metrics</span>
-                        </div>
+                        <h5><i class="fas fa-plus"></i> Add Resolution Preset</h5>
                     </div>
-                    
-                    <div class="metrics-grid">
-                        <div class="metric-item">
-                            <div class="metric-value" id="connectionCount">0</div>
-                            <div class="metric-label">Active Connections</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value" id="onlineCount">0</div>
-                            <div class="metric-label">Online VMs</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value" id="uptimeDisplay">--:--</div>
-                            <div class="metric-label">Uptime</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">
-                                <i class="fas fa-check-circle" style="color: var(--accent-success);"></i>
+                    <div class="card-body">
+                        <form id="presetForm">
+                            <div class="mb-3">
+                                <label for="presetName" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="presetName" required>
                             </div>
-                            <div class="metric-label">System Status</div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--border-radius-sm); border: 1px solid var(--border-primary);">
-                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: var(--spacing-sm);">Last Update: <span id="lastUpdate">Never</span></div>
-                        <div style="font-size: 0.875rem; color: var(--accent-success);">
-                            <i class="fas fa-bolt"></i> Performance Optimized • Real-time Monitoring Active
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Log Panel -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-terminal card-icon"></i>
-                            <span>Live System Logs</span>
-                        </div>
-                        <button class="btn btn-secondary btn-sm" onclick="clearLogs()" title="Clear Logs">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="log-panel" id="logPanel">
-                        <div class="text-muted">System ready - logs will appear here</div>
+                            <div class="mb-3">
+                                <label for="presetWidth" class="form-label">Width</label>
+                                <input type="number" class="form-control" id="presetWidth" min="640" max="7680" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="presetHeight" class="form-label">Height</label>
+                                <input type="number" class="form-control" id="presetHeight" min="480" max="4320" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="presetDescription" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="presetDescription">
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Add Preset
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Workspace Settings Modal -->
-    <div id="workspaceModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>
-                    <i class="fas fa-cogs"></i>
-                    Workspace Settings
-                </h3>
-                <span class="close" onclick="closeWorkspaceModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="settings-section">
-                    <h4>Quick Actions</h4>
-                    <div class="quick-actions-grid">
-                        <button class="btn btn-primary" onclick="assignAllVMsToWorkspaces()">
-                            <i class="fas fa-magic"></i>
-                            Auto-Assign All VMs
-                        </button>
-                        <button class="btn btn-secondary" onclick="clearAllWorkspaces()">
-                            <i class="fas fa-eraser"></i>
-                            Clear All Workspaces
-                        </button>
-                        <button class="btn btn-info" onclick="saveWorkspaceLayout()">
-                            <i class="fas fa-save"></i>
-                            Save Layout
-                        </button>
-                        <button class="btn btn-warning" onclick="loadWorkspaceLayout()">
-                            <i class="fas fa-upload"></i>
-                            Load Layout
-                        </button>
-                    </div>
+    <!-- Connection Modal -->
+    <div class="modal fade" id="connectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Connect to Remote Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                
-                <div class="settings-section">
-                    <h4>Workspace Configuration</h4>
-                    <div class="config-form">
-                        <div class="form-group">
-                            <label>Default Size Preset</label>
-                            <select id="defaultSizePreset" class="select-field">
-                                <option value="full">Full</option>
-                                <option value="half-left">Half Left</option>
-                                <option value="half-right">Half Right</option>
-                                <option value="quarter">Quarter</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Auto-refresh Interval (seconds)</label>
-                            <input type="number" id="refreshInterval" class="input-field" value="5" min="1" max="60">
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="enableAutoPosition" checked>
-                                Auto-position new RDP connections
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="connectionIP" class="form-label">IP Address</label>
+                        <input type="text" class="form-control" id="connectionIP" readonly>
+                    </div>
+                    <div class="mb-3 connection-type-selector">
+                        <label class="form-label">Connection Type</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="connectionType" id="rdpType" value="rdp" checked>
+                            <label class="btn btn-outline-primary" for="rdpType">
+                                <i class="fas fa-desktop"></i> RDP
+                            </label>
+                            <input type="radio" class="btn-check" name="connectionType" id="vncType" value="vnc">
+                            <label class="btn btn-outline-warning" for="vncType">
+                                <i class="fas fa-eye"></i> VNC
+                            </label>
+                            <input type="radio" class="btn-check" name="connectionType" id="sshType" value="ssh">
+                            <label class="btn btn-outline-success" for="sshType">
+                                <i class="fas fa-terminal"></i> SSH
                             </label>
                         </div>
                     </div>
+                    <div class="mb-3" id="resolutionSelector">
+                        <label for="connectionResolution" class="form-label">Resolution (RDP Only)</label>
+                        <select class="form-select" id="connectionResolution">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                        <div class="resolution-note" id="resolutionNote">
+                            Resolution presets are only used for RDP connections to Windows machines
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Credentials:</strong> nz7dev / lemonlime<br>
+                        <small id="clientInfo">RDP: xfreerdp, VNC: Remmina, SSH: Kitty Terminal</small>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeWorkspaceModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveWorkspaceSettings()">Save Settings</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="doConnect()">
+                        <i class="fas fa-plug"></i> Connect
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Enhanced Professional JavaScript Application
-        class MissionControlPro {
-            constructor() {
-                this.socket = io();
-                this.startTime = Date.now();
-                this.setupEventListeners();
-                this.setupKeyboardShortcuts();
-                this.requestInitialData();
-                this.startUptimeCounter();
-            }
-
-            setupEventListeners() {
-                this.socket.on('connect', () => {
-                    this.updateConnectionStatus(true);
-                    this.showNotification('Mission Control Online', 'success');
-                    this.addLog('Mission Control connected successfully', 'SUCCESS');
-                });
-
-                this.socket.on('disconnect', () => {
-                    this.updateConnectionStatus(false);
-                    this.showNotification('Connection Lost - Attempting Reconnect', 'warning');
-                    this.addLog('Connection lost - attempting reconnect', 'WARNING');
-                });
-
-                this.socket.on('status_update', (data) => {
-                    this.updateFleetStatus(data);
-                });
-
-                this.socket.on('log_message', (data) => {
-                    this.addLog(data.message, data.level, data.timestamp);
-                });
-
-                // Auto-refresh connections every 3 seconds for real-time feel
-                setInterval(() => this.updateActiveConnections(), 3000);
-            }
-
-            setupKeyboardShortcuts() {
-                document.addEventListener('keydown', (e) => {
-                    // Ctrl+Enter to deploy
-                    if (e.ctrlKey && e.key === 'Enter') {
-                        e.preventDefault();
-                        spawnRDP();
-                    }
-                    
-                    // Alt+1-6 for quick presets
-                    if (e.altKey && e.key >= '1' && e.key <= '6') {
-                        e.preventDefault();
-                        const presets = [
-                            ['192.168.1.20', 'nz7dev', 'lemonlime', 'ALPHA'],
-                            ['192.168.1.21', 'nz7dev', 'lemonlime', 'BRAVO'], 
-                            ['192.168.1.23', 'User', 'lemonlime', 'CHARLIE'],
-                            ['192.168.1.24', 'nz7dev', 'lemonlime', 'DELTA'],
-                            ['192.168.1.25', 'User', 'lemonlime', 'ECHO'],
-                            ['192.168.1.26', 'User', 'lemonlime', 'FOXTROT']
-                        ];
-                        const index = parseInt(e.key) - 1;
-                        if (presets[index]) {
-                            setPreset(presets[index][0], presets[index][1], presets[index][2], presets[index][3]);
-                        }
-                    }
-
-                    // F5 to refresh status
-                    if (e.key === 'F5') {
-                        e.preventDefault();
-                        this.socket.emit('request_status');
-                        this.showNotification('Status Refreshed', 'success');
-                    }
-                });
-            }
-
-            startUptimeCounter() {
-                setInterval(() => {
-                    const uptime = Date.now() - this.startTime;
-                    const hours = Math.floor(uptime / (1000 * 60 * 60));
-                    const minutes = Math.floor((uptime % (1000 * 60 * 60)) / (1000 * 60));
-                    document.getElementById('uptimeDisplay').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-                }, 1000);
-            }
-
-            requestInitialData() {
-                this.socket.emit('request_status');
-                this.updateActiveConnections();
-                this.loadWorkspaceResolutions();
-                this.addLog('System initialized - requesting initial fleet status', 'INFO');
-            }
-
-            async loadWorkspaceResolutions() {
-                try {
-                    const response = await fetch('/api/workspace/resolutions');
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        this.populateGeometryDropdown(data.workspaces);
-                        this.addLog('Workspace resolutions loaded for auto-geometry detection', 'INFO');
-                    } else {
-                        this.addLog(`Failed to load workspace resolutions: ${data.error}`, 'WARNING');
-                    }
-                } catch (error) {
-                    this.addLog(`Error loading workspace resolutions: ${error.message}`, 'ERROR');
-                }
-            }
-
-            populateGeometryDropdown(workspaces) {
-                const select = document.getElementById('rdpGeometry');
-                const currentValue = select.value;
-                
-                // Clear existing options
-                select.innerHTML = '';
-                
-                // Add auto-detect options (workspace-aware)
-                const autoGroup = document.createElement('optgroup');
-                autoGroup.label = 'Auto-Detect (Waybar Compensated)';
-                
-                for (let i = 1; i <= 5; i++) {
-                    const wsKey = `workspace_${i}`;
-                    if (workspaces[wsKey]) {
-                        const option = document.createElement('option');
-                        option.value = `auto-ws${i}`;
-                        option.textContent = workspaces[wsKey].display_name;
-                        autoGroup.appendChild(option);
-                    }
-                }
-                select.appendChild(autoGroup);
-                
-                // Add manual options
-                const manualGroup = document.createElement('optgroup');
-                manualGroup.label = 'Manual Resolution Override';
-                
-                const manualOptions = [
-                    { value: '1920x1080', text: '1920×1080 (Full HD)' },
-                    { value: '1680x1050', text: '1680×1050 (16:10)' },
-                    { value: '1440x900', text: '1440×900 (16:10)' },
-                    { value: '1280x720', text: '1280×720 (HD)' },
-                    { value: '1024x768', text: '1024×768 (4:3)' },
-                    { value: 'custom', text: '🎯 Custom Resolution' }
-                ];
-                
-                manualOptions.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.text;
-                    manualGroup.appendChild(option);
-                });
-                select.appendChild(manualGroup);
-                
-                // Restore previous selection or set default
-                if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
-                    select.value = currentValue;
-                } else {
-                    select.value = 'auto-ws4'; // Default to workspace 4 auto-detect
-                }
-            }
-
-            updateConnectionStatus(connected) {
-                const indicator = document.getElementById('connectionStatus');
-                if (connected) {
-                    indicator.style.background = 'var(--accent-success)';
-                    indicator.style.boxShadow = '0 0 10px var(--accent-success)';
-                } else {
-                    indicator.style.background = 'var(--accent-danger)';
-                    indicator.style.boxShadow = '0 0 10px var(--accent-danger)';
-                }
-            }
-
-            updateFleetStatus(data) {
-                const container = document.getElementById('fleetStatus');
-                let onlineCount = 0;
-                let connectedCount = 0;
-                
-                const html = Object.values(data).map(vm => {
-                    if (vm.online) onlineCount++;
-                    if (vm.window_active) connectedCount++;
-                    
-                    return `
-                        <div class="fleet-item">
-                            <div class="fleet-header">
-                                <div class="fleet-callsign">${vm.callsign}</div>
-                                <div class="fleet-status">
-                                    <span class="status-chip ${vm.online ? 'online' : 'offline'}">
-                                        ${vm.online ? 'ONLINE' : 'OFFLINE'}
-                                    </span>
-                                    ${vm.window_active ? '<span class="status-chip connected">CONNECTED</span>' : ''}
-                                </div>
-                            </div>
-                            <div class="fleet-details">
-                                ${vm.ip} • ${vm.geometry} • WS${vm.workspace} • ${vm.position.toUpperCase()}
-                            </div>
+    <!-- Edit Preset Modal -->
+    <div class="modal fade" id="editPresetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Resolution Preset</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPresetForm">
+                        <input type="hidden" id="editPresetKey">
+                        <div class="mb-3">
+                            <label for="editPresetName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="editPresetName" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="editPresetWidth" class="form-label">Width</label>
+                            <input type="number" class="form-control" id="editPresetWidth" min="640" max="7680" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPresetHeight" class="form-label">Height</label>
+                            <input type="number" class="form-control" id="editPresetHeight" min="480" max="4320" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPresetDescription" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="editPresetDescription">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="savePresetEdit()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let machines = [];
+        let presets = {};
+        let connectModal;
+        let currentMachineForConnect = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            connectModal = new bootstrap.Modal(document.getElementById('connectModal'));
+            loadMachines();
+            loadPresets();
+            
+            // Set up form submission
+            document.getElementById('presetForm').addEventListener('submit', addPreset);
+            
+            // Auto-refresh machines every 30 seconds
+            setInterval(loadMachines, 30000);
+
+            // Set up connection type change handler
+            document.querySelectorAll('input[name="connectionType"]').forEach(radio => {
+                radio.addEventListener('change', updateConnectionTypeUI);
+            });
+        });
+
+        // Update UI based on connection type
+        function updateConnectionTypeUI() {
+            const connectionType = document.querySelector('input[name="connectionType"]:checked').value;
+            const resolutionSelector = document.getElementById('resolutionSelector');
+            const resolutionNote = document.getElementById('resolutionNote');
+            const clientInfo = document.getElementById('clientInfo');
+            
+            if (connectionType === 'ssh') {
+                resolutionSelector.style.display = 'none';
+                clientInfo.textContent = 'SSH: Kitty Terminal - Terminal session, no resolution needed';
+            } else if (connectionType === 'vnc') {
+                resolutionSelector.style.display = 'none';
+                clientInfo.textContent = 'VNC: Remmina - Uses automatic resolution detection';
+            } else if (connectionType === 'rdp') {
+                resolutionSelector.style.display = 'block';
+                resolutionNote.textContent = 'Select resolution for RDP connection to Windows machine';
+                clientInfo.textContent = 'RDP: xfreerdp - Windows desktop connection with custom resolution';
+            }
+        }
+
+        // Load machines from API
+        async function loadMachines() {
+            try {
+                const response = await fetch('/api/machines');
+                const data = await response.json();
+                
+                if (data.success) {
+                    machines = data.machines;
+                    updateMachinesTable();
+                    updateLastScan(data.last_scan);
+                } else {
+                    console.error('Failed to load machines');
+                }
+            } catch (error) {
+                console.error('Error loading machines:', error);
+            }
+        }
+
+        // Load presets from API
+        async function loadPresets() {
+            try {
+                const response = await fetch('/api/presets');
+                const data = await response.json();
+                
+                if (data.success) {
+                    presets = data.presets;
+                    updatePresetsTable();
+                    updateResolutionSelect();
+                } else {
+                    console.error('Failed to load presets');
+                }
+            } catch (error) {
+                console.error('Error loading presets:', error);
+            }
+        }
+
+        // Update machines table
+        function updateMachinesTable() {
+            const tbody = document.getElementById('machinesBody');
+            
+            if (machines.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No machines with RDP/VNC/SSH found on network
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = machines.map(machine => {
+                const statusIcon = machine.online ? 
+                    '<i class="fas fa-circle status-online"></i> Online' : 
+                    '<i class="fas fa-circle status-offline"></i> Offline';
+                
+                // Build services badges
+                const services = [];
+                if (machine.rdp_enabled) {
+                    services.push('<span class="badge service-rdp">RDP</span>');
+                }
+                if (machine.vnc_enabled) {
+                    services.push('<span class="badge service-vnc">VNC</span>');
+                }
+                if (machine.ssh_enabled) {
+                    services.push('<span class="badge service-ssh">SSH</span>');
+                }
+                const servicesHtml = services.join(' ');
+                
+                const connectionStatus = machine.connected ? 
+                    `<i class="fas fa-link status-connected"></i> Connected (${machine.connection_type?.toUpperCase()})` : 
+                    '<i class="fas fa-unlink text-muted"></i> Disconnected';
+                
+                // Build action buttons
+                let actionButtons = '';
+                if (machine.connected) {
+                    actionButtons = `
+                        <button class="btn btn-sm btn-danger" onclick="disconnect('${machine.ip}')">
+                            <i class="fas fa-times"></i> Disconnect
+                        </button>
                     `;
-                }).join('');
-
-                container.innerHTML = html;
-                document.getElementById('onlineCount').textContent = onlineCount;
-                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
-                
-                // Log significant fleet status changes
-                if (this.lastOnlineCount !== undefined && this.lastOnlineCount !== onlineCount) {
-                    if (onlineCount > this.lastOnlineCount) {
-                        this.addLog(`Fleet status: ${onlineCount} VMs online (+${onlineCount - this.lastOnlineCount})`, 'SUCCESS');
-                    } else {
-                        this.addLog(`Fleet status: ${onlineCount} VMs online (-${this.lastOnlineCount - onlineCount})`, 'WARNING');
+                } else {
+                    const buttons = [];
+                    if (machine.rdp_enabled) {
+                        buttons.push(`
+                            <button class="btn btn-sm btn-primary" onclick="showConnectModal('${machine.ip}', 'rdp')" 
+                                ${!machine.online ? 'disabled' : ''} title="Connect via RDP (Windows)">
+                                <i class="fas fa-desktop"></i> RDP
+                            </button>
+                        `);
                     }
+                    if (machine.vnc_enabled) {
+                        buttons.push(`
+                            <button class="btn btn-sm btn-warning" onclick="showConnectModal('${machine.ip}', 'vnc')" 
+                                ${!machine.online ? 'disabled' : ''} title="Connect via VNC (Ubuntu Desktop)">
+                                <i class="fas fa-eye"></i> VNC
+                            </button>
+                        `);
+                    }
+                    if (machine.ssh_enabled) {
+                        buttons.push(`
+                            <button class="btn btn-sm btn-success" onclick="showConnectModal('${machine.ip}', 'ssh')" 
+                                ${!machine.online ? 'disabled' : ''} title="Connect via SSH (Terminal)">
+                                <i class="fas fa-terminal"></i> SSH
+                            </button>
+                        `);
+                    }
+                    actionButtons = `<div class="connection-buttons">${buttons.join('')}</div>`;
                 }
                 
-                if (this.lastConnectedCount !== undefined && this.lastConnectedCount !== connectedCount) {
-                    if (connectedCount > this.lastConnectedCount) {
-                        this.addLog(`RDP connections: ${connectedCount} active (+${connectedCount - this.lastConnectedCount})`, 'INFO');
-                    } else if (connectedCount < this.lastConnectedCount) {
-                        this.addLog(`RDP connections: ${connectedCount} active (-${this.lastConnectedCount - connectedCount})`, 'INFO');
-                    }
-                }
-                
-                this.lastOnlineCount = onlineCount;
-                this.lastConnectedCount = connectedCount;
-            }
+                const rowClass = machine.connected ? 'connected' : '';
 
-            async updateActiveConnections() {
-                try {
-                    const response = await fetch('/api/rdp/connections');
-                    const connections = await response.json();
-                    
-                    const container = document.getElementById('activeConnections');
-                    const count = Object.keys(connections).length;
-                    
-                    if (count === 0) {
-                        container.innerHTML = '<div class="text-muted">No active connections</div>';
-                    } else {
-                        const html = Object.entries(connections).map(([id, conn]) => `
-                            <div class="connection-item">
-                                <div class="connection-info">
-                                    <h4>${conn.ip}</h4>
-                                    <div class="connection-meta">
-                                        ${conn.username} • ${conn.geometry} • WS${conn.workspace} • ${conn.duration}
-                                    </div>
-                                </div>
-                                <button class="btn btn-danger btn-sm" onclick="killConnection('${id}')">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        `).join('');
-                        container.innerHTML = html;
-                    }
-                    
-                    document.getElementById('connectionCount').textContent = count;
-                } catch (error) {
-                    console.error('Failed to update connections:', error);
-                }
-            }
-
-            showNotification(message, type = 'success') {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                
-                const icon = type === 'success' ? 'check-circle' : 
-                           type === 'error' ? 'exclamation-circle' : 
-                           type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-                
-                notification.innerHTML = `
-                    <i class="fas fa-${icon}" style="margin-right: 8px;"></i>
-                    ${message}
+                return `
+                    <tr class="machine-row ${rowClass}">
+                        <td><strong>${machine.ip}</strong></td>
+                        <td>${machine.hostname}</td>
+                        <td>
+                            ${machine.os_version}
+                        </td>
+                        <td>${statusIcon}</td>
+                        <td>${servicesHtml}</td>
+                        <td>${connectionStatus}</td>
+                        <td>${actionButtons}</td>
+                    </tr>
                 `;
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => notification.classList.add('show'), 100);
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => document.body.removeChild(notification), 300);
-                }, 4000);
-            }
-
-            async makeRequest(url, options = {}) {
-                try {
-                    const response = await fetch(url, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...options.headers
-                        },
-                        ...options
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-
-                    return await response.json();
-                } catch (error) {
-                    this.showNotification(`Request failed: ${error.message}`, 'error');
-                    throw error;
-                }
-            }
-
-            addLog(message, level = 'INFO', timestamp = null) {
-                const container = document.getElementById('logPanel');
-                const logItem = document.createElement('div');
-                const time = timestamp ? new Date(timestamp) : new Date();
-                const timeStr = time.toLocaleTimeString();
-                
-                logItem.className = `log-item log-${level.toLowerCase()}`;
-                logItem.innerHTML = `
-                    <span class="log-timestamp">${timeStr}</span>
-                    <span class="log-level ${level.toUpperCase()}">${level.toUpperCase()}</span>
-                    <span class="log-message">${message}</span>
-                `;
-                
-                container.appendChild(logItem);
-                
-                // Auto-scroll to bottom
-                container.scrollTop = container.scrollHeight;
-                
-                // Keep only last 100 log entries for performance
-                const logItems = container.children;
-                if (logItems.length > 100) {
-                    container.removeChild(logItems[0]);
-                }
-            }
-
-            clearLogs() {
-                const container = document.getElementById('logPanel');
-                container.innerHTML = '';
-                this.addLog('Logs cleared by user', 'INFO');
-            }
+            }).join('');
         }
 
-        // Global functions for UI interactions
-        function toggleCustomResolution() {
-            const geometrySelect = document.getElementById('rdpGeometry');
-            const customGroup = document.getElementById('customResolutionGroup');
+        // Update presets table
+        function updatePresetsTable() {
+            const tbody = document.getElementById('presetsBody');
             
-            if (geometrySelect.value === 'custom') {
-                customGroup.style.display = 'block';
-                customGroup.classList.add('show');
-                // Focus on width input for quick entry
-                setTimeout(() => document.getElementById('customWidth').focus(), 150);
-                app.addLog('Custom resolution mode enabled', 'INFO');
-            } else {
-                customGroup.classList.remove('show');
-                setTimeout(() => {
-                    customGroup.style.display = 'none';
-                }, 300); // Match animation duration
-                app.addLog('Standard resolution selected', 'INFO');
-            }
-        }
-
-        async function spawnRDP() {
-            const ip = document.getElementById('rdpIp').value.trim();
-            const username = document.getElementById('rdpUsername').value.trim();
-            const password = document.getElementById('rdpPassword').value.trim();
-            let geometry = document.getElementById('rdpGeometry').value;
-            const workspace = parseInt(document.getElementById('rdpWorkspace').value);
-
-            // Handle custom resolution
-            if (geometry === 'custom') {
-                const customWidth = parseInt(document.getElementById('customWidth').value);
-                const customHeight = parseInt(document.getElementById('customHeight').value);
-                
-                if (!customWidth || !customHeight || customWidth < 640 || customHeight < 480) {
-                    app.showNotification('Invalid custom resolution. Please enter valid width×height (min 640×480)', 'error');
-                    app.addLog('RDP deployment failed: Invalid custom resolution specified', 'ERROR');
-                    return;
-                }
-                
-                if (customWidth > 3840 || customHeight > 2160) {
-                    app.showNotification('Custom resolution too large. Maximum supported: 3840×2160', 'warning');
-                    app.addLog('RDP deployment failed: Custom resolution exceeds maximum supported size', 'WARNING');
-                    return;
-                }
-                
-                geometry = `${customWidth}x${customHeight}`;
-                app.addLog(`Using custom resolution: ${geometry}`, 'INFO');
-            }
-
-            if (!ip) {
-                app.showNotification('Please enter target IP address', 'warning');
-                app.addLog('RDP deployment failed: No IP address provided', 'WARNING');
-                return;
-            }
-
-            if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
-                app.showNotification('Invalid IP address format', 'error');
-                app.addLog(`RDP deployment failed: Invalid IP format (${ip})`, 'ERROR');
-                return;
-            }
-
-            if (!username) {
-                app.showNotification('Please enter username', 'warning');
-                app.addLog('RDP deployment failed: No username provided', 'WARNING');
-                return;
-            }
-
-            if (!password) {
-                app.showNotification('Please enter password', 'warning');
-                app.addLog('RDP deployment failed: No password provided', 'WARNING');
-                return;
-            }
-
-            try {
-                // Determine geometry type for logging
-                let geometryDisplay = geometry;
-                if (geometry.startsWith('auto-ws')) {
-                    const autoWs = geometry.replace('auto-ws', '');
-                    geometryDisplay = `Auto-Detect WS${autoWs}`;
-                } else if (document.getElementById('rdpGeometry').value === 'custom') {
-                    geometryDisplay = `Custom ${geometry}`;
-                }
-                
-                app.addLog(`Deploying RDP connection to ${ip} (${username}, ${geometryDisplay}, WS${workspace})`, 'INFO');
-                
-                const result = await app.makeRequest('/api/rdp/spawn', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        ip,
-                        username,
-                        password,
-                        geometry,
-                        workspace,
-                        position: 'center',
-                        clipboard: true
-                    })
-                });
-
-                if (result.success) {
-                    app.showNotification(`RDP deployed to ${ip} successfully`, 'success');
-                    app.addLog(`RDP connection to ${ip} deployed successfully (ID: ${result.connection_id})`, 'SUCCESS');
-                    app.updateActiveConnections();
-                } else {
-                    app.showNotification(`Deployment failed: ${result.error}`, 'error');
-                    app.addLog(`RDP deployment to ${ip} failed: ${result.error}`, 'ERROR');
-                }
-            } catch (error) {
-                console.error('RDP deployment error:', error);
-                app.addLog(`RDP deployment to ${ip} failed: ${error.message}`, 'ERROR');
-            }
-        }
-
-        function setPreset(ip, username, password, name) {
-            document.getElementById('rdpIp').value = ip;
-            document.getElementById('rdpUsername').value = username;
-            document.getElementById('rdpPassword').value = password;
-            app.showNotification(`${name} target selected (${ip})`, 'success');
-            app.addLog(`Fleet preset selected: ${name} (${ip})`, 'INFO');
-        }
-
-        async function killConnection(connectionId) {
-            try {
-                app.addLog(`Terminating connection: ${connectionId}`, 'INFO');
-                
-                const result = await app.makeRequest(`/api/rdp/connection/${connectionId}/kill`, {
-                    method: 'POST'
-                });
-
-                if (result.success) {
-                    app.showNotification('Connection terminated successfully', 'success');
-                    app.addLog(`Connection ${connectionId} terminated successfully`, 'SUCCESS');
-                    app.updateActiveConnections();
-                } else {
-                    app.showNotification(`Termination failed: ${result.error}`, 'error');
-                    app.addLog(`Failed to terminate connection ${connectionId}: ${result.error}`, 'ERROR');
-                }
-            } catch (error) {
-                console.error('Connection termination error:', error);
-                app.addLog(`Connection termination failed: ${error.message}`, 'ERROR');
-            }
-        }
-
-        async function executeFleetCommand(command) {
-            try {
-                app.showNotification(`Executing fleet command: ${command.toUpperCase()}`, 'success');
-                app.addLog(`Executing fleet command: ${command}`, 'INFO');
-                
-                const result = await app.makeRequest(`/api/fleet/${command}`, {
-                    method: 'POST'
-                });
-
-                if (result.success) {
-                    app.showNotification(`Fleet command '${command}' executed successfully`, 'success');
-                    app.addLog(`Fleet command '${command}' completed successfully`, 'SUCCESS');
-                    if (result.output) {
-                        app.addLog(`Command output: ${result.output.trim()}`, 'DEBUG');
-                    }
-                } else {
-                    app.showNotification(`Fleet command failed: ${result.error}`, 'error');
-                    app.addLog(`Fleet command '${command}' failed: ${result.error}`, 'ERROR');
-                }
-            } catch (error) {
-                console.error('Fleet command error:', error);
-                app.addLog(`Fleet command '${command}' failed: ${error.message}`, 'ERROR');
-            }
-        }
-
-        function clearLogs() {
-            app.clearLogs();
-        }
-
-        // Workspace Manager Functions
-        let currentSizePreset = 'full';
-        let workspaceState = {};
-
-        async function refreshWorkspaceState() {
-            try {
-                app.addLog('Refreshing workspace state...', 'INFO');
-                const result = await app.makeRequest('/api/workspaces/state');
-                
-                if (result.success) {
-                    workspaceState = result.workspaces;
-                    updateWorkspaceVisual();
-                    updateAvailableVMs();
-                    app.addLog('Workspace state refreshed successfully', 'SUCCESS');
-                } else {
-                    app.addLog(`Failed to refresh workspace state: ${result.error}`, 'ERROR');
-                }
-            } catch (error) {
-                console.error('Error refreshing workspace state:', error);
-                app.addLog(`Error refreshing workspace state: ${error.message}`, 'ERROR');
-            }
-        }
-
-        function updateWorkspaceVisual() {
-            // Update workspace indicators and VM assignments
-            for (let wsId = 1; wsId <= 5; wsId++) {
-                const workspaceItem = document.querySelector(`[data-workspace="${wsId}"]`);
-                const workspace = workspaceState.workspaces && workspaceState.workspaces[wsId];
-                
-                if (workspaceItem && workspace) {
-                    // Update status indicator
-                    const statusIndicator = workspaceItem.querySelector('.status-indicator');
-                    statusIndicator.className = `status-indicator ${workspace.active ? 'active' : 'inactive'}`;
-                    
-                    // Update resolution info
-                    const resolutionInfo = workspaceItem.querySelector('.resolution-info');
-                    if (workspace.resolution) {
-                        resolutionInfo.textContent = `${workspace.resolution[0]}×${workspace.resolution[1]}`;
-                    }
-                    
-                    // Update VM slots
-                    const vmSlots = workspaceItem.querySelector('.vm-slots');
-                    vmSlots.innerHTML = '';
-                    
-                    if (workspace.windows && workspace.windows.length > 0) {
-                        workspace.windows.forEach(window => {
-                            if (window.vm_info) {
-                                const vmSlot = createVMSlot(window.vm_info);
-                                vmSlots.appendChild(vmSlot);
-                            }
-                        });
-                    } else {
-                        const emptySlot = createEmptySlot();
-                        vmSlots.appendChild(emptySlot);
-                    }
-                }
-            }
-            
-            // Update scratchpad
-            const scratchpadItem = document.querySelector('[data-workspace="special"]');
-            if (scratchpadItem && workspaceState.scratchpad) {
-                const statusIndicator = scratchpadItem.querySelector('.scratchpad-status');
-                statusIndicator.className = `status-indicator scratchpad-status ${workspaceState.scratchpad.visible ? 'visible' : 'hidden'}`;
-                
-                const vmSlots = scratchpadItem.querySelector('.scratchpad-slots');
-                vmSlots.innerHTML = '';
-                
-                if (workspaceState.scratchpad.windows && workspaceState.scratchpad.windows.length > 0) {
-                    workspaceState.scratchpad.windows.forEach(window => {
-                        if (window.vm_info) {
-                            const vmSlot = createVMSlot(window.vm_info);
-                            vmSlots.appendChild(vmSlot);
-                        }
-                    });
-                } else {
-                    const emptySlot = createEmptySlot('scratchpad-slot');
-                    vmSlots.appendChild(emptySlot);
-                }
-            }
-        }
-
-        function createVMSlot(vmInfo) {
-            const slot = document.createElement('div');
-            slot.className = 'vm-slot occupied';
-            slot.innerHTML = `
-                <div class="vm-info">
-                    <div class="vm-ip">${vmInfo.ip}</div>
-                    <div class="vm-size">${vmInfo.size.width}×${vmInfo.size.height}</div>
-                    <div class="vm-actions">
-                        <button class="btn-tiny" onclick="resizeVM('${vmInfo.ip}')" title="Resize">
-                            <i class="fas fa-expand-arrows-alt"></i>
+            tbody.innerHTML = Object.entries(presets).map(([key, preset]) => `
+                <tr>
+                    <td><strong>${preset.name}</strong></td>
+                    <td>${preset.width} × ${preset.height}</td>
+                    <td>${preset.description || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editPreset('${key}')">
+                            <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn-tiny danger" onclick="closeVM('${vmInfo.ip}')" title="Close">
-                            <i class="fas fa-times"></i>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deletePreset('${key}')">
+                            <i class="fas fa-trash"></i>
                         </button>
-                    </div>
-                </div>
-            `;
-            return slot;
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        function createEmptySlot(additionalClass = '') {
-            const slot = document.createElement('div');
-            slot.className = `vm-slot empty ${additionalClass}`;
-            slot.setAttribute('ondrop', 'dropVM(event)');
-            slot.setAttribute('ondragover', 'allowDrop(event)');
-            slot.innerHTML = `
-                <div class="slot-placeholder">
-                    <i class="fas fa-plus"></i>
-                    <span>Drop VM here</span>
-                </div>
-            `;
-            return slot;
+        // Update resolution select options
+        function updateResolutionSelect() {
+            const select = document.getElementById('connectionResolution');
+            select.innerHTML = Object.entries(presets).map(([key, preset]) => 
+                `<option value="${key}">${preset.name} (${preset.width}×${preset.height})</option>`
+            ).join('');
         }
 
-        async function updateAvailableVMs() {
-            try {
-                const fleetData = await app.makeRequest('/api/fleet/status');
-                const container = document.getElementById('availableVMs');
-                
-                if (fleetData.success && fleetData.fleet) {
-                    container.innerHTML = '';
-                    
-                    fleetData.fleet.forEach(vm => {
-                        const vmElement = createDraggableVM(vm);
-                        container.appendChild(vmElement);
-                    });
-                }
-            } catch (error) {
-                console.error('Error updating available VMs:', error);
+        // Update last scan time
+        function updateLastScan(timestamp) {
+            const element = document.getElementById('lastScan');
+            if (timestamp) {
+                const date = new Date(timestamp);
+                element.textContent = `Last scan: ${date.toLocaleTimeString()}`;
             }
         }
 
-        function createDraggableVM(vm) {
-            const element = document.createElement('div');
-            element.className = `draggable-vm ${vm.status.toLowerCase()}`;
-            element.draggable = true;
-            element.setAttribute('data-vm-ip', vm.ip);
-            element.setAttribute('data-connected', vm.connected || false);
+        // Refresh machines scan
+        async function refreshMachines() {
+            const button = event.target;
+            const originalText = button.innerHTML;
             
-            // Add connection status indicator
-            const connectionStatus = vm.connected ? 'connected' : 'disconnected';
-            const connectionIcon = vm.connected ? 'fa-link' : 'fa-unlink';
-            const connectionColor = vm.connected ? 'var(--accent-success)' : 'var(--text-muted)';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+            button.disabled = true;
             
-            element.innerHTML = `
-                <div class="vm-icon">
-                    <i class="fas fa-server"></i>
-                </div>
-                <div class="vm-details">
-                    <div class="vm-name">${vm.callsign}</div>
-                    <div class="vm-ip">${vm.ip}</div>
-                    <div class="vm-status ${vm.status.toLowerCase()}">${vm.status}</div>
-                    <div class="vm-connection-status ${connectionStatus}" style="color: ${connectionColor}">
-                        <i class="fas ${connectionIcon}"></i>
-                        ${vm.connected ? 'Connected' : 'Click to connect'}
-                    </div>
-                </div>
-            `;
-            
-            element.addEventListener('dragstart', (e) => {
-                element.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', vm.ip);
-                e.dataTransfer.setData('application/json', JSON.stringify(vm));
-                app.addLog(`Dragging ${vm.callsign} (${vm.ip}) - ${vm.connected ? 'will reposition' : 'will connect and position'}`, 'INFO');
-            });
-            
-            element.addEventListener('dragend', (e) => {
-                element.classList.remove('dragging');
-            });
-            
-            return element;
-        }
-
-        function allowDrop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.add('drag-over');
-        }
-
-        function dropVM(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.remove('drag-over');
-            
-            const vmIp = ev.dataTransfer.getData('text/plain');
-            const vmDataJson = ev.dataTransfer.getData('application/json');
-            const workspaceElement = ev.currentTarget.closest('[data-workspace]');
-            const workspace = workspaceElement.getAttribute('data-workspace');
-            const isSpecial = workspaceElement.getAttribute('data-type') === 'scratchpad';
-            
-            if (vmIp && workspace) {
-                // Parse VM data if available
-                let vmData = null;
-                try {
-                    vmData = JSON.parse(vmDataJson);
-                } catch (e) {
-                    // Fallback if JSON parsing fails
-                    vmData = { ip: vmIp };
-                }
-                
-                assignVMToWorkspace(vmIp, workspace, isSpecial, vmData);
-            }
-        }
-
-        async function assignVMToWorkspace(vmIp, workspace, useScratchpad, vmData = null) {
             try {
-                app.addLog(`Deploying VM ${vmIp} to ${useScratchpad ? 'scratchpad' : `workspace ${workspace}`}`, 'INFO');
-                app.showNotification(`Deploying ${vmIp}...`, 'success');
-                
-                // First, check if an RDP connection already exists for this VM
-                const connections = await app.makeRequest('/api/rdp/connections');
-                const existingConnection = Object.values(connections).find(conn => conn.ip === vmIp);
-                
-                if (existingConnection) {
-                    // Connection exists, just position it
-                    app.addLog(`RDP connection to ${vmIp} already exists, positioning window`, 'INFO');
-                    await positionExistingConnection(vmIp, workspace, useScratchpad);
-                } else {
-                    // No connection exists, spawn one first
-                    app.addLog(`No RDP connection to ${vmIp}, spawning new connection`, 'INFO');
-                    await spawnAndPositionVM(vmIp, workspace, useScratchpad, vmData);
-                }
-                
-            } catch (error) {
-                console.error('Error assigning VM to workspace:', error);
-                app.addLog(`Error deploying VM ${vmIp}: ${error.message}`, 'ERROR');
-                app.showNotification(`Failed to deploy ${vmIp}: ${error.message}`, 'error');
-            }
-        }
-
-        async function positionExistingConnection(vmIp, workspace, useScratchpad) {
-            try {
-                const result = await app.makeRequest('/api/workspaces/assign', {
+                const response = await fetch('/api/machines/refresh', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        vm_ip: vmIp,
-                        workspace: parseInt(workspace),
-                        size_preset: currentSizePreset,
-                        position: 'center',
-                        use_scratchpad: useScratchpad
-                    })
+                    headers: { 'Content-Type': 'application/json' }
                 });
+                
+                if (response.ok) {
+                    // Wait a bit for scan to start, then refresh
+                    setTimeout(loadMachines, 2000);
+                }
+            } catch (error) {
+                console.error('Error refreshing machines:', error);
+            } finally {
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 3000);
+            }
+        }
 
+        // Show connect modal
+        function showConnectModal(ip, preferredType = 'rdp') {
+            document.getElementById('connectionIP').value = ip;
+            currentMachineForConnect = machines.find(m => m.ip === ip);
+            
+            // Set up connection type radio buttons based on available services
+            const rdpRadio = document.getElementById('rdpType');
+            const vncRadio = document.getElementById('vncType');
+            const sshRadio = document.getElementById('sshType');
+            const rdpLabel = document.querySelector('label[for="rdpType"]');
+            const vncLabel = document.querySelector('label[for="vncType"]');
+            const sshLabel = document.querySelector('label[for="sshType"]');
+            
+            if (currentMachineForConnect) {
+                rdpRadio.disabled = !currentMachineForConnect.rdp_enabled;
+                vncRadio.disabled = !currentMachineForConnect.vnc_enabled;
+                sshRadio.disabled = !currentMachineForConnect.ssh_enabled;
+                
+                // Update label classes
+                rdpLabel.classList.toggle('disabled', !currentMachineForConnect.rdp_enabled);
+                vncLabel.classList.toggle('disabled', !currentMachineForConnect.vnc_enabled);
+                sshLabel.classList.toggle('disabled', !currentMachineForConnect.ssh_enabled);
+                
+                // Set preferred type if available
+                if (preferredType === 'rdp' && currentMachineForConnect.rdp_enabled) {
+                    rdpRadio.checked = true;
+                } else if (preferredType === 'vnc' && currentMachineForConnect.vnc_enabled) {
+                    vncRadio.checked = true;
+                } else if (preferredType === 'ssh' && currentMachineForConnect.ssh_enabled) {
+                    sshRadio.checked = true;
+                } else {
+                    // Default to first available option
+                    if (currentMachineForConnect.rdp_enabled) {
+                        rdpRadio.checked = true;
+                    } else if (currentMachineForConnect.vnc_enabled) {
+                        vncRadio.checked = true;
+                    } else if (currentMachineForConnect.ssh_enabled) {
+                        sshRadio.checked = true;
+                    }
+                }
+            }
+            
+            // Update UI based on selection
+            updateConnectionTypeUI();
+            connectModal.show();
+        }
+
+        // Connect to RDP/VNC/SSH
+        async function doConnect() {
+            const ip = document.getElementById('connectionIP').value;
+            const connectionType = document.querySelector('input[name="connectionType"]:checked').value;
+            const resolution = connectionType !== 'ssh' ? document.getElementById('connectionResolution').value : 'terminal';
+            
+            try {
+                const response = await fetch('/api/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip, connection_type: connectionType, resolution })
+                });
+                
+                const result = await response.json();
+                
                 if (result.success) {
-                    app.showNotification(result.message, 'success');
-                    app.addLog(result.message, 'SUCCESS');
-                    refreshWorkspaceState();
+                    connectModal.hide();
+                    showAlert('success', `Connected to ${ip} via ${connectionType.toUpperCase()}`);
+                    loadMachines(); // Refresh table
                 } else {
-                    app.showNotification(`Failed to position VM: ${result.error}`, 'error');
-                    app.addLog(`Failed to position VM ${vmIp}: ${result.error}`, 'ERROR');
+                    showAlert('danger', result.error || 'Connection failed');
                 }
             } catch (error) {
-                throw error;
+                showAlert('danger', 'Connection error: ' + error.message);
             }
         }
 
-        async function spawnAndPositionVM(vmIp, workspace, useScratchpad, vmData) {
+        // Disconnect from session
+        async function disconnect(ip) {
             try {
-                // Get VM configuration from fleet data to get credentials
-                const fleetData = await app.makeRequest('/api/fleet/status');
-                let vmConfig = null;
-                
-                if (fleetData.success && fleetData.fleet) {
-                    vmConfig = fleetData.fleet.find(vm => vm.ip === vmIp);
-                }
-                
-                if (!vmConfig) {
-                    throw new Error(`VM configuration not found for ${vmIp}`);
-                }
-                
-                // Prepare RDP spawn parameters
-                const rdpParams = {
-                    ip: vmIp,
-                    username: vmIp.includes('192.168.1.23') || vmIp.includes('192.168.1.25') || vmIp.includes('192.168.1.26') ? 'User' : 'nz7dev',
-                    password: 'lemonlime',
-                    geometry: 'auto-ws' + workspace, // Use auto-detect for the target workspace
-                    workspace: parseInt(workspace),
-                    position: 'center',
-                    clipboard: true
-                };
-                
-                app.addLog(`Spawning RDP connection to ${vmIp} with auto-positioning`, 'INFO');
-                
-                // Spawn RDP connection
-                const spawnResult = await app.makeRequest('/api/rdp/spawn', {
+                const response = await fetch('/api/disconnect', {
                     method: 'POST',
-                    body: JSON.stringify(rdpParams)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip })
                 });
-
-                if (spawnResult.success) {
-                    app.addLog(`RDP connection to ${vmIp} spawned successfully`, 'SUCCESS');
-                    
-                    // Wait a moment for the connection to establish and window to appear
-                    app.showNotification(`Connecting to ${vmIp}... positioning window`, 'success');
-                    
-                    // Wait for window to appear, then position it
-                    setTimeout(async () => {
-                        try {
-                            await positionExistingConnection(vmIp, workspace, useScratchpad);
-                            app.showNotification(`${vmIp} deployed successfully!`, 'success');
-                        } catch (error) {
-                            app.addLog(`Failed to position window after spawn: ${error.message}`, 'WARNING');
-                            app.showNotification(`${vmIp} connected but positioning failed - window may need manual positioning`, 'warning');
-                        }
-                    }, 5000); // Wait 5 seconds for RDP to establish
-                    
-                } else {
-                    throw new Error(spawnResult.error || 'Failed to spawn RDP connection');
-                }
                 
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', `Disconnected from ${ip}`);
+                    loadMachines(); // Refresh table
+                } else {
+                    showAlert('danger', result.error || 'Disconnect failed');
+                }
             } catch (error) {
-                throw error;
+                showAlert('danger', 'Disconnect error: ' + error.message);
             }
         }
 
-        async function resizeVM(vmIp) {
-            // Show size preset selection modal
-            const preset = prompt('Select size preset:\nfull, half-left, half-right, quarter, third, two-thirds', currentSizePreset);
+        // Add preset
+        async function addPreset(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('presetName').value.trim();
+            const width = parseInt(document.getElementById('presetWidth').value);
+            const height = parseInt(document.getElementById('presetHeight').value);
+            const description = document.getElementById('presetDescription').value.trim();
+            
+            // Validation
+            if (!name || name.length < 1) {
+                showAlert('danger', 'Please enter a valid preset name');
+                return;
+            }
+            
+            if (width < 640 || width > 7680) {
+                showAlert('danger', 'Width must be between 640 and 7680 pixels');
+                return;
+            }
+            
+            if (height < 480 || height > 4320) {
+                showAlert('danger', 'Height must be between 480 and 4320 pixels');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/presets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, width, height, description })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Preset added successfully');
+                    document.getElementById('presetForm').reset();
+                    loadPresets();
+                } else {
+                    showAlert('danger', 'Failed to add preset');
+                }
+            } catch (error) {
+                showAlert('danger', 'Error adding preset: ' + error.message);
+            }
+        }
+
+        // Edit preset
+        function editPreset(key) {
+            const preset = presets[key];
             if (preset) {
-                currentSizePreset = preset;
-                // Re-assign with new size
-                const currentWorkspace = findVMWorkspace(vmIp);
-                if (currentWorkspace) {
-                    assignVMToWorkspace(vmIp, currentWorkspace.workspace, currentWorkspace.isScratchpad);
-                }
+                document.getElementById('editPresetKey').value = key;
+                document.getElementById('editPresetName').value = preset.name;
+                document.getElementById('editPresetWidth').value = preset.width;
+                document.getElementById('editPresetHeight').value = preset.height;
+                document.getElementById('editPresetDescription').value = preset.description || '';
+                new bootstrap.Modal(document.getElementById('editPresetModal')).show();
             }
         }
 
-        async function closeVM(vmIp) {
-            if (confirm(`Close RDP connection to ${vmIp}?`)) {
-                try {
-                    const result = await app.makeRequest(`/api/rdp/connection/ip/${vmIp}/kill`, {
-                        method: 'POST'
-                    });
-                    
-                    if (result.success) {
-                        app.showNotification(`RDP connection to ${vmIp} closed`, 'success');
-                        refreshWorkspaceState();
-                    } else {
-                        app.showNotification(`Failed to close connection: ${result.error}`, 'error');
-                    }
-                } catch (error) {
-                    app.addLog(`Error closing VM ${vmIp}: ${error.message}`, 'ERROR');
-                }
-            }
-        }
+        // Save edited preset
+        async function savePresetEdit() {
+            const key = document.getElementById('editPresetKey').value;
+            const name = document.getElementById('editPresetName').value.trim();
+            const width = parseInt(document.getElementById('editPresetWidth').value);
+            const height = parseInt(document.getElementById('editPresetHeight').value);
+            const description = document.getElementById('editPresetDescription').value.trim();
 
-        function findVMWorkspace(vmIp) {
-            // Search in workspaces
-            for (let wsId = 1; wsId <= 5; wsId++) {
-                const workspace = workspaceState.workspaces && workspaceState.workspaces[wsId];
-                if (workspace && workspace.windows) {
-                    const found = workspace.windows.find(w => w.vm_info && w.vm_info.ip === vmIp);
-                    if (found) {
-                        return { workspace: wsId, isScratchpad: false };
-                    }
-                }
+            // Validation
+            if (!name || name.length < 1) {
+                showAlert('danger', 'Please enter a valid preset name');
+                return;
             }
             
-            // Search in scratchpad
-            if (workspaceState.scratchpad && workspaceState.scratchpad.windows) {
-                const found = workspaceState.scratchpad.windows.find(w => w.vm_info && w.vm_info.ip === vmIp);
-                if (found) {
-                    return { workspace: 'special', isScratchpad: true };
-                }
+            if (width < 640 || width > 7680) {
+                showAlert('danger', 'Width must be between 640 and 7680 pixels');
+                return;
             }
             
-            return null;
-        }
+            if (height < 480 || height > 4320) {
+                showAlert('danger', 'Height must be between 480 and 4320 pixels');
+                return;
+            }
 
-        async function toggleScratchpad() {
             try {
-                const result = await app.makeRequest('/api/hyprctl/dispatch', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        command: 'togglespecialworkspace'
-                    })
+                const response = await fetch(`/api/presets/${key}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, width, height, description })
                 });
+                
+                const result = await response.json();
                 
                 if (result.success) {
-                    app.addLog('Toggled scratchpad visibility', 'INFO');
-                    setTimeout(refreshWorkspaceState, 500); // Refresh after toggle
+                    showAlert('success', 'Preset updated successfully');
+                    loadPresets();
+                    new bootstrap.Modal(document.getElementById('editPresetModal')).hide();
+                } else {
+                    showAlert('danger', 'Failed to update preset');
                 }
             } catch (error) {
-                app.addLog(`Error toggling scratchpad: ${error.message}`, 'ERROR');
+                showAlert('danger', 'Error updating preset: ' + error.message);
             }
         }
 
-        function openWorkspaceSettings() {
-            document.getElementById('workspaceModal').style.display = 'block';
-        }
-
-        function closeWorkspaceModal() {
-            document.getElementById('workspaceModal').style.display = 'none';
-        }
-
-        async function assignAllVMsToWorkspaces() {
+        // Delete preset
+        async function deletePreset(key) {
+            if (!confirm('Are you sure you want to delete this preset?')) {
+                return;
+            }
+            
             try {
-                const fleetData = await app.makeRequest('/api/fleet/status');
-                if (fleetData.success && fleetData.fleet) {
-                    const assignments = [];
-                    
-                    fleetData.fleet.forEach((vm, index) => {
-                        if (vm.status === 'ONLINE') {
-                            const workspace = (index % 5) + 1; // Distribute across workspaces 1-5
-                            assignments.push({
-                                vm_ip: vm.ip,
-                                workspace: workspace,
-                                size_preset: 'full',
-                                position: 'center',
-                                use_scratchpad: false
-                            });
-                        }
-                    });
-                    
-                    const result = await app.makeRequest('/api/workspaces/batch-assign', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ assignments })
-                    });
-                    
-                    if (result.success) {
-                        app.showNotification(result.summary, 'success');
-                        refreshWorkspaceState();
-                        closeWorkspaceModal();
-                    } else {
-                        app.showNotification(`Batch assignment failed: ${result.error}`, 'error');
-                    }
+                const response = await fetch(`/api/presets/${key}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Preset deleted successfully');
+                    loadPresets();
+                } else {
+                    showAlert('danger', 'Failed to delete preset');
                 }
             } catch (error) {
-                app.addLog(`Error in auto-assign: ${error.message}`, 'ERROR');
+                showAlert('danger', 'Error deleting preset: ' + error.message);
             }
         }
 
-        async function clearAllWorkspaces() {
-            if (confirm('Clear all workspace assignments? This will not close connections, only remove workspace assignments.')) {
-                // Implementation would go here - moving all windows back to workspace 1
-                app.showNotification('Clear all workspaces not yet implemented', 'info');
-            }
-        }
-
-        function saveWorkspaceLayout() {
-            const layout = {
-                timestamp: Date.now(),
-                workspaces: workspaceState
-            };
-            localStorage.setItem('nz7dev_workspace_layout', JSON.stringify(layout));
-            app.showNotification('Workspace layout saved', 'success');
-            closeWorkspaceModal();
-        }
-
-        function loadWorkspaceLayout() {
-            const saved = localStorage.getItem('nz7dev_workspace_layout');
-            if (saved) {
-                try {
-                    const layout = JSON.parse(saved);
-                    app.showNotification(`Layout from ${new Date(layout.timestamp).toLocaleString()} loaded`, 'success');
-                    // Implementation would restore the layout
-                    closeWorkspaceModal();
-                } catch (error) {
-                    app.showNotification('Failed to load workspace layout', 'error');
-                }
-            } else {
-                app.showNotification('No saved layout found', 'info');
-            }
-        }
-
-        function saveWorkspaceSettings() {
-            const settings = {
-                defaultSizePreset: document.getElementById('defaultSizePreset').value,
-                refreshInterval: parseInt(document.getElementById('refreshInterval').value),
-                enableAutoPosition: document.getElementById('enableAutoPosition').checked
-            };
+        // Show alert
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
             
-            localStorage.setItem('nz7dev_workspace_settings', JSON.stringify(settings));
-            currentSizePreset = settings.defaultSizePreset;
+            document.body.insertBefore(alertDiv, document.body.firstChild);
             
-            app.showNotification('Workspace settings saved', 'success');
-            closeWorkspaceModal();
-        }
-
-        // Size preset selection
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Professional Application first
-            app = new MissionControlPro();
-            console.log('🚀 NZ7DEV Mission Control Professional Edition Initialized');
-            
-            // Initialize size preset selection
-            document.querySelectorAll('.preset-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.preset-item').forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                    currentSizePreset = item.getAttribute('data-preset');
-                    app.addLog(`Size preset selected: ${currentSizePreset}`, 'INFO');
-                });
-            });
-            
-            // Initialize VM filter buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    const filter = btn.getAttribute('data-filter');
-                    filterVMs(filter);
-                });
-            });
-            
-            // Load saved settings
-            const saved = localStorage.getItem('nz7dev_workspace_settings');
-            if (saved) {
-                try {
-                    const settings = JSON.parse(saved);
-                    currentSizePreset = settings.defaultSizePreset;
-                    document.getElementById('defaultSizePreset').value = settings.defaultSizePreset;
-                    document.getElementById('refreshInterval').value = settings.refreshInterval;
-                    document.getElementById('enableAutoPosition').checked = settings.enableAutoPosition;
-                } catch (error) {
-                    console.warn('Failed to load workspace settings:', error);
-                }
-            }
-            
-            // Initial workspace state load - now that app exists
             setTimeout(() => {
-                refreshWorkspaceState();
-            }, 1000); // Give app time to fully initialize
-            
-            // Auto-refresh workspace state
-            setInterval(refreshWorkspaceState, 10000); // Every 10 seconds
-        });
-
-        function filterVMs(filter) {
-            const vms = document.querySelectorAll('.draggable-vm');
-            vms.forEach(vm => {
-                const status = vm.querySelector('.vm-status').textContent.toLowerCase();
-                const isConnected = vm.getAttribute('data-connected') === 'true';
-                
-                let show = true;
-                switch (filter) {
-                    case 'online':
-                        show = status === 'online';
-                        break;
-                    case 'offline':
-                        show = status === 'offline';
-                        break;
-                    case 'connected':
-                        show = isConnected;
-                        break;
-                    case 'all':
-                    default:
-                        show = true;
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
                 }
-                
-                vm.style.display = show ? 'flex' : 'none';
-            });
+            }, 5000);
         }
-
-        // Initialize Professional Application
-        let app;
-        document.addEventListener('DOMContentLoaded', () => {
-            app = new MissionControlPro();
-            console.log('🚀 NZ7DEV Mission Control Professional Edition Initialized');
-        });
     </script>
 </body>
 </html>
