@@ -136,6 +136,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1><i class="fas fa-network-wired"></i> NZ7DEV Remote Manager</h1>
                     <div>
+                        <button class="btn btn-outline-info me-2" onclick="showManualTestModal()">
+                            <i class="fas fa-vial"></i> Manual Test
+                        </button>
                         <button class="btn btn-primary" onclick="refreshMachines()">
                             <i class="fas fa-sync-alt"></i> Refresh Scan
                         </button>
@@ -348,21 +351,86 @@
         </div>
     </div>
 
+    <!-- Manual Connection Test Modal -->
+    <div class="modal fade" id="manualTestModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-vial"></i> Manual Connection Test</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Test connections</strong> to machines not showing in the scan results.
+                    </div>
+                    <form id="manualTestForm">
+                        <div class="mb-3">
+                            <label for="manualIP" class="form-label">IP Address</label>
+                            <input type="text" class="form-control" id="manualIP" placeholder="192.168.1.100" required>
+                            <div class="form-text">Enter the IP address to test</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Protocol</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="manualProtocol" id="manualRDP" value="rdp" checked>
+                                <label class="btn btn-outline-primary" for="manualRDP">
+                                    <i class="fas fa-desktop"></i> RDP
+                                </label>
+                                <input type="radio" class="btn-check" name="manualProtocol" id="manualVNC" value="vnc">
+                                <label class="btn btn-outline-warning" for="manualVNC">
+                                    <i class="fas fa-eye"></i> VNC
+                                </label>
+                                <input type="radio" class="btn-check" name="manualProtocol" id="manualSSH" value="ssh">
+                                <label class="btn btn-outline-success" for="manualSSH">
+                                    <i class="fas fa-terminal"></i> SSH
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3" id="manualResolutionGroup">
+                            <label for="manualResolution" class="form-label">Resolution (RDP Only)</label>
+                            <select class="form-select" id="manualResolution">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </form>
+                    <div id="manualTestResult" class="mt-3" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-info me-2" onclick="checkManualConnection()">
+                        <i class="fas fa-search"></i> Check Service
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="testManualConnection(event)">
+                        <i class="fas fa-play"></i> Test Connection
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let machines = [];
         let presets = {};
         let connectModal;
+        let manualTestModal;
         let currentMachineForConnect = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             connectModal = new bootstrap.Modal(document.getElementById('connectModal'));
+            manualTestModal = new bootstrap.Modal(document.getElementById('manualTestModal'));
             loadMachines();
             loadPresets();
             
             // Set up form submission
             document.getElementById('presetForm').addEventListener('submit', addPreset);
+            
+            // Set up manual test form - prevent default form submission since we handle it via button
+            document.getElementById('manualTestForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+            });
             
             // Auto-refresh machines every 30 seconds
             setInterval(loadMachines, 30000);
@@ -371,6 +439,14 @@
             document.querySelectorAll('input[name="connectionType"]').forEach(radio => {
                 radio.addEventListener('change', updateConnectionTypeUI);
             });
+            
+            // Set up manual protocol change handler
+            document.querySelectorAll('input[name="manualProtocol"]').forEach(radio => {
+                radio.addEventListener('change', updateManualResolutionUI);
+            });
+            
+            // Initialize manual resolution dropdown
+            updateManualResolutionSelect();
         });
 
         // Update UI based on connection type
@@ -421,6 +497,7 @@
                     presets = data.presets;
                     updatePresetsTable();
                     updateResolutionSelect();
+                    updateManualResolutionSelect(); // Update manual test dropdown too
                 } else {
                     console.error('Failed to load presets');
                 }
@@ -827,6 +904,206 @@
                     alertDiv.remove();
                 }
             }, 5000);
+        }
+
+        // Manual test functionality
+        // Update manual resolution UI based on protocol
+        function updateManualResolutionUI() {
+            const protocol = document.querySelector('input[name="manualProtocol"]:checked').value;
+            const resolutionGroup = document.getElementById('manualResolutionGroup');
+            
+            if (protocol === 'rdp') {
+                resolutionGroup.style.display = 'block';
+            } else {
+                resolutionGroup.style.display = 'none';
+            }
+        }
+
+        // Update manual resolution select with presets
+        function updateManualResolutionSelect() {
+            const select = document.getElementById('manualResolution');
+            select.innerHTML = '';
+            
+            Object.entries(presets).forEach(([key, preset]) => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${preset.name} (${preset.width}×${preset.height})`;
+                if (preset.description) {
+                    option.textContent += ` - ${preset.description}`;
+                }
+                select.appendChild(option);
+            });
+            
+            // Update UI for current protocol
+            updateManualResolutionUI();
+        }
+
+        // Check manual connection service availability
+        async function checkManualConnection() {
+            const ip = document.getElementById('manualIP').value.trim();
+            const protocol = document.querySelector('input[name="manualProtocol"]:checked')?.value;
+            const resultDiv = document.getElementById('manualTestResult');
+            
+            if (!ip) {
+                showAlert('warning', 'Please enter an IP address');
+                return;
+            }
+            
+            if (!protocol) {
+                showAlert('warning', 'Please select a protocol');
+                return;
+            }
+            
+            // Validate IP format
+            const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            if (!ipRegex.test(ip)) {
+                showAlert('warning', 'Please enter a valid IP address');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Checking...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Checking ${protocol.toUpperCase()} service on ${ip}...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/api/manual-check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip, protocol })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    let alertClass = result.online && result.service_available ? 'success' : 'warning';
+                    let icon = result.online && result.service_available ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+                    
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-${alertClass}">
+                            <i class="${icon}"></i>
+                            <strong>Check Result:</strong><br>
+                            ${result.message}<br>
+                            <small>
+                                <strong>Hostname:</strong> ${result.hostname || 'Unknown'}<br>
+                                <strong>Protocol:</strong> ${(result.protocol || protocol).toUpperCase()} (Port ${result.port || 'Unknown'})
+                            </small>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle"></i>
+                            <strong>Check Failed:</strong> ${result.message || 'Unknown error'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Error:</strong> ${error.message || 'Unknown error'}
+                    </div>
+                `;
+            }
+        }
+
+        // Test manual connection
+        async function testManualConnection(event) {
+            event.preventDefault();
+            
+            const ip = document.getElementById('manualIP').value.trim();
+            const protocol = document.querySelector('input[name="manualProtocol"]:checked')?.value;
+            const resolution = document.getElementById('manualResolution').value || 'full_hd';
+            const resultDiv = document.getElementById('manualTestResult');
+            
+            if (!ip) {
+                showAlert('warning', 'Please enter an IP address');
+                return;
+            }
+            
+            if (!protocol) {
+                showAlert('warning', 'Please select a protocol');
+                return;
+            }
+            
+            // Validate IP format
+            const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            if (!ipRegex.test(ip)) {
+                showAlert('warning', 'Please enter a valid IP address');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Connecting...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Testing ${protocol.toUpperCase()} connection to ${ip}...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/api/manual-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip, protocol, resolution })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Connection Test Successful!</strong><br>
+                            ${result.message}<br>
+                            <small>
+                                <strong>Connection ID:</strong> ${result.connection_id}<br>
+                                <strong>Protocol:</strong> ${result.tested_protocol.toUpperCase()}<br>
+                                <strong>IP:</strong> ${result.tested_ip}
+                                ${protocol === 'rdp' ? `<br><strong>Resolution:</strong> ${result.resolution}` : ''}
+                            </small>
+                        </div>
+                    `;
+                    
+                    // Refresh machines to show new connection
+                    loadMachines();
+                    
+                    showAlert('success', `Manual ${protocol.toUpperCase()} connection to ${ip} started successfully!`);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle"></i>
+                            <strong>Connection Test Failed:</strong><br>
+                            ${result.message}
+                        </div>
+                    `;
+                    
+                    showAlert('danger', `Failed to connect to ${ip} via ${protocol.toUpperCase()}: ${result.message}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Test Error:</strong> ${error.message}
+                    </div>
+                `;
+                
+                showAlert('danger', `Connection test error: ${error.message}`);
+            }
+        }
+
+        // Show manual test modal
+        function showManualTestModal() {
+            updateManualResolutionUI(); // Ensure correct display for manual test
+            manualTestModal.show();
         }
     </script>
 </body>

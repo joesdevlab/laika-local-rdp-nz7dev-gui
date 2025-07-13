@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 """
 NZ7DEV RDP/VNC/SSH Manager - Simplified Edition
 Basic RDP/VNC/SSH session management with machine detection and resolution presets
@@ -358,9 +358,9 @@ class ConnectionManager:
             
             logger.info(f"Connecting to {ip} via RDP with resolution {resolution}")
             
-            # Try multiple RDP connection methods
+            # Try multiple RDP connection methods with correct FreeRDP 2.11.7 syntax
             connection_methods = [
-                # Method 1: Standard connection
+                # Method 1: Standard connection with modern syntax
                 [
                     'xfreerdp',
                     f'/v:{ip}',
@@ -369,12 +369,12 @@ class ConnectionManager:
                     f'/w:{preset.width}',
                     f'/h:{preset.height}',
                     '/cert:ignore',
-                    '/compression',
-                    '/clipboard',
-                    '+auto-reconnect',
+                    '+compression',
+                    '+clipboard',
+                    '/auto-reconnect',
                     '/log-level:ERROR'
                 ],
-                # Method 2: Disable NLA
+                # Method 2: Disable NLA (Network Level Authentication)
                 [
                     'xfreerdp',
                     f'/v:{ip}',
@@ -383,27 +383,12 @@ class ConnectionManager:
                     f'/w:{preset.width}',
                     f'/h:{preset.height}',
                     '/cert:ignore',
-                    '/compression',
-                    '/clipboard',
-                    '-authentication',
-                    '/log-level:ERROR'
-                ],
-                # Method 3: Force RDP security
-                [
-                    'xfreerdp',
-                    f'/v:{ip}',
-                    f'/u:{STANDARD_USERNAME}',
-                    f'/p:{STANDARD_PASSWORD}',
-                    f'/w:{preset.width}',
-                    f'/h:{preset.height}',
-                    '/cert:ignore',
-                    '/compression',
-                    '/clipboard',
+                    '+compression',
+                    '+clipboard',
                     '/sec:rdp',
-                    '-authentication',
                     '/log-level:ERROR'
                 ],
-                # Method 4: TLS security
+                # Method 3: TLS security only
                 [
                     'xfreerdp',
                     f'/v:{ip}',
@@ -412,9 +397,22 @@ class ConnectionManager:
                     f'/w:{preset.width}',
                     f'/h:{preset.height}',
                     '/cert:ignore',
-                    '/clipboard',
+                    '+compression',
+                    '+clipboard',
                     '/sec:tls',
-                    '-authentication',
+                    '/log-level:ERROR'
+                ],
+                # Method 4: No security (for older systems)
+                [
+                    'xfreerdp',
+                    f'/v:{ip}',
+                    f'/u:{STANDARD_USERNAME}',
+                    f'/p:{STANDARD_PASSWORD}',
+                    f'/w:{preset.width}',
+                    f'/h:{preset.height}',
+                    '/cert:ignore',
+                    '+clipboard',
+                    '/sec:rdp',
                     '/log-level:ERROR'
                 ]
             ]
@@ -425,11 +423,47 @@ class ConnectionManager:
             for i, cmd in enumerate(connection_methods, 1):
                 logger.info(f"Trying RDP connection method {i} to {ip}")
                 try:
+                    # Set up proper environment for X11 GUI applications
+                    env = os.environ.copy()
+                    
+                    # Try to detect the correct DISPLAY
+                    if 'DISPLAY' not in env or not env['DISPLAY']:
+                        # Common display values to try
+                        possible_displays = [':0', ':1', ':10.0', ':0.0']
+                        for display in possible_displays:
+                            try:
+                                # Test if display is accessible
+                                test_result = subprocess.run(['xset', '-display', display, 'q'], 
+                                                           capture_output=True, timeout=2)
+                                if test_result.returncode == 0:
+                                    env['DISPLAY'] = display
+                                    logger.info(f"Using DISPLAY={display}")
+                                    break
+                            except:
+                                continue
+                        
+                        # Fallback to :0 if no display found
+                        if 'DISPLAY' not in env or not env['DISPLAY']:
+                            env['DISPLAY'] = ':0'
+                            logger.warning("No accessible display found, using fallback DISPLAY=:0")
+                    
+                    # Set XDG_RUNTIME_DIR if not set
+                    if 'XDG_RUNTIME_DIR' not in env:
+                        env['XDG_RUNTIME_DIR'] = f'/run/user/{os.getuid()}'
+                    
+                    # Set XAUTHORITY if not set
+                    if 'XAUTHORITY' not in env:
+                        user = os.getenv('USER', 'root')
+                        env['XAUTHORITY'] = f'/home/{user}/.Xauthority'
+                    
+                    logger.info(f"RDP environment: DISPLAY={env.get('DISPLAY')}, USER={env.get('USER')}")
+                    
                     process = subprocess.Popen(
                         cmd,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.PIPE,
-                        start_new_session=True
+                        start_new_session=True,
+                        env=env  # Pass the environment with X11 variables
                     )
                     
                     # Wait to see if connection succeeds
@@ -821,9 +855,118 @@ def api_edit_preset(preset_key):
 
 @app.route('/api/presets/<preset_key>', methods=['DELETE'])
 def api_delete_preset(preset_key):
-    """Delete resolution preset"""
-    success = remote_app.resolution_manager.delete_preset(preset_key)
-    return jsonify({"success": success})
+    """Delete a resolution preset"""
+    try:
+        if remote_app.resolution_manager.delete_preset(preset_key):
+            return jsonify({"success": True, "message": "Preset deleted successfully"})
+        else:
+            return jsonify({"success": False, "message": "Preset not found"}), 404
+    except Exception as e:
+        logger.error(f"Error deleting preset: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/api/manual-test', methods=['POST'])
+def api_manual_test():
+    """Test manual connection to a specific IP and protocol"""
+    try:
+        data = request.get_json()
+        ip = data.get('ip', '').strip()
+        protocol = data.get('protocol', '').lower()
+        resolution_key = data.get('resolution', 'full_hd')
+        
+        if not ip or not protocol:
+            return jsonify({"success": False, "message": "IP address and protocol are required"}), 400
+        
+        if protocol not in ['rdp', 'vnc', 'ssh']:
+            return jsonify({"success": False, "message": "Invalid protocol. Must be rdp, vnc, or ssh"}), 400
+        
+        # Validate IP format
+        try:
+            socket.inet_aton(ip)
+        except socket.error:
+            return jsonify({"success": False, "message": "Invalid IP address format"}), 400
+        
+        # Test the connection using the connection manager
+        result = remote_app.connection_manager.connect(ip, protocol, resolution_key)
+        
+        # Add some additional info for manual test
+        result['manual_test'] = True
+        result['tested_protocol'] = protocol
+        result['tested_ip'] = ip
+        
+        if result.get('success'):
+            logger.info(f"Manual test successful: {protocol.upper()} connection to {ip}")
+        else:
+            logger.warning(f"Manual test failed: {protocol.upper()} connection to {ip} - {result.get('message', 'Unknown error')}")
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Error in manual test: {e}")
+        return jsonify({"success": False, "message": f"Test failed: {str(e)}"}), 500
+
+@app.route('/api/manual-check', methods=['POST'])
+def api_manual_check():
+    """Check if a manual IP has the specified service available"""
+    try:
+        data = request.get_json()
+        ip = data.get('ip', '').strip()
+        protocol = data.get('protocol', '').lower()
+        
+        if not ip or not protocol:
+            return jsonify({"success": False, "message": "IP address and protocol are required"}), 400
+        
+        # Validate IP format
+        try:
+            socket.inet_aton(ip)
+        except socket.error:
+            return jsonify({"success": False, "message": "Invalid IP address format"}), 400
+        
+        # Check if host is reachable
+        scanner = remote_app.machine_scanner
+        is_online = scanner.ping_host(ip)
+        
+        if not is_online:
+            return jsonify({
+                "success": True,
+                "online": False,
+                "service_available": False,
+                "message": f"Host {ip} is not reachable"
+            })
+        
+        # Check the specific service
+        service_available = False
+        port = None
+        
+        if protocol == 'rdp':
+            service_available = scanner.check_rdp_port(ip)
+            port = 3389
+        elif protocol == 'vnc':
+            service_available = scanner.check_vnc_port(ip)
+            port = 5900
+        elif protocol == 'ssh':
+            service_available = scanner.check_ssh_port(ip)
+            port = 22
+        else:
+            return jsonify({"success": False, "message": "Invalid protocol"}), 400
+        
+        # Try to get hostname
+        hostname = scanner.get_hostname(ip) or "Unknown"
+        
+        return jsonify({
+            "success": True,
+            "online": is_online,
+            "service_available": service_available,
+            "hostname": hostname,
+            "protocol": protocol,
+            "port": port,
+            "message": f"Host {ip} is {'online' if is_online else 'offline'}, "
+                      f"{protocol.upper()} service is {'available' if service_available else 'not available'}"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in manual check: {e}")
+        return jsonify({"success": False, "message": f"Check failed: {str(e)}"}), 500
 
 if __name__ == '__main__':
     # Create templates directory
